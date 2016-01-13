@@ -1,6 +1,8 @@
 # Maven
 target/
 
+
+
 # PURL specific 
 doc/
 
@@ -8,3 +10,6 @@ doc/
 .classpath
 .project
 .settings
+
+# Netbeans
+nb-configuration.xml
