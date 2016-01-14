@@ -184,6 +184,8 @@ public class DatabaseManager extends Function {
         }
     }
 
+    
+    
     /**
      * Assigns default values to the settings table. Default values are as
      * follows:
@@ -219,7 +221,8 @@ public class DatabaseManager extends Function {
     }
 
     /**
-     *
+     * Updates values given by the parameter to the settings table
+     * 
      * @param prepend the prepended String to be attached to each id
      * @param prefix The string that will be at the front of every id.
      * @param tokenType Designates what characters are contained in the id's
@@ -254,7 +257,7 @@ public class DatabaseManager extends Function {
     }
 
     /**
-     * Assigns values given by the parameter to the settings table
+     * Updates values given by the parameter to the settings table
      *
      * @param prepend the prepended String to be attached to each id
      * @param prefix The string that will be at the front of every id.
