@@ -195,7 +195,7 @@ public class MinterController {
             RequestLock.unlock();
             Logger.warn("Request to update default settings finished, UNLOCKING MINTER");
         }
-        // redirect to the administration panel
+        // redirect to the administration panel located at http://[domain]/
         return "redirect:";
 
     }
@@ -235,7 +235,7 @@ public class MinterController {
             // instantiate the correct minter and calculate remaining number of permutations
             long remainingPermutations;
             Minter minter;
-            if (Settings.isAuto()) {
+            if (tempSettings.isAuto()) {
                 minter = createAutoMinter(requestedAmount, tempSettings);
                 remainingPermutations
                         = DatabaseManager.getPermutations(tempSettings.getPrefix(),
@@ -261,16 +261,16 @@ public class MinterController {
             Set<Id> idList;
             // have the minter create the ids and assign it to message
             if (tempSettings.isAuto()) {
-                if (Settings.isRandom()) {
+                if (tempSettings.isRandom()) {
 
                     idList = minter.genIdAutoRandom(requestedAmount);
-                    Logger.info("Generated IDs will use the Format: " + Settings);
+                    Logger.info("Generated IDs will use the Format: " + tempSettings);
                     Logger.info("Making autoRandom Generated IDs, Amount Requested="
                             + requestedAmount);
                 } else {
 
                     idList = minter.genIdAutoSequential(requestedAmount);
-                    Logger.info("Generated IDs will use the Format: " + Settings);
+                    Logger.info("Generated IDs will use the Format: " + tempSettings);
                     Logger.info("Making autoSequential Generated IDs, Amount Requested="
                             + requestedAmount);
                 }
@@ -278,14 +278,14 @@ public class MinterController {
                 if (tempSettings.isRandom()) {
 
                     idList = minter.genIdCustomRandom(requestedAmount);
-                    Logger.info("Generated IDs will use the Format: " + Settings);
+                    Logger.info("Generated IDs will use the Format: " + tempSettings);
                     Logger.info("Making customRandom Generated IDs, Amount Requested="
                             + requestedAmount);
 
                 } else {
 
                     idList = minter.genIdCustomSequential(requestedAmount);
-                    Logger.info("Generated IDs will use the Format: " + Settings);
+                    Logger.info("Generated IDs will use the Format: " + tempSettings);
                     Logger.info("Making customSequential Generated IDs, Amount Requested="
                             + requestedAmount);
                 }
