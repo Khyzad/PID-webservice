@@ -96,7 +96,7 @@ public class CustomMinter extends TestMinter{
     }
 
     /**
-     * 
+     * missing javadoc
      * @param amount
      * @return 
      */
@@ -120,6 +120,27 @@ public class CustomMinter extends TestMinter{
         
         return tempIdList;
 
+    }
+    
+    /**
+     * missing javadoc
+     * @return 
+     */
+    @Override
+    public long calculatePermutations(){
+        long totalPermutations = 1;
+        for (int i = 0; i < CharMap.length(); i++) {
+            if (CharMap.charAt(i) == 'd') {
+                totalPermutations *= 10;
+            } else if (CharMap.charAt(i) == 'l' || CharMap.charAt(i) == 'u') {
+                totalPermutations *= (SansVowel) ? 20 : 26;
+            } else if (CharMap.charAt(i) == 'm') {
+                totalPermutations *= (SansVowel) ? 40 : 52;
+            } else if (CharMap.charAt(i) == 'e') {
+                totalPermutations *= (SansVowel) ? 50 : 62;
+            } 
+        }
+        return totalPermutations;
     }
     
     /**

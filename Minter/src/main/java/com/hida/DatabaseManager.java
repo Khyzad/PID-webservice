@@ -70,7 +70,7 @@ public class DatabaseManager extends Function {
     /**
      * Declares a Minter object to manage
      */
-    private Minter Minter;
+    private TestMinter Minter;
 
     /**
      * Used to explicitly define the name and path of database
@@ -203,7 +203,7 @@ public class DatabaseManager extends Function {
      */
     public void createAutoMinter(String prepend, String prefix, boolean sansVowel,
             TokenType tokenType, int rootLength) throws BadParameterException {
-        Minter = new Minter(this, prepend, tokenType, rootLength, prefix, sansVowel);
+        Minter = new AutoMinter(prepend, prefix, sansVowel, tokenType, rootLength);
     }
 
     /**
@@ -217,15 +217,19 @@ public class DatabaseManager extends Function {
      */
     public void createCustomMinter(String prepend, String prefix, boolean sansVowel,
             String charMap) throws BadParameterException {
-        Minter = new Minter(this, prepend, charMap, prefix, sansVowel);
+        Minter = new CustomMinter(prepend, prefix, sansVowel, charMap);
     }
     
     public Set<Id> mint(long request){
         // calculate number of permutations
-        
-        // determine remaining number of permutations
+        if(Minter instanceof AutoMinter){
+            //this.getPermutations(Minter., TokenType.DIGIT, rootLength, isTableCreatedFlag);
+        }else{
+            
+        }                
         
         // have Minter return a set of ids and check them
+                
         
         // add the set of ids to the id table in the database
         
@@ -276,7 +280,7 @@ public class DatabaseManager extends Function {
                     long amountTaken = totalPermutations - uniqueIdCounter;
 
                     
-                    Logger.error("Total number of Permutations Exceeded: Total Permutation COunt="+totalPermutations);
+                    Logger.error("Total number of Permutations Exceeded: Total Permutation Count="+totalPermutations);
                     setAmountCreated(
                             Minter.getPrefix(), Minter.getTokenType(), Minter.isSansVowel(), Minter.getRootLength(), amountTaken);
                     throw new NotEnoughPermutationsException(uniqueIdCounter, amount);

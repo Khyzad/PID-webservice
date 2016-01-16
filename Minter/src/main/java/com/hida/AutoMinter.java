@@ -129,6 +129,34 @@ public class AutoMinter extends TestMinter {
 
         return tempIdList;
     }
+    
+    @Override
+    public long calculatePermutations(){
+        // get the base of each character
+        int base = 0;
+        switch (TokenType) {
+            case DIGIT:
+                base = 10;
+                break;
+            case LOWERCASE:
+            case UPPERCASE:
+                base = (SansVowel) ? 20 : 26;
+                break;
+            case MIXEDCASE:
+                base = (SansVowel) ? 40 : 52;
+                break;
+            case LOWER_EXTENDED:
+            case UPPER_EXTENDED:
+                base = (SansVowel) ? 30 : 36;
+                break;
+            case MIXED_EXTENDED:
+                base = (SansVowel) ? 50 : 62;
+                break;            
+        }
+
+        // raise it to the power of how ever long the rootLength is
+        return ((long) Math.pow(base, RootLength));
+    }
 
     /* getters and setters */
     public TokenType getTokenType() {

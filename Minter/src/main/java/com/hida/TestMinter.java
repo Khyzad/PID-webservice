@@ -86,6 +86,7 @@ public abstract class TestMinter {
     
     public abstract Set<Id> randomMint(long amount);
     public abstract Set<Id> sequentialMint(long amount);
+    public abstract long calculatePermutations();
     
     /**
      * missing javadoc
