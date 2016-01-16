@@ -223,6 +223,19 @@ public abstract class TestMinter {
     }
 */
         
+    public Set<Id> incrementIds(Set<Id> set, Set<Id> duplicateSet, long totalPermutations){
+        Set<Id> uniqueSet = new TreeSet<>();
+        for(Id id : set){
+            int counter = 0;
+            while((!id.isUnique() || uniqueSet.contains(id) || duplicateSet.contains(id)) ||
+                    counter <= totalPermutations){
+                id.incrementId();
+                counter++;
+            }
+            
+        }
+    }
+    
     /**
      * Continuously increments a set of ids until the set is completely filled
      * with unique ids.
@@ -282,11 +295,8 @@ public abstract class TestMinter {
             // Size methods aren't used because int is returned
             uniqueIdCounter++;
             uniqueList.add(currentId);
-        }
-        
-
+        }        
         return uniqueList;
-
     }
 
     /**

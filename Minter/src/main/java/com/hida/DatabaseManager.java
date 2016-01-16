@@ -1,5 +1,6 @@
 package com.hida;
 
+import static com.hida.TestMinter.Logger;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
@@ -10,6 +11,8 @@ import java.util.Set;
 import java.util.regex.Pattern;
 import org.sqlite.Function;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.TreeSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -232,6 +235,63 @@ public class DatabaseManager extends Function {
         return null;
     }
 
+    /**
+     * Continuously increments a set of ids until the set is completely filled
+     * with unique ids.
+     *
+     * @param set the set set of ds
+     * @param order determines whether or not the ids will be ordered
+     * @param isAuto determines whether or not the ids are AutoId or CustomId
+     * @param amount the amount of ids to be created.
+     * @return A set of unique ids
+     * @throws SQLException - thrown whenever there is an error with the
+     * database.
+     */
+    protected Set<Id> incrementIds(Set<Id> set, long totalPermutations, long amount)
+            throws SQLException, NotEnoughPermutationsException {
+        
+
+        // Used to count the number of unique ids. Size methods aren't used because int is returned
+        long uniqueIdCounter = 0;
+
+         
+        // Declares and initializes a list that holds unique values.          
+        Set<Id> uniqueList = new TreeSet<>();
+        
+
+        // iterate through every id 
+        for (Id currentId : set) {
+            // counts the number of times an id has been rejected
+            long counter = 0;
+
+            // continuously increments invalid or non-unique ids
+            while (!isValidId(currentId) || uniqueList.contains(currentId)) {
+                /* 
+                 if counter exceeds totalPermutations, then id has iterated through every 
+                 possible permutation. Related format is updated as a quick look-up reference
+                 with the number of ids that were inadvertedly been created using other formats.
+                 NotEnoughPermutationsException is thrown stating remaining number of ids.
+                 */
+                if (counter > totalPermutations) {
+                    long amountTaken = totalPermutations - uniqueIdCounter;
+
+                    
+                    Logger.error("Total number of Permutations Exceeded: Total Permutation COunt="+totalPermutations);
+                    setAmountCreated(
+                            Minter.getPrefix(), Minter.getTokenType(), Minter.isSansVowel(), Minter.getRootLength(), amountTaken);
+                    throw new NotEnoughPermutationsException(uniqueIdCounter, amount);
+                }
+                currentId.incrementId();
+                counter++;
+            }
+            // unique ids are added to list and uniqueIdCounter is incremented.
+            // Size methods aren't used because int is returned
+            uniqueIdCounter++;
+            uniqueList.add(currentId);
+        }        
+        return uniqueList;
+    }
+    
     /**
      * Assigns default values to the settings table. Default values are as
      * follows:
