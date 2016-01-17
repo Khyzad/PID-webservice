@@ -1,7 +1,7 @@
 package com.hida.util;
 
-import static com.hida.util.TestMinter.Rng;
-import static com.hida.util.TestMinter.Logger;
+import static com.hida.util.IdGenerator.Rng;
+import static com.hida.util.IdGenerator.Logger;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.TreeSet;
@@ -10,7 +10,7 @@ import java.util.TreeSet;
  *
  * @author lruffin
  */
-public class AutoMinter extends TestMinter {
+public class AutoIdGenerator extends IdGenerator {
 
     /**
      * Designates what characters are contained in the id's root. There are 7
@@ -35,7 +35,7 @@ public class AutoMinter extends TestMinter {
      */
     private int RootLength;
 
-    public AutoMinter(String prepend, String prefix, boolean sansVowel, TokenType tokenType,
+    public AutoIdGenerator(String prepend, String prefix, boolean sansVowel, TokenType tokenType,
             int rootLength) {
         super(prepend, prefix, sansVowel);
         this.TokenType = tokenType;
@@ -176,7 +176,7 @@ public class AutoMinter extends TestMinter {
     }
 
     /**
-     * Created and used by AutoMinter
+     * Created and used by AutoIdGenerator
      */
     private class AutoId extends Id {
 

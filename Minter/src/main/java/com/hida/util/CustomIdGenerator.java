@@ -1,8 +1,8 @@
 package com.hida.util;
 
-import com.hida.util.TestMinter;
-import static com.hida.util.TestMinter.Rng;
-import static com.hida.util.TestMinter.Logger;
+import com.hida.util.IdGenerator;
+import static com.hida.util.IdGenerator.Rng;
+import static com.hida.util.IdGenerator.Logger;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -12,7 +12,7 @@ import java.util.TreeSet;
  *
  * @author lruffin
  */
-public class CustomMinter extends TestMinter {
+public class CustomIdGenerator extends IdGenerator {
 
     /**
      * The mapping used to describe range of possible characters at each of the
@@ -39,7 +39,7 @@ public class CustomMinter extends TestMinter {
      * @param sansVowel
      * @param charMap
      */
-    public CustomMinter(String prepend, String prefix, boolean sansVowel, String charMap) {
+    public CustomIdGenerator(String prepend, String prefix, boolean sansVowel, String charMap) {
         super(prepend, prefix, sansVowel);
         this.CharMap = charMap;
 

@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
  * @author Brittany Cruz
  * @author lruffin
  */
-public abstract class TestMinter {
+public abstract class IdGenerator {
 
     /**
      * Creates and new random number generator to aid in the production of
@@ -38,7 +38,7 @@ public abstract class TestMinter {
     /**
      * Logger; logfile to be stored in resource folder
      */
-    protected static final Logger Logger = LoggerFactory.getLogger(TestMinter.class);               
+    protected static final Logger Logger = LoggerFactory.getLogger(IdGenerator.class);               
 
     /**
      * Contains the mappings for either tokens or the charMaps. The AutoMinter
@@ -73,7 +73,7 @@ public abstract class TestMinter {
      * @param prefix
      * @param sansVowel 
      */
-    public TestMinter(String prepend, String prefix, boolean sansVowel){
+    public IdGenerator(String prepend, String prefix, boolean sansVowel){
         this.Prepend = prepend;
         this.Prefix = prefix;
         this.SansVowel = sansVowel;

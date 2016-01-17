@@ -3,9 +3,9 @@ package com.hida.client;
 import com.hida.util.NotEnoughPermutationsException;
 import com.hida.util.TokenType;
 import com.hida.util.Id;
-import com.hida.util.CustomMinter;
-import com.hida.util.TestMinter;
-import com.hida.util.AutoMinter;
+import com.hida.util.CustomIdGenerator;
+import com.hida.util.IdGenerator;
+import com.hida.util.AutoIdGenerator;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
@@ -23,10 +23,10 @@ import org.slf4j.LoggerFactory;
  *
  * @author lruffin
  */
-public class DatabaseManager {
+public class Minter {
 
 // Logger; logfile to be stored in resource folder
-    private static final Logger Logger = LoggerFactory.getLogger(DatabaseManager.class);
+    private static final Logger Logger = LoggerFactory.getLogger(Minter.class);
 
 // names of the columns used in the tables
     private final String ID_COLUMN = "ID";
@@ -72,7 +72,7 @@ public class DatabaseManager {
     /**
      * Declares a Minter object to manage
      */
-    private TestMinter Minter;
+    private IdGenerator Minter;
 
     /**
      * Used to explicitly define the name and path of database
@@ -80,7 +80,7 @@ public class DatabaseManager {
      * @param DatabasePath path of the database
      * @param DatabaseName name of the database
      */
-    public DatabaseManager(String DatabasePath, String DatabaseName) {
+    public Minter(String DatabasePath, String DatabaseName) {
         this.DatabasePath = DatabasePath;
         this.DatabaseName = DatabaseName;
 
@@ -91,7 +91,7 @@ public class DatabaseManager {
      * Used by default, this method will create a database named PID.db wherever
      * the default location server is located.
      */
-    public DatabaseManager() {
+    public Minter() {
         this.DatabasePath = "";
         this.DatabaseName = "PID.db";
         this.DRIVER = "jdbc:sqlite:" + DatabaseName;
@@ -162,7 +162,8 @@ public class DatabaseManager {
             }
 
             if (!tableExists(SETTINGS_TABLE)) {
-                Logger.info("Creating Table: " + SETTINGS_TABLE + " with Column Name: " + ID_COLUMN);
+                Logger.info("Creating Table: " + SETTINGS_TABLE + 
+                        " with Column Name: " + ID_COLUMN);
                 String createSettingsTable = String.format("CREATE TABLE %s "
                         + "(%s TEXT, "
                         + "%s TEXT, "
@@ -204,7 +205,7 @@ public class DatabaseManager {
      */
     public void createAutoMinter(String prepend, String prefix, boolean sansVowel,
             TokenType tokenType, int rootLength) throws BadParameterException {
-        Minter = new AutoMinter(prepend, prefix, sansVowel, tokenType, rootLength);
+        Minter = new AutoIdGenerator(prepend, prefix, sansVowel, tokenType, rootLength);
     }
 
     /**
@@ -218,7 +219,7 @@ public class DatabaseManager {
      */
     public void createCustomMinter(String prepend, String prefix, boolean sansVowel,
             String charMap) throws BadParameterException {
-        Minter = new CustomMinter(prepend, prefix, sansVowel, charMap);
+        Minter = new CustomIdGenerator(prepend, prefix, sansVowel, charMap);
     }
 
     /**
@@ -237,7 +238,7 @@ public class DatabaseManager {
      * @throws SQLException
      * @throws BadParameterException
      */
-    private long getRemainingPermutations(AutoMinter minter) throws SQLException,
+    private long getRemainingPermutations(AutoIdGenerator minter) throws SQLException,
             BadParameterException {
         //Logger.info("in Permutations 1");
         // calculate the total number of possible permuations        
@@ -275,7 +276,7 @@ public class DatabaseManager {
      * @throws SQLException
      * @throws BadParameterException
      */
-    private long getRemainingPermutations(CustomMinter minter) throws SQLException,
+    private long getRemainingPermutations(CustomIdGenerator minter) throws SQLException,
             BadParameterException {
         // calculate the total number of possible permuations
         int charMapLength = minter.getCharMap().length();
@@ -332,14 +333,14 @@ public class DatabaseManager {
         long remaining;
         TokenType token;
         int rootLength;
-        if (Minter instanceof AutoMinter) {
-            remaining = getRemainingPermutations((AutoMinter) Minter);
-            token = ((AutoMinter) Minter).getTokenType();
-            rootLength = ((AutoMinter) Minter).getRootLength();
+        if (Minter instanceof AutoIdGenerator) {
+            remaining = getRemainingPermutations((AutoIdGenerator) Minter);
+            token = ((AutoIdGenerator) Minter).getTokenType();
+            rootLength = ((AutoIdGenerator) Minter).getRootLength();
         } else {
-            remaining = getRemainingPermutations((CustomMinter) Minter);
-            token = convertToToken(((CustomMinter) Minter).getCharMap());
-            rootLength = ((CustomMinter) Minter).getCharMap().length();
+            remaining = getRemainingPermutations((CustomIdGenerator) Minter);
+            token = convertToToken(((CustomIdGenerator) Minter).getCharMap());
+            rootLength = ((CustomIdGenerator) Minter).getCharMap().length();
         }
 
         // determine if its possible to create the requested amount of ids
@@ -405,7 +406,8 @@ public class DatabaseManager {
                 if (counter > totalPermutations) {
                     long amountTaken = totalPermutations - uniqueIdCounter;
 
-                    Logger.error("Total number of Permutations Exceeded: Total Permutation Count=" + totalPermutations);
+                    Logger.error("Total number of Permutations Exceeded: Total Permutation Count=" 
+                            + totalPermutations);
                     setAmountCreated(
                             Minter.getPrefix(), token, Minter.isSansVowel(), rootLength, amountTaken);
                     throw new NotEnoughPermutationsException(uniqueIdCounter, amount);
@@ -683,8 +685,8 @@ public class DatabaseManager {
     }
 
     /**
-     * For any valid DatabaseManager, a regular expression is returned that'll
-     * match that DatabaseManager's mapping.
+     * For any valid Minter, a regular expression is returned that'll
+ match that Minter's mapping.
      *
      * @param tokenType Designates what characters are contained in the id's
      * root

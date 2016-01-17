@@ -1,7 +1,7 @@
 package test.hida;
 
 import com.hida.client.BadParameterException;
-import com.hida.client.DatabaseManager;
+import com.hida.client.Minter;
 import com.hida.util.Id;
 import com.hida.Minter;
 import com.hida.util.NotEnoughPermutationsException;
@@ -40,10 +40,10 @@ public class MinterTest implements Comparator<String> {
     static String DbName = "testPID";
 
     /**
-     * Creates a new DatabaseManager completely separate from the actual
-     * service.
+     * Creates a new Minter completely separate from the actual
+ service.
      */
-    DatabaseManager DatabaseManager = new DatabaseManager("", DbName);
+    Minter DatabaseManager = new Minter("", DbName);
 
     public MinterTest() {
     }

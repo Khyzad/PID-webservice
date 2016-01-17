@@ -47,7 +47,7 @@ public class MinterController {
     /**
      * create a database to be used to create and count number of ids
      */
-    private final DatabaseManager DatabaseManager;
+    private final Minter DatabaseManager;
 
     /**
      *
@@ -85,10 +85,10 @@ public class MinterController {
                 path += "\\";
                 Logger.warn("Database Path not set correctly: adding \\");
             }
-            DatabaseManager = new DatabaseManager(path, name);
+            DatabaseManager = new Minter(path, name);
             Logger.info("Creating DataBase Manager with Path=" + path + ", Name=" + name);
         } else {
-            DatabaseManager = new DatabaseManager();
+            DatabaseManager = new Minter();
             Logger.info("Creating DatabaseManager with "
                     + "Path=" + DatabaseManager.getDatabasePath() + ", "
                     + "Name=" + DatabaseManager.getDatabaseName());
