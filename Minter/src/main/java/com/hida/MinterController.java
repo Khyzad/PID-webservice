@@ -234,7 +234,22 @@ public class MinterController {
 
             // override default settings
             CachedSettings tempSettings = overrideDefaults(parameters);
+            if(tempSettings.Auto){
+                DatabaseManager.createAutoMinter(tempSettings.getPrepend(), 
+                        tempSettings.getPrefix(), 
+                        tempSettings.isSansVowels(), 
+                        tempSettings.getTokenType(), 
+                        tempSettings.getRootLength());
+            }else{
+                DatabaseManager.createCustomMinter(tempSettings.getPrepend(),
+                        tempSettings.getPrefix(), 
+                        tempSettings.isSansVowels(), 
+                        tempSettings.getCharMap());
+            }
+            Set<Id> idList =  DatabaseManager.mint(requestedAmount, tempSettings.Random);
+            
 
+            /*
             // instantiate the correct minter and calculate remaining number of permutations
             long remainingPermutations;
             Minter minter;
@@ -293,7 +308,7 @@ public class MinterController {
                             + requestedAmount);
                 }
             }
-
+*/
             message = convertListToJson(idList, tempSettings.getPrepend());
             //Logger.info("Message from Minter: "+message);
 
