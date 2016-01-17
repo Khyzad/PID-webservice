@@ -1,6 +1,5 @@
 package com.hida;
 
-import static com.hida.TestMinter.Logger;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
@@ -11,7 +10,6 @@ import java.util.Set;
 import java.util.regex.Pattern;
 import org.sqlite.Function;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.TreeSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -219,28 +217,142 @@ public class DatabaseManager extends Function {
             String charMap) throws BadParameterException {
         Minter = new CustomMinter(prepend, prefix, sansVowel, charMap);
     }
-    
-    public Set<Id> mint(long request){
+
+    /**
+     *
+     * @param minter
+     * @return
+     * @throws SQLException
+     * @throws BadParameterException
+     */
+    private long getRemainingPermutations(AutoMinter minter, long total) throws SQLException,
+            BadParameterException {
+        //Logger.info("in Permutations 1");
+        // calculate the total number of possible permuations        
+        long totalPermutations = getTotalPermutations(minter.getTokenType(),
+                minter.getRootLength(), minter.isSansVowel());
+        long amountCreated = getAmountCreated(minter.getPrefix(), minter.getTokenType(),
+                minter.isSansVowel(), minter.getRootLength());
+
+        // format wasn't found
+        if (amountCreated == -1) {
+            Logger.warn("Format Doesn't Exist");
+            this.createFormat(minter.getPrefix(), minter.getTokenType(), minter.isSansVowel(),
+                    minter.getRootLength());
+            return totalPermutations;
+        } else {
+            // format was found
+            Logger.info("format Exists");
+            return totalPermutations - amountCreated;
+        }
+    }
+
+    /**
+     *
+     * @param minter
+     * @return
+     * @throws SQLException
+     * @throws BadParameterException
+     */
+    private long getRemainingPermutations(CustomMinter minter, long total) throws SQLException,
+            BadParameterException {
+        // calculate the total number of possible permuations
+        int charMapLength = minter.getCharMap().length();
+        TokenType token = convertToToken(minter.getCharMap());
+        long totalPermutations = this.getTotalPermutations(minter.getCharMap(),
+                minter.isSansVowel());
+        long amountCreated = getAmountCreated(minter.getPrefix(), token,
+                minter.isSansVowel(), charMapLength);
+
+        // format wasn't found
+        if (amountCreated == -1) {
+            Logger.warn("Format Doesn;t Exist");
+            this.createFormat(minter.getPrefix(), token, minter.isSansVowel(), charMapLength);
+            return totalPermutations;
+        } else {
+            // format was found
+            Logger.info("format exists");
+            return totalPermutations - amountCreated;
+        }
+    }
+
+    /**
+     * missing javadoc
+     *
+     * @param total
+     * @param amountCreated
+     * @return
+     */
+    private boolean isValidRequest(long remaining, long amount) {
+        // throw an error if its impossible to generate ids 
+        if (remaining < amount) {
+            Logger.error("Not enough remaining Permutations, "
+                    + "Requested Amount=" + amount + " --> "
+                    + "Amount Remaining=" + remaining);
+            throw new NotEnoughPermutationsException(remaining, amount);
+
+        }
+        return remaining < amount;
+    }
+
+    /**
+     * missing javadoc
+     *
+     * @param amount
+     * @param isRandom
+     * @return
+     * @throws SQLException
+     * @throws BadParameterException
+     */
+    public Set<Id> mint(long amount, boolean isRandom) throws SQLException, BadParameterException {
         // calculate total number of permutations
         long total = Minter.calculatePermutations();
-        
+
         // determine remaining amount of permutations
-        
-        // have Minter return a set of ids and check them        
-        
-        // add the set of ids to the id table in the database
-        
-        // add the formats used to format table in the database
-        
+        long remaining;
+        TokenType token;
+        int rootLength;
+        if (Minter instanceof AutoMinter) {
+            remaining = getRemainingPermutations((AutoMinter) Minter, total);
+            token = ((AutoMinter) Minter).getTokenType();
+            rootLength = ((AutoMinter) Minter).getRootLength();
+        } else {
+            remaining = getRemainingPermutations((CustomMinter) Minter, total);
+            token = convertToToken(((CustomMinter) Minter).getCharMap());
+            rootLength = ((CustomMinter) Minter).getCharMap().length();
+        }
+
+        // determine if its possible to create the requested amount of ids
+        if (isValidRequest(remaining, amount)) {
+            Logger.error("Not enough remaining Permutations, "
+                    + "Requested Amount=" + amount + " --> "
+                    + "Amount Remaining=" + remaining);
+            throw new NotEnoughPermutationsException(remaining, amount);
+        }
+
+        // have Minter return a set of ids and check them   
+        Set<Id> set;
+        if (isRandom) {
+            set = Minter.randomMint(amount);
+        } else {
+            set = Minter.sequentialMint(amount);
+        }
+
+        // check ids and increment them appropriately
+        set = incrementIds(set, total, amount, token, rootLength);
+
+        // add the set of ids to the id table in the database and their formats
+        addIdList(set, amount, Minter.getPrefix(), token, Minter.isSansVowel(), rootLength);
+
         // return the set of ids
-        return null;
+        return set;
     }
 
     /**
      * Continuously increments a set of ids until the set is completely filled
      * with unique ids.
      *
-     * @param set the set set of ds
+     * @param set the set of ids
      * @param order determines whether or not the ids will be ordered
      * @param isAuto determines whether or not the ids are AutoId or CustomId
      * @param amount the amount of ids to be created.
@@ -248,17 +360,14 @@ public class DatabaseManager extends Function {
      * @throws SQLException - thrown whenever there is an error with the
      * database.
      */
-    protected Set<Id> incrementIds(Set<Id> set, long totalPermutations, long amount)
-            throws SQLException, NotEnoughPermutationsException {
-        
-
+    private Set<Id> incrementIds(Set<Id> set, long totalPermutations, long amount,
+            TokenType token, int rootLength)
+            throws SQLException, NotEnoughPermutationsException, BadParameterException {
         // Used to count the number of unique ids. Size methods aren't used because int is returned
         long uniqueIdCounter = 0;
 
-         
         // Declares and initializes a list that holds unique values.          
         Set<Id> uniqueList = new TreeSet<>();
-        
 
         // iterate through every id 
         for (Id currentId : set) {
@@ -276,10 +385,9 @@ public class DatabaseManager extends Function {
                 if (counter > totalPermutations) {
                     long amountTaken = totalPermutations - uniqueIdCounter;
 
-                    
-                    Logger.error("Total number of Permutations Exceeded: Total Permutation Count="+totalPermutations);
+                    Logger.error("Total number of Permutations Exceeded: Total Permutation Count=" + totalPermutations);
                     setAmountCreated(
-                            Minter.getPrefix(), Minter.getTokenType(), Minter.isSansVowel(), Minter.getRootLength(), amountTaken);
+                            Minter.getPrefix(), token, Minter.isSansVowel(), rootLength, amountTaken);
                     throw new NotEnoughPermutationsException(uniqueIdCounter, amount);
                 }
                 currentId.incrementId();
@@ -289,10 +397,50 @@ public class DatabaseManager extends Function {
             // Size methods aren't used because int is returned
             uniqueIdCounter++;
             uniqueList.add(currentId);
-        }        
+        }
         return uniqueList;
     }
-    
+
+    /**
+     * This method returns an equivalent token for any given charMap
+     *
+     * @param charMap The mapping used to describe range of possible characters
+     * at each of the id's root's digits
+     * @return the token equivalent to the charMap
+     * @throws BadParameterException thrown whenever a malformed or invalid
+     * parameter is passed
+     */
+    private TokenType convertToToken(String charMap) throws BadParameterException {
+
+        // true if charMap only contains character 'd'
+        if (charMap.matches("^[d]+$")) {
+            return TokenType.DIGIT;
+        } // true if charMap only contains character 'l'.
+        else if (charMap.matches("^[l]+$")) {
+            return TokenType.LOWERCASE;
+        } // true if charMap only contains character 'u'
+        else if (charMap.matches("^[u]+$")) {
+            return TokenType.UPPERCASE;
+        } // true if charMap only contains character groups 'lu' or 'm'
+        else if (charMap.matches("(^(?=[lum]*l)(?=[lum]*u)[lum]*$)" + "|"
+                + "(^(?=[lum]*m)[lum]*$)")) {
+            return TokenType.MIXEDCASE;
+        } // true if charMap only contains characters 'dl'
+        else if (charMap.matches("(^(?=[dl]*l)(?=[ld]*d)[dl]*$)")) {
+            return TokenType.LOWER_EXTENDED;
+        } // true if charMap only contains characters 'du'
+        else if (charMap.matches("(^(?=[du]*u)(?=[du]*d)[du]*$)")) {
+            return TokenType.UPPER_EXTENDED;
+        } // true if charMap at least contains character groups 'dlu' or 'md' or 'e' respectively
+        else if (charMap.matches("(^(?=[dlume]*d)(?=[dlume]*l)(?=[dlume]*u)[dlume]*$)" + "|"
+                + "(^(?=[dlume]*m)(?=[dlume]*d)[dlume]*$)" + "|"
+                + "(^(?=[dlume]*e)[dlume]*$)")) {
+            return TokenType.MIXED_EXTENDED;
+        } else {
+            throw new BadParameterException(charMap, "detected in getToken method");
+        }
+    }
+
     /**
      * Assigns default values to the settings table. Default values are as
      * follows:
@@ -449,7 +597,8 @@ public class DatabaseManager extends Function {
                 valueQuery += String.format(", ('%s')", id);
             }
 
-            /* 500 is used because, to my knowledge, the max number of values that 
+            /* 
+             500 is used because, to my knowledge, the max number of values that 
              can be inserted at once is 500. The condition is also met whenever the
              id is the last id in the list.            
              */
@@ -835,11 +984,9 @@ public class DatabaseManager extends Function {
             return totalPermutations;
         } else {
             // format was found
-
             Logger.info("format Exists");
             return totalPermutations - amountCreated;
         }
-
     }
 
     /**
@@ -878,12 +1025,11 @@ public class DatabaseManager extends Function {
         // format wasn't found
         if (amountCreated == -1) {
 
-            Logger.warn("Format Doesn;t Exist");
+            Logger.warn("Format Doesn't Exist");
             this.createFormat(prefix, tokenType, sansVowel, charMap.length());
             return totalPermutations;
         } else {
             // format was found
-
             Logger.info("format exists");
             return totalPermutations - amountCreated;
         }
@@ -1013,43 +1159,7 @@ public class DatabaseManager extends Function {
         Logger.info("DB Connection Closed");
         DatabaseConnection.close();
     }
-
-    /**
-     * Checks to see if the database already has a minted and format tables
-     * created. This method is used to prevent constant checking on whether or
-     * not the database was created along with a table on every request.
-     *
-     * @param c connection to the database
-     * @return true if table exists in database, false otherwise
-     * @throws SQLException thrown whenever there is an error with the database
-     */
-    private boolean isDbSetup() throws SQLException {
-
-        if (!isTableCreatedFlag) {
-            DatabaseMetaData metaData = DatabaseConnection.getMetaData();
-            ResultSet idTableExists = metaData.getTables(null, null, ID_TABLE, null);
-            ResultSet formatTableExists = metaData.getTables(null, null, FORMAT_TABLE, null);
-
-            if (!(idTableExists.next() && formatTableExists.next())) {
-                idTableExists.close();
-                formatTableExists.close();
-                Logger.info("Database has not been Setup");
-
-                return false;
-            }
-
-            // set the flag to prevent database being called for table existence every request
-            idTableExists.close();
-            formatTableExists.close();
-            Logger.info("Database has been configured");
-
-            isTableCreatedFlag = true;
-        }
-        // raise the flag to prevent constant requerying
-        return isTableCreatedFlag;
-
-    }
-
+    
     /**
      * Checks to see if the database for the existence of a particular table. If
      * the database returns a null value then the given tableName does not exist
@@ -1154,5 +1264,4 @@ public class DatabaseManager extends Function {
     public String getDatabaseName() {
         return DatabaseName;
     }
-
 }

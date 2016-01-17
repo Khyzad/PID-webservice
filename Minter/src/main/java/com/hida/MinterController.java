@@ -247,68 +247,7 @@ public class MinterController {
                         tempSettings.getCharMap());
             }
             Set<Id> idList =  DatabaseManager.mint(requestedAmount, tempSettings.Random);
-            
-
-            /*
-            // instantiate the correct minter and calculate remaining number of permutations
-            long remainingPermutations;
-            Minter minter;
-            if (tempSettings.isAuto()) {
-                minter = createAutoMinter(requestedAmount, tempSettings);
-                remainingPermutations
-                        = DatabaseManager.getPermutations(tempSettings.getPrefix(),
-                                tempSettings.getTokenType(),
-                                tempSettings.getRootLength(),
-                                tempSettings.isSansVowels());
-            } else {
-                minter = createCustomMinter(requestedAmount, tempSettings);
-                remainingPermutations
-                        = DatabaseManager.getPermutations(tempSettings.getPrefix(),
-                                tempSettings.isSansVowels(),
-                                tempSettings.getCharMap(),
-                                minter.getTokenType());
-            }
-
-            // throw an exception if the requested amount of ids can't be generated
-            if (remainingPermutations < requestedAmount) {
-                Logger.error("Not enough remaining Permutations, "
-                        + "Requested Amount=" + requestedAmount + " --> "
-                        + "Amount Remaining=" + remainingPermutations);
-                throw new NotEnoughPermutationsException(remainingPermutations, requestedAmount);
-            }
-            Set<Id> idList;
-            // have the minter create the ids and assign it to message
-            if (tempSettings.isAuto()) {
-                if (tempSettings.isRandom()) {
-
-                    idList = minter.genIdAutoRandom(requestedAmount);
-                    Logger.info("Generated IDs will use the Format: " + tempSettings);
-                    Logger.info("Making autoRandom Generated IDs, Amount Requested="
-                            + requestedAmount);
-                } else {
-
-                    idList = minter.genIdAutoSequential(requestedAmount);
-                    Logger.info("Generated IDs will use the Format: " + tempSettings);
-                    Logger.info("Making autoSequential Generated IDs, Amount Requested="
-                            + requestedAmount);
-                }
-            } else {
-                if (tempSettings.isRandom()) {
-
-                    idList = minter.genIdCustomRandom(requestedAmount);
-                    Logger.info("Generated IDs will use the Format: " + tempSettings);
-                    Logger.info("Making customRandom Generated IDs, Amount Requested="
-                            + requestedAmount);
-
-                } else {
-
-                    idList = minter.genIdCustomSequential(requestedAmount);
-                    Logger.info("Generated IDs will use the Format: " + tempSettings);
-                    Logger.info("Making customSequential Generated IDs, Amount Requested="
-                            + requestedAmount);
-                }
-            }
-*/
+                       
             message = convertListToJson(idList, tempSettings.getPrepend());
             //Logger.info("Message from Minter: "+message);
 

@@ -130,6 +130,10 @@ public class AutoMinter extends TestMinter {
         return tempIdList;
     }
     
+    /**
+     * missing javadoc
+     * @return 
+     */
     @Override
     public long calculatePermutations(){
         // get the base of each character
