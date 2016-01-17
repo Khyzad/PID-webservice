@@ -1,11 +1,11 @@
 package test.hida;
 
-import com.hida.BadParameterException;
-import com.hida.DatabaseManager;
-import com.hida.Id;
+import com.hida.client.BadParameterException;
+import com.hida.client.DatabaseManager;
+import com.hida.util.Id;
 import com.hida.Minter;
-import com.hida.NotEnoughPermutationsException;
-import com.hida.TokenType;
+import com.hida.util.NotEnoughPermutationsException;
+import com.hida.util.TokenType;
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;

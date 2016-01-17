@@ -1,4 +1,4 @@
-package com.hida;
+package com.hida.client;
 
 /**
  * An exception that was created to display what parameter was incorrect and the value

@@ -1,12 +1,8 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-package com.hida;
+package com.hida.util;
 
-import static com.hida.TestMinter.Rng;
-import static com.hida.TestMinter.Logger;
+import com.hida.util.TestMinter;
+import static com.hida.util.TestMinter.Rng;
+import static com.hida.util.TestMinter.Logger;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.Set;

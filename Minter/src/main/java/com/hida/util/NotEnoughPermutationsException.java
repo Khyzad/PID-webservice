@@ -1,4 +1,4 @@
-package com.hida;
+package com.hida.util;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

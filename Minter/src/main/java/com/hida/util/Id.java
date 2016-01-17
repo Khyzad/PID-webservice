@@ -1,4 +1,4 @@
-package com.hida;
+package com.hida.util;
 
 import java.util.Arrays;
 import org.slf4j.Logger;

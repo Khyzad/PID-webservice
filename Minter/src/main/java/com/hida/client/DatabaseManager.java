@@ -1,5 +1,11 @@
-package com.hida;
+package com.hida.client;
 
+import com.hida.util.NotEnoughPermutationsException;
+import com.hida.util.TokenType;
+import com.hida.util.Id;
+import com.hida.util.CustomMinter;
+import com.hida.util.TestMinter;
+import com.hida.util.AutoMinter;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
@@ -7,7 +13,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Set;
-import org.sqlite.Function;
 import java.util.Iterator;
 import java.util.TreeSet;
 import org.slf4j.Logger;

@@ -1,4 +1,4 @@
-package com.hida;
+package com.hida.util;
 
 import java.security.SecureRandom;
 import java.util.HashMap;

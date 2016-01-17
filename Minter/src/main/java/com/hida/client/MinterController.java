@@ -1,13 +1,14 @@
-package com.hida;
+package com.hida.client;
 
+import com.hida.util.NotEnoughPermutationsException;
+import com.hida.util.TokenType;
+import com.hida.util.Id;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.net.URISyntaxException;
 import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.Map;
@@ -17,7 +18,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.util.concurrent.locks.ReentrantLock;
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.codehaus.jackson.map.ObjectMapper;

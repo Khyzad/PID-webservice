@@ -1,11 +1,9 @@
-package com.hida;
-
-
+package com.hida.util;
 
 /**
  * An Enum created to hold define the tokens used by the Minter class. Enums 
  * are inherently serializable and, as such, do not need to implement Serializable.
- * All Enums will have the have a serialVersionUID of 0L and will therefore not
+ * All Enums will have a serialVersionUID of 0L and will therefore not
  * need to be specified. 
  * @author lruffin
  */
