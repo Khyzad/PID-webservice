@@ -15,6 +15,11 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.util.concurrent.locks.ReentrantLock;
+import javax.json.Json;
+import javax.json.JsonArray;
+import javax.json.JsonArrayBuilder;
+import javax.json.JsonBuilderFactory;
+import javax.json.JsonObjectBuilder;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -390,7 +395,7 @@ public class MinterController {
             tempSetting.Auto = convertBoolean(parameters.get("auto"), "auto");
         }
         if (parameters.containsKey("random")) {
-            tempSetting.Random = convertBoolean(parameters.get("random"),"random");
+            tempSetting.Random = convertBoolean(parameters.get("random"), "random");
         }
         if (parameters.containsKey("sansVowels")) {
             tempSetting.SansVowels = convertBoolean(parameters.get("sansVowels"), "sansVowels");
@@ -426,24 +431,26 @@ public class MinterController {
             throw new BadParameterException(requestedAmount, "Requested Amount");
         }
     }
-    
+
     /**
-     * This method is used to check to see whether or not the given parameter is explicitly
-     * equivalent to "true" or "false" and returns them respectively. The method
-     * provided by the Boolean wrapper class converts all Strings that do no explictly
-     * contain true to false. 
+     * This method is used to check to see whether or not the given parameter is
+     * explicitly equivalent to "true" or "false" and returns them respectively.
+     * The method provided by the Boolean wrapper class converts all Strings
+     * that do no explictly contain true to false.
+     *
      * @param parameter the given string to convert.
      * @param parameterType the type of the parameter.
-     * @throws BadParameterException Thrown whenever a malformed parameter is formed or passed
-     * @return the equivalent version of true or false. 
+     * @throws BadParameterException Thrown whenever a malformed parameter is
+     * formed or passed
+     * @return the equivalent version of true or false.
      */
-    private boolean convertBoolean(String parameter, String parameterType) 
-            throws BadParameterException{
-        if(parameter.equals("true")){
+    private boolean convertBoolean(String parameter, String parameterType)
+            throws BadParameterException {
+        if (parameter.equals("true")) {
             return true;
-        }else if(parameter.equals("false")){
+        } else if (parameter.equals("false")) {
             return false;
-        }else{
+        } else {
             throw new BadParameterException(parameter, parameterType);
         }
     }
@@ -520,36 +527,42 @@ public class MinterController {
     }
 
     /**
-     * Creates a Json object based off a list of ids given in the parameter
+     * Creates a Json object based off a set of ids given in the parameter
      *
-     * @param list A list of ids to display into JSON
+     * @param set A set of ids to display into JSON
      * @param prepend A value to attach to the beginning of every id. Typically
      * used to determine the format of the id. For example, ARK or DOI.
-     * @return A reference to a String that contains Json list of ids
+     * @return A reference to a String that contains Json set of ids
      * @throws IOException thrown whenever a file could not be found
      */
-    public String convertListToJson(Set<Id> list, String prepend) throws IOException {
-        // Jackson objects to create formatted Json string
-        String jsonString = "";
+    public String convertListToJson(Set<Id> set, String prepend) throws IOException {
+
+        // Jackson objects to format JSON strings
+        String jsonString;
         ObjectMapper mapper = new ObjectMapper();
         Object formattedJson;
-
-        // Object used to iterate through list of ids
-        Iterator<Id> iterator = list.iterator();
-        for (int i = 0; iterator.hasNext(); i++) {
-
-            // Creates desired JSON format and adds the prepended string to be displayed
-            String id = String.format("{\"id\":%d,\"name\":\"%s%s\"}",
-                    i, prepend, iterator.next());
-
-            formattedJson = mapper.readValue(id, Object.class);
-
-            // append formatted json
-            jsonString += mapper.writerWithDefaultPrettyPrinter().
-                    writeValueAsString(formattedJson) + "\n";
+        
+        // Javax objects to create JSON strings
+        JsonBuilderFactory factory = Json.createBuilderFactory(null);
+        JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
+        JsonArray jsonArray;
+        
+        // convert the set of ids into a json array
+        int counter = 0;
+        for (Id id : set) {
+            arrayBuilder.add(factory.createObjectBuilder()
+                    .add("id", counter)
+                    .add("name", id.toString()));
+            counter++;
         }
+        jsonArray = arrayBuilder.build();
 
-        return jsonString;
+        // format json array
+        formattedJson = mapper.readValue(jsonArray.toString(), Object.class);
+        jsonString = mapper.writerWithDefaultPrettyPrinter().
+                writeValueAsString(formattedJson);
+        
+        return jsonString;       
     }
 
     /**
