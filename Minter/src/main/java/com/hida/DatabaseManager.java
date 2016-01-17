@@ -7,7 +7,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Set;
-import java.util.regex.Pattern;
 import org.sqlite.Function;
 import java.util.Iterator;
 import java.util.TreeSet;
@@ -19,7 +18,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author lruffin
  */
-public class DatabaseManager extends Function {
+public class DatabaseManager {
 
 // Logger; logfile to be stored in resource folder
     private static final Logger Logger = LoggerFactory.getLogger(DatabaseManager.class);
@@ -113,8 +112,7 @@ public class DatabaseManager extends Function {
         DatabaseConnection = DriverManager.getConnection(DRIVER);
         //Logger.info("Database Connection Created Using: org.sqlite.JDBC");
         // allow the database connection to use regular expressions
-        Function.create(DatabaseConnection, "REGEXP", new DatabaseManager());
-
+        
         if (this.isTableCreatedFlag) {
             return true;
         } else {
@@ -219,18 +217,26 @@ public class DatabaseManager extends Function {
     }
 
     /**
+     * Used by AutoMinters to determine the number of permutations are
+     * available.
      *
+     * Each id will be matched against a CachedFormat, specified by this
+     * method's parameter. If a matching CachedFormat does not exist, then a
+     * CachedFormat will be created for it and the database will be searched to
+     * see how many other ids exist in the similar formats.
+     *
+     * Once a format exists the database will calculate the remaining number of
+     * permutations that can be created using the given parameters
      * @param minter
      * @return
      * @throws SQLException
      * @throws BadParameterException
      */
-    private long getRemainingPermutations(AutoMinter minter, long total) throws SQLException,
+    private long getRemainingPermutations(AutoMinter minter) throws SQLException,
             BadParameterException {
         //Logger.info("in Permutations 1");
         // calculate the total number of possible permuations        
-        long totalPermutations = getTotalPermutations(minter.getTokenType(),
-                minter.getRootLength(), minter.isSansVowel());
+        long totalPermutations = minter.calculatePermutations();
         long amountCreated = getAmountCreated(minter.getPrefix(), minter.getTokenType(),
                 minter.isSansVowel(), minter.getRootLength());
 
@@ -248,19 +254,28 @@ public class DatabaseManager extends Function {
     }
 
     /**
+     * Used by CustomMinters to determine the number of permutations are
+     * available.
      *
+     * Each id will be matched against a CachedFormat, specified by this
+     * method's parameter. If a matching CachedFormat does not exist, then a
+     * CachedFormat will be created for it and the database will be searched to
+     * see how many other ids exist in the similar formats.
+     *
+     * Once a format exists the database will calculate the remaining number of
+     * permutations that can be created using the given parameters
+     * 
      * @param minter
      * @return
      * @throws SQLException
      * @throws BadParameterException
      */
-    private long getRemainingPermutations(CustomMinter minter, long total) throws SQLException,
+    private long getRemainingPermutations(CustomMinter minter) throws SQLException,
             BadParameterException {
         // calculate the total number of possible permuations
         int charMapLength = minter.getCharMap().length();
         TokenType token = convertToToken(minter.getCharMap());
-        long totalPermutations = this.getTotalPermutations(minter.getCharMap(),
-                minter.isSansVowel());
+        long totalPermutations = minter.calculatePermutations();
         long amountCreated = getAmountCreated(minter.getPrefix(), token,
                 minter.isSansVowel(), charMapLength);
 
@@ -313,11 +328,11 @@ public class DatabaseManager extends Function {
         TokenType token;
         int rootLength;
         if (Minter instanceof AutoMinter) {
-            remaining = getRemainingPermutations((AutoMinter) Minter, total);
+            remaining = getRemainingPermutations((AutoMinter) Minter);
             token = ((AutoMinter) Minter).getTokenType();
             rootLength = ((AutoMinter) Minter).getRootLength();
         } else {
-            remaining = getRemainingPermutations((CustomMinter) Minter, total);
+            remaining = getRemainingPermutations((CustomMinter) Minter);
             token = convertToToken(((CustomMinter) Minter).getCharMap());
             rootLength = ((CustomMinter) Minter).getCharMap().length();
         }
@@ -502,9 +517,7 @@ public class DatabaseManager extends Function {
                 autoFlag, randomFlag, vowelFlag);
 
         databaseStatement.executeUpdate(sqlQuery);
-
         databaseStatement.close();
-
     }
 
     /**
@@ -696,83 +709,7 @@ public class DatabaseManager extends Function {
         }
 
     }
-
-    /**
-     * Gets the total number of permutations using the given parameters.
-     * Primarily used by AutoMinters
-     *
-     * @param tokenType Designates what characters are contained in the id's
-     * root.
-     * @param rootLength Designates the length of the id's root.
-     * @param sansVowel Designates whether or not the id's root contains vowels.
-     * @return the number of total possible permutations.
-     * @throws BadParameterException thrown whenever a malformed or invalid
-     * parameter is passed
-     */
-    public long getTotalPermutations(TokenType tokenType, int rootLength, boolean sansVowel)
-            throws BadParameterException {
-
-        // get the base of each character
-        int base;
-        switch (tokenType) {
-            case DIGIT:
-                base = 10;
-                break;
-            case LOWERCASE:
-            case UPPERCASE:
-                base = (sansVowel) ? 20 : 26;
-                break;
-            case MIXEDCASE:
-                base = (sansVowel) ? 40 : 52;
-                break;
-            case LOWER_EXTENDED:
-            case UPPER_EXTENDED:
-                base = (sansVowel) ? 30 : 36;
-                break;
-            case MIXED_EXTENDED:
-                base = (sansVowel) ? 50 : 62;
-                break;
-            default:
-                throw new BadParameterException(tokenType, "Token Type");
-        }
-
-        // raise it to the power of how ever long the rootLength is
-        return ((long) Math.pow(base, rootLength));
-    }
-
-    /**
-     * Gets the total number of permutations using the given parameters.
-     * Primarily used by CustomMinters
-     *
-     * @param charMap The mapping used to describe range of possible characters
-     * at each of the id's root's digits.
-     * @param sansVowel Designates whether or not the id's root contains vowels.
-     * @return the number of total possible permutations
-     * @throws BadParameterException thrown whenever a malformed or invalid
-     * parameter is passed
-     */
-    public long getTotalPermutations(String charMap, boolean sansVowel)
-            throws BadParameterException {
-
-        long totalPermutations = 1;
-        for (int i = 0; i < charMap.length(); i++) {
-            if (charMap.charAt(i) == 'd') {
-                totalPermutations *= 10;
-            } else if (charMap.charAt(i) == 'l' || charMap.charAt(i) == 'u') {
-                totalPermutations *= (sansVowel) ? 20 : 26;
-            } else if (charMap.charAt(i) == 'm') {
-                totalPermutations *= (sansVowel) ? 40 : 52;
-            } else if (charMap.charAt(i) == 'e') {
-                totalPermutations *= (sansVowel) ? 50 : 62;
-            } else {
-                Logger.error("Error in Total permutations");
-                throw new BadParameterException(charMap,
-                        "Char Map");
-            }
-        }
-        return totalPermutations;
-    }
-
+    
     /**
      * Creates a format using the given parameters. The format will be stored in
      * the FORMAT table of the database. The amount created column of the format
@@ -942,98 +879,7 @@ public class DatabaseManager extends Function {
         result.close();
         databaseStatement.close();
         return value;
-    }
-
-    /**
-     * Used by AutoMinters to determine the number of permutations are
-     * available.
-     *
-     * Each id will be matched against a CachedFormat, specified by this
-     * method's parameter. If a matching CachedFormat does not exist, then a
-     * CachedFormat will be created for it and the database will be searched to
-     * see how many other ids exist in the similar formats.
-     *
-     * Once a format exists the database will calculate the remaining number of
-     * permutations that can be created using the given parameters
-     *
-     * @param prefix The string that will be at the front of every id
-     * @param tokenType Designates what characters are contained in the id's
-     * root
-     * @param rootLength Designates the length of the id's root
-     * @param sansVowel Designates whether or not the id's root contains vowels.
-     * @return the number of possible permutations that can be added to the
-     * database with the given parameters
-     * @throws SQLException thrown whenever there is an error with the database
-     * @throws BadParameterException thrown whenever a malformed or invalid
-     * parameter is passed
-     */
-    public long getPermutations(String prefix, TokenType tokenType, int rootLength,
-            boolean sansVowel)
-            throws SQLException, BadParameterException {
-
-        //Logger.info("in Permutations 1");
-        // calculate the total number of possible permuations        
-        long totalPermutations = getTotalPermutations(tokenType, rootLength, sansVowel);
-        long amountCreated = getAmountCreated(prefix, tokenType, sansVowel, rootLength);
-
-        // format wasn't found
-        if (amountCreated == -1) {
-
-            Logger.warn("Format Doesn't Exist");
-            this.createFormat(prefix, tokenType, sansVowel, rootLength);
-            return totalPermutations;
-        } else {
-            // format was found
-            Logger.info("format Exists");
-            return totalPermutations - amountCreated;
-        }
-    }
-
-    /**
-     * Used by CustomMinters to determine the number of permutations are
-     * available.
-     *
-     * Each id will be matched against a CachedFormat, specified by this
-     * method's parameter. If a matching CachedFormat does not exist, then a
-     * CachedFormat will be created for it and the database will be searched to
-     * see how many other ids exist in the similar formats.
-     *
-     * Once a format exists the database will calculate the remaining number of
-     * permutations that can be created using the given parameters
-     *
-     * @param prefix The string that will be at the front of every id
-     * @param sansVowel Designates whether or not the id's root contains vowels.
-     * If the root does not contain vowels, the sansVowel is true; false
-     * otherwise.
-     * @param charMap The mapping used to describe range of possible characters
-     * at each of the id's root's digits
-     * @param tokenType Designates what characters are contained in the id's
-     * root
-     * @return the number of possible permutations that can be added to the
-     * database with the given parameters
-     * @throws SQLException thrown whenever there is an error with the database
-     * @throws BadParameterException thrown whenever a malformed or invalid
-     * parameter is passed
-     */
-    public long getPermutations(String prefix, boolean sansVowel, String charMap,
-            TokenType tokenType) throws SQLException, BadParameterException {
-
-        // calculate the total number of possible permuations        
-        long totalPermutations = this.getTotalPermutations(charMap, sansVowel);
-        long amountCreated = getAmountCreated(prefix, tokenType, sansVowel, charMap.length());
-
-        // format wasn't found
-        if (amountCreated == -1) {
-
-            Logger.warn("Format Doesn't Exist");
-            this.createFormat(prefix, tokenType, sansVowel, charMap.length());
-            return totalPermutations;
-        } else {
-            // format was found
-            Logger.info("format exists");
-            return totalPermutations - amountCreated;
-        }
-    }
+    }       
 
     /**
      * Refers to retrieveRegex method to build regular expressions to match each
@@ -1094,7 +940,6 @@ public class DatabaseManager extends Function {
             System.out.println("id " + i + ")" + ") " + curr);
             //Logger.info("Generated ID: "+i+" "+curr);
         }
-
         //Logger.info("Done with Print");
     }
 
@@ -1165,6 +1010,7 @@ public class DatabaseManager extends Function {
      * the database returns a null value then the given tableName does not exist
      * within the database.
      *
+     * @param tableName
      * @return true if table exists in database, false otherwise
      * @throws SQLException thrown whenever there is an error with the database
      */
@@ -1185,25 +1031,7 @@ public class DatabaseManager extends Function {
         databaseResponse.close();
         return flag;
     }
-
-    /**
-     * Creates a method to allow a database connection to use regular
-     * expressions.
-     *
-     * @throws SQLException thrown whenever there is an error with the database
-     */
-    @Override
-    protected void xFunc() throws SQLException {
-        String expression = value_text(0);
-        String value = value_text(1);
-        if (value == null) {
-            value = "";
-        }
-
-        Pattern pattern = Pattern.compile(expression);
-        result(pattern.matcher(value).find() ? 1 : 0);
-    }
-
+    
     /* typical getters and setters */
     public String getPREFIX_COLUMN() {
         return PREFIX_COLUMN;

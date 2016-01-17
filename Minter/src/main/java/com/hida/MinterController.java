@@ -60,7 +60,11 @@ public class MinterController {
      * a database called PID.db will be made at the default location specified
      * by the server.
      *
+     * 
      * @throws IOException Thrown if the property file was not found.
+     * @throws SQLException
+     * @throws BadParameterException
+     * @throws ClassNotFoundException
      */
     public MinterController() throws IOException, SQLException, BadParameterException, ClassNotFoundException {
 
@@ -234,20 +238,20 @@ public class MinterController {
 
             // override default settings
             CachedSettings tempSettings = overrideDefaults(parameters);
-            if(tempSettings.Auto){
-                DatabaseManager.createAutoMinter(tempSettings.getPrepend(), 
-                        tempSettings.getPrefix(), 
-                        tempSettings.isSansVowels(), 
-                        tempSettings.getTokenType(), 
+            if (tempSettings.Auto) {
+                DatabaseManager.createAutoMinter(tempSettings.getPrepend(),
+                        tempSettings.getPrefix(),
+                        tempSettings.isSansVowels(),
+                        tempSettings.getTokenType(),
                         tempSettings.getRootLength());
-            }else{
+            } else {
                 DatabaseManager.createCustomMinter(tempSettings.getPrepend(),
-                        tempSettings.getPrefix(), 
-                        tempSettings.isSansVowels(), 
+                        tempSettings.getPrefix(),
+                        tempSettings.isSansVowels(),
                         tempSettings.getCharMap());
             }
-            Set<Id> idList =  DatabaseManager.mint(requestedAmount, tempSettings.Random);
-                       
+            Set<Id> idList = DatabaseManager.mint(requestedAmount, tempSettings.Random);
+
             message = convertListToJson(idList, tempSettings.getPrepend());
             //Logger.info("Message from Minter: "+message);
 
@@ -290,34 +294,6 @@ public class MinterController {
     }
 
     /**
-     * Because the minter construction checks the parameters for validity, this
-     * method not only instantiates an AutoMinter but also checks whether or not
-     * the requested amount of ids is valid.
-     *
-     * @param tempSettings The parameters of the minter given by the rest end
-     * point and default values.
-     * @param requestedAmount The amount of ids requested.
-     * @return an AutoMinter
-     * @throws BadParameterException thrown whenever a malformed or invalid
-     * parameter is passed
-     */
-    private Minter createAutoMinter(long requestedAmount, CachedSettings tempSettings)
-            throws BadParameterException {
-        Minter minter = new Minter(DatabaseManager,
-                tempSettings.getPrepend(),
-                tempSettings.getTokenType(),
-                tempSettings.getRootLength(),
-                tempSettings.getPrefix(),
-                tempSettings.isSansVowels());
-
-        if (minter.isValidAmount(requestedAmount)) {
-            return minter;
-        } else {
-            throw new BadParameterException(requestedAmount, "Requested Amount");
-        }
-    }
-
-    /**
      * Overrides the default value of cached value with values given in the
      * parameter. If the parameters do not contain any of the valid parameters,
      * the default values are maintained.
@@ -347,7 +323,7 @@ public class MinterController {
             tempSetting.Auto = convertBoolean(parameters.get("auto"), "auto");
         }
         if (parameters.containsKey("random")) {
-            tempSetting.Random = convertBoolean(parameters.get("random"),"random");
+            tempSetting.Random = convertBoolean(parameters.get("random"), "random");
         }
         if (parameters.containsKey("sansVowels")) {
             tempSetting.SansVowels = convertBoolean(parameters.get("sansVowels"), "sansVowels");
@@ -357,50 +333,24 @@ public class MinterController {
     }
 
     /**
-     * Because the minter construction checks the parameters for validity, this
-     * method not only instantiates a CustomMinter but also checks whether or
-     * not the requested amount of ids is valid.
+     * This method is used to check to see whether or not the given parameter is
+     * explicitly equivalent to "true" or "false" and returns them respectively.
+     * The method provided by the Boolean wrapper class converts all Strings
+     * that do no explictly contain true to false.
      *
-     * @param tempSettings The parameters of the minter given by the rest end
-     * point and default values.
-     * @param requestedAmount The amount of ids requested.
-     * @return a CustomMinter
-     * @throws BadParameterException thrown whenever a malformed or invalid
-     * parameter is passed
-     */
-    private Minter createCustomMinter(long requestedAmount, CachedSettings tempSettings)
-            throws BadParameterException {
-        Minter minter = new Minter(DatabaseManager,
-                tempSettings.getPrepend(),
-                tempSettings.getCharMap(),
-                tempSettings.getPrefix(),
-                tempSettings.isSansVowels());
-
-        if (minter.isValidAmount(requestedAmount)) {
-            return minter;
-        } else {
-            Logger.error("Request amount of " + requestedAmount + " IDs is unavailable");
-            throw new BadParameterException(requestedAmount, "Requested Amount");
-        }
-    }
-    
-    /**
-     * This method is used to check to see whether or not the given parameter is explicitly
-     * equivalent to "true" or "false" and returns them respectively. The method
-     * provided by the Boolean wrapper class converts all Strings that do no explictly
-     * contain true to false. 
      * @param parameter the given string to convert.
      * @param parameterType the type of the parameter.
-     * @throws BadParameterException Thrown whenever a malformed parameter is formed or passed
-     * @return the equivalent version of true or false. 
+     * @throws BadParameterException Thrown whenever a malformed parameter is
+     * formed or passed
+     * @return the equivalent version of true or false.
      */
-    private boolean convertBoolean(String parameter, String parameterType) 
-            throws BadParameterException{
-        if(parameter.equals("true")){
+    private boolean convertBoolean(String parameter, String parameterType)
+            throws BadParameterException {
+        if (parameter.equals("true")) {
             return true;
-        }else if(parameter.equals("false")){
+        } else if (parameter.equals("false")) {
             return false;
-        }else{
+        } else {
             throw new BadParameterException(parameter, parameterType);
         }
     }
@@ -468,15 +418,6 @@ public class MinterController {
     }
 
     /**
-     * Gets the current length of the queue of RequestLock
-     *
-     * @return length of the queue
-     */
-    public int getRequestLockQueueLength() {
-        return this.RequestLock.getQueueLength();
-    }
-
-    /**
      * Creates a Json object based off a list of ids given in the parameter
      *
      * @param list A list of ids to display into JSON
@@ -505,7 +446,6 @@ public class MinterController {
             jsonString += mapper.writerWithDefaultPrettyPrinter().
                     writeValueAsString(formattedJson) + "\n";
         }
-
         return jsonString;
     }
 

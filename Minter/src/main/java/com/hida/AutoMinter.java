@@ -45,16 +45,16 @@ public class AutoMinter extends TestMinter {
         super(prepend, prefix, sansVowel);
         this.TokenType = tokenType;
         this.RootLength = rootLength;
-        
+
         // assign base map the appropriate values
         this.BaseMap.put(TokenType.DIGIT, DIGIT_TOKEN);
         if (sansVowel) {
             this.BaseMap.put(TokenType.LOWERCASE, SANS_VOWEL_TOKEN);
             this.BaseMap.put(TokenType.UPPERCASE, SANS_VOWEL_TOKEN.toUpperCase());
-            this.BaseMap.put(TokenType.MIXEDCASE, 
+            this.BaseMap.put(TokenType.MIXEDCASE,
                     SANS_VOWEL_TOKEN + SANS_VOWEL_TOKEN.toUpperCase());
             this.BaseMap.put(TokenType.LOWER_EXTENDED, DIGIT_TOKEN + SANS_VOWEL_TOKEN);
-            this.BaseMap.put(TokenType.UPPER_EXTENDED, 
+            this.BaseMap.put(TokenType.UPPER_EXTENDED,
                     DIGIT_TOKEN + SANS_VOWEL_TOKEN.toUpperCase());
             this.BaseMap.put(TokenType.MIXED_EXTENDED,
                     DIGIT_TOKEN + SANS_VOWEL_TOKEN + SANS_VOWEL_TOKEN.toUpperCase());
@@ -67,7 +67,7 @@ public class AutoMinter extends TestMinter {
             this.BaseMap.put(TokenType.MIXED_EXTENDED,
                     DIGIT_TOKEN + VOWEL_TOKEN + VOWEL_TOKEN.toUpperCase());
         }
-        Logger.info("BaseMap values set to: "+BaseMap);
+        Logger.info("BaseMap values set to: " + BaseMap);
     }
 
     /**
@@ -129,13 +129,14 @@ public class AutoMinter extends TestMinter {
 
         return tempIdList;
     }
-    
+
     /**
      * missing javadoc
-     * @return 
+     *
+     * @return
      */
     @Override
-    public long calculatePermutations(){
+    public long calculatePermutations() {
         // get the base of each character
         int base = 0;
         switch (TokenType) {
@@ -155,7 +156,7 @@ public class AutoMinter extends TestMinter {
                 break;
             case MIXED_EXTENDED:
                 base = (SansVowel) ? 50 : 62;
-                break;            
+                break;
         }
 
         // raise it to the power of how ever long the rootLength is
@@ -170,7 +171,7 @@ public class AutoMinter extends TestMinter {
     public void setTokenType(TokenType TokenType) {
         this.TokenType = TokenType;
     }
-    
+
     public int getRootLength() {
         return RootLength;
     }
@@ -178,7 +179,7 @@ public class AutoMinter extends TestMinter {
     public void setRootLength(int RootLength) {
         this.RootLength = RootLength;
     }
-    
+
     /**
      * Created and used by AutoMinter
      */
@@ -196,6 +197,11 @@ public class AutoMinter extends TestMinter {
             this.TokenMap = tokenMap;
         }
 
+        /**
+         * missing javadoc
+         *
+         * @return
+         */
         @Override
         public boolean incrementId() {
             int range = this.getBaseMap().length - 1;
@@ -216,6 +222,11 @@ public class AutoMinter extends TestMinter {
             return !overflow;
         }
 
+        /**
+         * missing javadoc
+         *
+         * @return
+         */
         @Override
         public String getRootName() {
             String charId = "";

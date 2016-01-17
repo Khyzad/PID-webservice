@@ -16,7 +16,8 @@ import java.util.TreeSet;
  *
  * @author lruffin
  */
-public class CustomMinter extends TestMinter{
+public class CustomMinter extends TestMinter {
+
     /**
      * The mapping used to describe range of possible characters at each of the
      * id's root's digits. There are total of 5 different ranges that a charMap
@@ -33,18 +34,19 @@ public class CustomMinter extends TestMinter{
      *
      */
     private String CharMap;
-    
+
     /**
      * missing javadoc
+     *
      * @param prepend
      * @param prefix
      * @param sansVowel
-     * @param charMap 
+     * @param charMap
      */
-    public CustomMinter(String prepend, String prefix, boolean sansVowel, String charMap){
+    public CustomMinter(String prepend, String prefix, boolean sansVowel, String charMap) {
         super(prepend, prefix, sansVowel);
         this.CharMap = charMap;
-        
+
         // assign base map the appropriate values
         if (sansVowel) {
             this.BaseMap.put("d", DIGIT_TOKEN);
@@ -59,19 +61,19 @@ public class CustomMinter extends TestMinter{
             this.BaseMap.put("m", VOWEL_TOKEN + VOWEL_TOKEN.toUpperCase());
             this.BaseMap.put("e", DIGIT_TOKEN + VOWEL_TOKEN + VOWEL_TOKEN.toUpperCase());
         }
-        Logger.info("BaseMap values set to: "+BaseMap);
+        Logger.info("BaseMap values set to: " + BaseMap);
     }
-    
-    
+
     /**
      * missing javadoc
+     *
      * @param amount
-     * @return 
+     * @return
      */
     @Override
-    public Set<Id> sequentialMint(long amount){
+    public Set<Id> sequentialMint(long amount) {
         //Logger.info("in genIdCustomSequential: " + amount);
-        
+
         // checks to see if its possible to produce or add requested amount of
         // ids to database
         String[] tokenMapArray = getBaseCharMapping();
@@ -80,30 +82,31 @@ public class CustomMinter extends TestMinter{
 
         int[] previousIdBaseMap = new int[CharMap.length()];
         CustomId firstId = new CustomId(Prefix, previousIdBaseMap, tokenMapArray);
-        Logger.info("Custom Sequential ID Generated: "+firstId);
+        Logger.info("Custom Sequential ID Generated: " + firstId);
         tempIdList.add(firstId);
 
         for (int i = 0; i < amount - 1; i++) {
             CustomId currentId = new CustomId(firstId);
-            Logger.info("Custom Sequential ID Generated: "+currentId);
+            Logger.info("Custom Sequential ID Generated: " + currentId);
             currentId.incrementId();
             tempIdList.add(currentId);
             firstId = new CustomId(currentId);
         }
-        
+
         return tempIdList;
-        
+
     }
 
     /**
      * missing javadoc
+     *
      * @param amount
-     * @return 
+     * @return
      */
     @Override
     public Set<Id> randomMint(long amount) {
         String[] tokenMapArray = getBaseCharMapping();
-              
+
         Set<Id> tempIdList = new LinkedHashSet((int) amount);
 
         for (int i = 0; i < amount; i++) {
@@ -112,22 +115,23 @@ public class CustomMinter extends TestMinter{
                 tempIdBaseMap[j] = Rng.nextInt(tokenMapArray[j].length());
             }
             Id currentId = new CustomId(Prefix, tempIdBaseMap, tokenMapArray);
-            Logger.info("Generated Custom Random ID: "+currentId);
+            Logger.info("Generated Custom Random ID: " + currentId);
             while (!tempIdList.add(currentId)) {
                 currentId.incrementId();
             }
         }
-        
+
         return tempIdList;
 
     }
-    
+
     /**
      * missing javadoc
-     * @return 
+     *
+     * @return
      */
     @Override
-    public long calculatePermutations(){
+    public long calculatePermutations() {
         long totalPermutations = 1;
         for (int i = 0; i < CharMap.length(); i++) {
             if (CharMap.charAt(i) == 'd') {
@@ -138,11 +142,11 @@ public class CustomMinter extends TestMinter{
                 totalPermutations *= (SansVowel) ? 40 : 52;
             } else if (CharMap.charAt(i) == 'e') {
                 totalPermutations *= (SansVowel) ? 50 : 62;
-            } 
+            }
         }
         return totalPermutations;
     }
-    
+
     /**
      * Creates an array that stores a range of characters that designates a
      * sequence of possible characters at that specific location.
@@ -158,7 +162,7 @@ public class CustomMinter extends TestMinter{
         }
         return baseTokenMapArray;
     }
-    
+
     /* getters and setters */
     public String getCharMap() {
         return CharMap;
@@ -167,8 +171,7 @@ public class CustomMinter extends TestMinter{
     public void setCharMap(String CharMap) {
         this.CharMap = CharMap;
     }
-    
-    
+
     /**
      * Created and used by CustomMinters
      */
@@ -186,6 +189,11 @@ public class CustomMinter extends TestMinter{
             this.TokenMapArray = Arrays.copyOf(tokenMapArray, tokenMapArray.length);
         }
 
+        /**
+         * Created and used by CustomMinters
+         *
+         * @return
+         */
         @Override
         public boolean incrementId() {
             int range = this.getBaseMap().length - 1;
@@ -248,5 +256,4 @@ public class CustomMinter extends TestMinter{
             this.TokenMapArray = TokenMapArray;
         }
     }
-    
 }
