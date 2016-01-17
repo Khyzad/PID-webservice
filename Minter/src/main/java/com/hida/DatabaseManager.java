@@ -221,15 +221,12 @@ public class DatabaseManager extends Function {
     }
     
     public Set<Id> mint(long request){
-        // calculate number of permutations
-        if(Minter instanceof AutoMinter){
-            //this.getPermutations(Minter., TokenType.DIGIT, rootLength, isTableCreatedFlag);
-        }else{
-            
-        }                
+        // calculate total number of permutations
+        long total = Minter.calculatePermutations();
         
-        // have Minter return a set of ids and check them
-                
+        // determine remaining amount of permutations
+        
+        // have Minter return a set of ids and check them        
         
         // add the set of ids to the id table in the database
         
