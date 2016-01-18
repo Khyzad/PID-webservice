@@ -70,9 +70,9 @@ public class Minter {
     private final String DatabaseName;
 
     /**
-     * Declares a Minter object to manage
+     * Declares a Generator object to manage
      */
-    private IdGenerator Minter;
+    private IdGenerator Generator;
 
     /**
      * Used to explicitly define the name and path of database
@@ -195,31 +195,29 @@ public class Minter {
 
     /**
      * missing javadoc
-     *
-     * @param prepend
+     *          
      * @param prefix
      * @param sansVowel
      * @param tokenType
      * @param rootLength
      * @throws BadParameterException
      */
-    public void createAutoMinter(String prepend, String prefix, boolean sansVowel,
+    public void createAutoMinter(String prefix, boolean sansVowel,
             TokenType tokenType, int rootLength) throws BadParameterException {
-        Minter = new AutoIdGenerator(prefix, sansVowel, tokenType, rootLength);
+        Generator = new AutoIdGenerator(prefix, sansVowel, tokenType, rootLength);
     }
 
     /**
      * missing javadoc
-     *
-     * @param prepend
+     *     
      * @param prefix
      * @param sansVowel
      * @param charMap
      * @throws BadParameterException
      */
-    public void createCustomMinter(String prepend, String prefix, boolean sansVowel,
+    public void createCustomMinter(String prefix, boolean sansVowel,
             String charMap) throws BadParameterException {
-        Minter = new CustomIdGenerator(prefix, sansVowel, charMap);
+        Generator = new CustomIdGenerator(prefix, sansVowel, charMap);
     }
 
     /**
@@ -327,20 +325,20 @@ public class Minter {
      */
     public Set<Id> mint(long amount, boolean isRandom) throws SQLException, BadParameterException {
         // calculate total number of permutations
-        long total = Minter.calculatePermutations();
+        long total = Generator.calculatePermutations();
 
         // determine remaining amount of permutations
         long remaining;
         TokenType token;
         int rootLength;
-        if (Minter instanceof AutoIdGenerator) {
-            remaining = getRemainingPermutations((AutoIdGenerator) Minter);
-            token = ((AutoIdGenerator) Minter).getTokenType();
-            rootLength = ((AutoIdGenerator) Minter).getRootLength();
+        if (Generator instanceof AutoIdGenerator) {
+            remaining = getRemainingPermutations((AutoIdGenerator) Generator);
+            token = ((AutoIdGenerator) Generator).getTokenType();
+            rootLength = ((AutoIdGenerator) Generator).getRootLength();
         } else {
-            remaining = getRemainingPermutations((CustomIdGenerator) Minter);
-            token = convertToToken(((CustomIdGenerator) Minter).getCharMap());
-            rootLength = ((CustomIdGenerator) Minter).getCharMap().length();
+            remaining = getRemainingPermutations((CustomIdGenerator) Generator);
+            token = convertToToken(((CustomIdGenerator) Generator).getCharMap());
+            rootLength = ((CustomIdGenerator) Generator).getCharMap().length();
         }
 
         // determine if its possible to create the requested amount of ids
@@ -351,19 +349,19 @@ public class Minter {
             throw new NotEnoughPermutationsException(remaining, amount);
         }
 
-        // have Minter return a set of ids and check them   
+        // have Generator return a set of ids and check them   
         Set<Id> set;
         if (isRandom) {
-            set = Minter.randomMint(amount);
+            set = Generator.randomMint(amount);
         } else {
-            set = Minter.sequentialMint(amount);
+            set = Generator.sequentialMint(amount);
         }
 
         // check ids and increment them appropriately
         set = rollIdSet(set, total, amount, token, rootLength);
 
         // add the set of ids to the id table in the database and their formats
-        addIdList(set, amount, Minter.getPrefix(), token, Minter.isSansVowel(), rootLength);
+        addIdList(set, amount, Generator.getPrefix(), token, Generator.isSansVowel(), rootLength);
 
         // return the set of ids
         return set;
@@ -408,8 +406,8 @@ public class Minter {
 
                     Logger.error("Total number of Permutations Exceeded: Total Permutation Count=" 
                             + totalPermutations);
-                    setAmountCreated(
-                            Minter.getPrefix(), token, Minter.isSansVowel(), rootLength, amountTaken);
+                    setAmountCreated(Generator.getPrefix(), token, Generator.isSansVowel(), 
+                            rootLength, amountTaken);
                     throw new NotEnoughPermutationsException(uniqueIdCounter, amount);
                 }
                 currentId.incrementId();
@@ -685,8 +683,8 @@ public class Minter {
     }
 
     /**
-     * For any valid Minter, a regular expression is returned that'll
- match that Minter's mapping.
+     * For any valid Generator, a regular expression is returned that'll
+ match that Generator's mapping.
      *
      * @param tokenType Designates what characters are contained in the id's
      * root

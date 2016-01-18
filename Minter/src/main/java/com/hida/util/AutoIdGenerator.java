@@ -36,16 +36,14 @@ public class AutoIdGenerator extends IdGenerator {
     private int RootLength;
 
     /**
-     * 
-     * @param prepend
+     * missing javadoc
      * @param prefix
      * @param sansVowel
      * @param tokenType
      * @param rootLength 
      */
-    public AutoIdGenerator(String prepend, String prefix, boolean sansVowel, TokenType tokenType,
-            int rootLength) {
-        super(prepend, prefix, sansVowel);
+    public AutoIdGenerator(String prefix, boolean sansVowel, TokenType tokenType, int rootLength) {
+        super(prefix, sansVowel);
         this.TokenType = tokenType;
         this.RootLength = rootLength;
 
@@ -112,25 +110,30 @@ public class AutoIdGenerator extends IdGenerator {
         //Logger.info("in genIdAutoSequential: " + amount);        
 
         // checks to see if its possible to produce or add requested amount of
-        // ids to database
+        long total = calculatePermutations();
+        if(total < amount){
+            throw new NotEnoughPermutationsException();
+        }
+        
+        // generate ids
         String tokenMap = BaseMap.get(TokenType);
 
-        Set<Id> tempIdList = new TreeSet();
+        Set<Id> idSet = new TreeSet();
 
         int[] previousIdBaseMap = new int[RootLength];
         AutoId firstId = new AutoId(Prefix, previousIdBaseMap, tokenMap);
         Logger.info("Generated Auto Sequential ID: " + firstId);
-        tempIdList.add(firstId);
+        idSet.add(firstId);
 
         for (int i = 0; i < amount - 1; i++) {
             AutoId currentId = new AutoId(firstId);
             Logger.info("Generated Auto Sequential ID: " + currentId);
             currentId.incrementId();
-            tempIdList.add(currentId);
+            idSet.add(currentId);
             firstId = new AutoId(currentId);
         }
 
-        return tempIdList;
+        return idSet;
     }
 
     /**

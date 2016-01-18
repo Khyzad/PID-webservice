@@ -33,12 +33,12 @@ public abstract class IdGenerator {
     /**
      * Contains the range of the English alphabet with vowels and y.
      */
-    protected final static String VOWEL_TOKEN = "abcdefghijklmnopqrstuvwxyz";       
-    
+    protected final static String VOWEL_TOKEN = "abcdefghijklmnopqrstuvwxyz";
+
     /**
      * Logger; logfile to be stored in resource folder
      */
-    protected static final Logger Logger = LoggerFactory.getLogger(IdGenerator.class);               
+    protected static final Logger Logger = LoggerFactory.getLogger(IdGenerator.class);
 
     /**
      * Contains the mappings for either tokens or the charMaps. The AutoMinter
@@ -49,14 +49,6 @@ public abstract class IdGenerator {
     protected final HashMap<Object, String> BaseMap = new HashMap<>();
 
     /**
-     * This value is not added to the database, however this will be displayed.
-     * The value is usually used to determine the type of format, if requested,
-     * of the id.
-     */
-    protected String Prepend;
-
-    
-    /**
      * The string that will be at the front of every id
      */
     protected String Prefix;
@@ -66,41 +58,24 @@ public abstract class IdGenerator {
      * being included in each id.
      */
     protected boolean SansVowel;
-    
+
     /**
      * missing javadoc
-     * @param prepend
+     *
      * @param prefix
-     * @param sansVowel 
+     * @param sansVowel
      */
-    public IdGenerator(String prepend, String prefix, boolean sansVowel){
-        this.Prepend = prepend;
+    public IdGenerator(String prefix, boolean sansVowel) {
         this.Prefix = prefix;
         this.SansVowel = sansVowel;
     }
-    
+
     public abstract Set<Id> randomMint(long amount);
+
     public abstract Set<Id> sequentialMint(long amount);
-    public abstract long calculatePermutations();
-    
-    /**
-     * missing javadoc
-     * @param set
-     * @return 
-     */
-    public Set<Id> randomizeIdSet(Set<Id> set){
-        return set;
-    }
-    
-    /**
-     * missing javadoc
-     * @param set
-     * @return 
-     */
-    public Set<Id> incrementIdSet(Set<Id> set){
-        return set;
-    }                            
-                       
+
+    public abstract long calculatePermutations();   
+
     /**
      * Checks whether or not the prefix is valid.
      *
@@ -131,7 +106,7 @@ public abstract class IdGenerator {
     public final boolean isValidRootLength(long rootLength) {
         return rootLength >= 0 && rootLength <= 10;
     }
-    
+
     /**
      * Checks whether or not the given charMap is valid for this minter.
      *
@@ -144,15 +119,7 @@ public abstract class IdGenerator {
         return charMap.matches("^[dlume]*$");
     }
 
-    /* typical getter and setter methods */    
-    public String getPrepend() {
-        return Prepend;
-    }
-
-    public void setPrepend(String Prepend) {
-        this.Prepend = Prepend;
-    }
-    
+    /* typical getter and setter methods */
     public String getPrefix() {
         return Prefix;
     }
@@ -167,5 +134,5 @@ public abstract class IdGenerator {
 
     public void setSansVowel(boolean SansVowel) {
         this.SansVowel = SansVowel;
-    }          
+    }
 }

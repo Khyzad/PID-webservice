@@ -33,8 +33,7 @@ public class CustomIdGenerator extends IdGenerator {
 
     /**
      * missing javadoc
-     *
-     * @param prepend
+     *     
      * @param prefix
      * @param sansVowel
      * @param charMap
@@ -74,22 +73,22 @@ public class CustomIdGenerator extends IdGenerator {
         // ids to database
         String[] tokenMapArray = getBaseCharMapping();
 
-        Set<Id> tempIdList = new TreeSet();
+        Set<Id> idSet = new TreeSet();
 
         int[] previousIdBaseMap = new int[CharMap.length()];
         CustomId firstId = new CustomId(Prefix, previousIdBaseMap, tokenMapArray);
         Logger.info("Custom Sequential ID Generated: " + firstId);
-        tempIdList.add(firstId);
+        idSet.add(firstId);
 
         for (int i = 0; i < amount - 1; i++) {
             CustomId currentId = new CustomId(firstId);
             Logger.info("Custom Sequential ID Generated: " + currentId);
             currentId.incrementId();
-            tempIdList.add(currentId);
+            idSet.add(currentId);
             firstId = new CustomId(currentId);
         }
 
-        return tempIdList;
+        return idSet;
 
     }
 
