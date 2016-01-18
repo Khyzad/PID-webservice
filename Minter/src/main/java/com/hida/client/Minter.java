@@ -205,7 +205,7 @@ public class Minter {
      */
     public void createAutoMinter(String prepend, String prefix, boolean sansVowel,
             TokenType tokenType, int rootLength) throws BadParameterException {
-        Minter = new AutoIdGenerator(prepend, prefix, sansVowel, tokenType, rootLength);
+        Minter = new AutoIdGenerator(prefix, sansVowel, tokenType, rootLength);
     }
 
     /**
@@ -219,7 +219,7 @@ public class Minter {
      */
     public void createCustomMinter(String prepend, String prefix, boolean sansVowel,
             String charMap) throws BadParameterException {
-        Minter = new CustomIdGenerator(prepend, prefix, sansVowel, charMap);
+        Minter = new CustomIdGenerator(prefix, sansVowel, charMap);
     }
 
     /**

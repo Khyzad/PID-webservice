@@ -39,8 +39,8 @@ public class CustomIdGenerator extends IdGenerator {
      * @param sansVowel
      * @param charMap
      */
-    public CustomIdGenerator(String prepend, String prefix, boolean sansVowel, String charMap) {
-        super(prepend, prefix, sansVowel);
+    public CustomIdGenerator(String prefix, boolean sansVowel, String charMap) {
+        super(prefix, sansVowel);
         this.CharMap = charMap;
 
         // assign base map the appropriate values

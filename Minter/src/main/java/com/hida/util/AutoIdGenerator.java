@@ -35,6 +35,14 @@ public class AutoIdGenerator extends IdGenerator {
      */
     private int RootLength;
 
+    /**
+     * 
+     * @param prepend
+     * @param prefix
+     * @param sansVowel
+     * @param tokenType
+     * @param rootLength 
+     */
     public AutoIdGenerator(String prepend, String prefix, boolean sansVowel, TokenType tokenType,
             int rootLength) {
         super(prepend, prefix, sansVowel);
