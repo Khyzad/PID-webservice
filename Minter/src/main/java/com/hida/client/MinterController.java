@@ -239,14 +239,12 @@ public class MinterController {
             // override default settings
             CachedSettings tempSettings = overrideDefaults(parameters);
             if (tempSettings.Auto) {
-                DatabaseManager.createAutoMinter(tempSettings.getPrepend(),
-                        tempSettings.getPrefix(),
+                DatabaseManager.createAutoMinter(tempSettings.getPrefix(),
                         tempSettings.isSansVowels(),
                         tempSettings.getTokenType(),
                         tempSettings.getRootLength());
             } else {
-                DatabaseManager.createCustomMinter(tempSettings.getPrepend(),
-                        tempSettings.getPrefix(),
+                DatabaseManager.createCustomMinter(tempSettings.getPrefix(),
                         tempSettings.isSansVowels(),
                         tempSettings.getCharMap());
             }
