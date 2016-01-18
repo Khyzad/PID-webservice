@@ -360,7 +360,7 @@ public class Minter {
         }
 
         // check ids and increment them appropriately
-        set = incrementIds(set, total, amount, token, rootLength);
+        set = rollIdSet(set, total, amount, token, rootLength);
 
         // add the set of ids to the id table in the database and their formats
         addIdList(set, amount, Minter.getPrefix(), token, Minter.isSansVowel(), rootLength);
@@ -381,7 +381,7 @@ public class Minter {
      * @throws SQLException - thrown whenever there is an error with the
      * database.
      */
-    private Set<Id> incrementIds(Set<Id> set, long totalPermutations, long amount,
+    private Set<Id> rollIdSet(Set<Id> set, long totalPermutations, long amount,
             TokenType token, int rootLength)
             throws SQLException, NotEnoughPermutationsException, BadParameterException {
         // Used to count the number of unique ids. Size methods aren't used because int is returned
