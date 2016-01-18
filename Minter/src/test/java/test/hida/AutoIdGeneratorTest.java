@@ -53,20 +53,20 @@ public class AutoIdGeneratorTest implements Comparator<String> {
     @DataProvider(name = "sansVowel")
     public Object[][] sansVowelParameters() {
         return new Object[][]{
-            {"", true, TokenType.DIGIT, 4},
-            {"", true, TokenType.LOWERCASE, 4},
-            {"", true, TokenType.UPPERCASE, 4},
-            {"", true, TokenType.MIXEDCASE, 4},
-            {"", true, TokenType.LOWER_EXTENDED, 4},
-            {"", true, TokenType.UPPER_EXTENDED, 4},
-            {"", true, TokenType.MIXED_EXTENDED, 4},
-            {"", false, TokenType.DIGIT, 4},
-            {"", false, TokenType.LOWERCASE, 4},
-            {"", false, TokenType.UPPERCASE, 4},
-            {"", false, TokenType.MIXEDCASE, 4},
-            {"", false, TokenType.LOWER_EXTENDED, 4},
-            {"", false, TokenType.UPPER_EXTENDED, 4},
-            {"", false, TokenType.MIXED_EXTENDED, 4}
+            {"", true, TokenType.DIGIT, 4, 1000},
+            {"", true, TokenType.LOWERCASE, 4, 1000},
+            {"", true, TokenType.UPPERCASE, 4, 1000},
+            {"", true, TokenType.MIXEDCASE, 4, 1000},
+            {"", true, TokenType.LOWER_EXTENDED, 4, 1000},
+            {"", true, TokenType.UPPER_EXTENDED, 4, 1000},
+            {"", true, TokenType.MIXED_EXTENDED, 4, 1000},
+            {"", false, TokenType.DIGIT, 4, 1000},
+            {"", false, TokenType.LOWERCASE, 4, 1000},
+            {"", false, TokenType.UPPERCASE, 4, 1000},
+            {"", false, TokenType.MIXEDCASE, 4, 1000},
+            {"", false, TokenType.LOWER_EXTENDED, 4, 1000},
+            {"", false, TokenType.UPPER_EXTENDED, 4, 1000},
+            {"", false, TokenType.MIXED_EXTENDED, 4, 1000}
         };
     }
 
@@ -78,13 +78,13 @@ public class AutoIdGeneratorTest implements Comparator<String> {
     @DataProvider(name = "prefix")
     public Object[][] prefixParameters() {
         return new Object[][]{
-            {"", false, TokenType.DIGIT, 4},
-            {"!@*(", false, TokenType.DIGIT, 4},
-            {"www", false, TokenType.DIGIT, 4},
-            {"123", false, TokenType.DIGIT, 4},
-            {"123abc", false, TokenType.DIGIT, 4},
-            {"!a1", false, TokenType.DIGIT, 4},
-            {" ", false, TokenType.DIGIT, 4}
+            {"", false, TokenType.DIGIT, 4, 1000},
+            {"!@*(", false, TokenType.DIGIT, 4, 1000},
+            {"www", false, TokenType.DIGIT, 4, 1000},
+            {"123", false, TokenType.DIGIT, 4, 1000},
+            {"123abc", false, TokenType.DIGIT, 4, 1000},
+            {"!a1", false, TokenType.DIGIT, 4, 1000},
+            {" ", false, TokenType.DIGIT, 4, 1000}
         };
     }
 
@@ -97,7 +97,7 @@ public class AutoIdGeneratorTest implements Comparator<String> {
     public Object[][] rootLengthParameters() {
         Object[][] parameter = new Object[5][];
         for (int i = 1; i <= 5; i++) {
-            Object[] array = {"", false, TokenType.DIGIT, i};
+            Object[] array = {"", false, TokenType.DIGIT, i, 1000};
             parameter[i - 1] = array;
         }
         return parameter;
@@ -110,12 +110,14 @@ public class AutoIdGeneratorTest implements Comparator<String> {
      * @param sansVowel
      * @param tokenType
      * @param rootLength
+     * @param amount
      */
     @Test(dataProvider = "sansVowel")
     public void testSansVowels(String prefix, boolean sansVowel, TokenType tokenType,
-            int rootLength) {
-        Set<Id> sequentialSet = testSequentialMint(prefix, sansVowel, tokenType, rootLength);
-        Set<Id> randomSet = testRandomMint(prefix, sansVowel, tokenType, rootLength);
+            int rootLength, int amount) {
+        Set<Id> sequentialSet
+                = testSequentialMint(prefix, sansVowel, tokenType, rootLength, amount);
+        Set<Id> randomSet = testRandomMint(prefix, sansVowel, tokenType, rootLength, amount);
 
         // test sequential mint
         String prev = null;
@@ -124,7 +126,8 @@ public class AutoIdGeneratorTest implements Comparator<String> {
             // fail if the id does not match the token 
             String current = iter.next().toString();
             if (!containsCorrectCharacters(prefix, current, tokenType, sansVowel)) {
-                Assert.fail(String.format("Id \"%s\" contains a vowel", current));
+                Assert.fail(String.format("Id \"%s\" does not match %s, sansVowels = %b",
+                        current, tokenType, sansVowel));
             }
 
             // fail the test if ids aren't ordered
@@ -139,7 +142,8 @@ public class AutoIdGeneratorTest implements Comparator<String> {
         for (Id id : randomSet) {
             // fail if the id does not match the token 
             if (!containsCorrectCharacters(prefix, id.toString(), tokenType, sansVowel)) {
-                Assert.fail(String.format("Id \"%s\" contains a vowel", id.toString()));
+                Assert.fail(String.format("Id \"%s\" does not match %s, sansVowels = %b",
+                        id.toString(), tokenType, sansVowel));
             }
         }
     }
@@ -151,11 +155,14 @@ public class AutoIdGeneratorTest implements Comparator<String> {
      * @param sansVowel
      * @param tokenType
      * @param rootLength
+     * @param amount
      */
     @Test(dataProvider = "prefix")
-    public void testPrefix(String prefix, boolean sansVowel, TokenType tokenType, int rootLength) {
-        Set<Id> sequentialSet = testSequentialMint(prefix, sansVowel, tokenType, rootLength);
-        Set<Id> randomSet = testRandomMint(prefix, sansVowel, tokenType, rootLength);
+    public void testPrefix(String prefix, boolean sansVowel, TokenType tokenType, int rootLength,
+            int amount) {
+        Set<Id> sequentialSet
+                = testSequentialMint(prefix, sansVowel, tokenType, rootLength, amount);
+        Set<Id> randomSet = testRandomMint(prefix, sansVowel, tokenType, rootLength, amount);
 
         // test sequential mint
         String prev = null;
@@ -189,11 +196,13 @@ public class AutoIdGeneratorTest implements Comparator<String> {
      * @param sansVowel
      * @param tokenType
      * @param rootLength
+     * @param amount
      */
     public void testRootLength(String prefix, boolean sansVowel, TokenType tokenType,
-            int rootLength) {
-        Set<Id> sequentialSet = testSequentialMint(prefix, sansVowel, tokenType, rootLength);
-        Set<Id> randomSet = testRandomMint(prefix, sansVowel, tokenType, rootLength);
+            int rootLength, int amount) {
+        Set<Id> sequentialSet
+                = testSequentialMint(prefix, sansVowel, tokenType, rootLength, amount);
+        Set<Id> randomSet = testRandomMint(prefix, sansVowel, tokenType, rootLength, amount);
 
         // test sequential mint
         String prev = null;
@@ -232,9 +241,8 @@ public class AutoIdGeneratorTest implements Comparator<String> {
      * @return
      */
     private Set<Id> testSequentialMint(String prefix, boolean sansVowel, TokenType tokenType,
-            int rootLength) {
+            int rootLength, int amount) {
         IdGenerator generator = new AutoIdGenerator(prefix, sansVowel, tokenType, rootLength);
-        long amount = generator.calculatePermutations();
         return generator.sequentialMint(amount);
     }
 
@@ -248,9 +256,8 @@ public class AutoIdGeneratorTest implements Comparator<String> {
      * @return
      */
     private Set<Id> testRandomMint(String prefix, boolean sansVowel, TokenType tokenType,
-            int rootLength) {
+            int rootLength, int amount) {
         IdGenerator generator = new AutoIdGenerator(prefix, sansVowel, tokenType, rootLength);
-        long amount = generator.calculatePermutations();
         return generator.randomMint(amount);
     }
 
@@ -282,7 +289,7 @@ public class AutoIdGeneratorTest implements Comparator<String> {
 
         switch (tokenType) {
             case DIGIT:
-                return "(^[\\d]$)";
+                return "(^[\\d]*$)";
             case LOWERCASE:
                 return (sansVowel) ? "(^[^aeiouyA-Z\\W\\d]*$)" : "(^[a-z]*$)";
             case UPPERCASE:
@@ -294,7 +301,7 @@ public class AutoIdGeneratorTest implements Comparator<String> {
             case UPPER_EXTENDED:
                 return (sansVowel) ? "(^[^a-zAEIOUY\\W]*$)" : "(^[A-Z\\d]*$)";
             default:
-                return (sansVowel) ? "(^[^aeiouyAEIOUY\\W]*$))" : "(^[a-zA-z\\d]*$)";
+                return (sansVowel) ? "(^[^aeiouyAEIOUY\\W]*$)" : "(^[a-zA-z\\d]*$)";
         }
     }
 
