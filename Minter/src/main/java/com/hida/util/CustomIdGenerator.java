@@ -1,6 +1,5 @@
 package com.hida.util;
 
-import com.hida.util.IdGenerator;
 import static com.hida.util.IdGenerator.Rng;
 import static com.hida.util.IdGenerator.Logger;
 import java.util.Arrays;
@@ -75,7 +74,7 @@ public class CustomIdGenerator extends IdGenerator {
             throw new NotEnoughPermutationsException();
         }
         
-        // ids to database
+        // generate ids
         String[] tokenMapArray = getBaseCharMapping();
         Set<Id> idSet = new TreeSet();
                 
@@ -88,9 +87,7 @@ public class CustomIdGenerator extends IdGenerator {
             nextId.incrementId();            
             currentId = new CustomId(nextId); 
         }
-
         return idSet;
-
     }
 
     /**
@@ -106,9 +103,9 @@ public class CustomIdGenerator extends IdGenerator {
         if (total < amount) {
             throw new NotEnoughPermutationsException();
         }
-        
+        // generate ids
         String[] tokenMapArray = getBaseCharMapping();
-        Set<Id> tempIdList = new LinkedHashSet((int) amount);
+        Set<Id> tempIdList = new LinkedHashSet();
 
         for (int i = 0; i < amount; i++) {
             int[] tempIdBaseMap = new int[CharMap.length()];
@@ -121,9 +118,7 @@ public class CustomIdGenerator extends IdGenerator {
                 currentId.incrementId();
             }
         }
-
         return tempIdList;
-
     }
 
     /**
