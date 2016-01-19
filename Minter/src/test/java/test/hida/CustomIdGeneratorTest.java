@@ -235,9 +235,13 @@ public class CustomIdGeneratorTest implements Comparator<String> {
     @Test(dataProvider = "rootLength")
     public void testSequentialLength(String prefix, boolean sansVowel, String charMap,
             int amount) {
-        Set<Id> sequentialSet
-                = testSequentialMint(prefix, sansVowel, charMap, amount);
-
+        CustomIdGenerator minter = new CustomIdGenerator(prefix, sansVowel, charMap);
+        long total = minter.calculatePermutations();
+        if (amount > total) {
+            amount = (int) total;
+        }
+        Set<Id> sequentialSet = minter.sequentialMint(amount);
+        
         // test sequential mint
         String prev = null;
         int nameLength = prefix.length() + charMap.length();
@@ -271,8 +275,13 @@ public class CustomIdGeneratorTest implements Comparator<String> {
     @Test(dataProvider = "rootLength")
     public void testRandomLength(String prefix, boolean sansVowel, String charMap, int amount) {
 
-        Set<Id> randomSet = testRandomMint(prefix, sansVowel, charMap, amount);
-
+        CustomIdGenerator minter = new CustomIdGenerator(prefix, sansVowel, charMap);
+        long total = minter.calculatePermutations();
+        if (amount > total) {
+            amount = (int) total;
+        }
+        Set<Id> randomSet = minter.randomMint(amount);
+        
         // test random mint
         int nameLength = prefix.length() + charMap.length();
         for (Id id : randomSet) {

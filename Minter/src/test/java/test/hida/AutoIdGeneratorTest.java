@@ -241,8 +241,12 @@ public class AutoIdGeneratorTest implements Comparator<String> {
     @Test(dataProvider = "rootLength")
     public void testSequentialRootLength(String prefix, boolean sansVowel, TokenType tokenType,
             int rootLength, int amount) {
-        Set<Id> sequentialSet
-                = testSequentialMint(prefix, sansVowel, tokenType, rootLength, amount);
+        AutoIdGenerator minter = new AutoIdGenerator(prefix, sansVowel, tokenType, rootLength);
+        long total = minter.calculatePermutations();
+        if (amount > total) {
+            amount = (int) total;
+        }
+        Set<Id> sequentialSet = minter.sequentialMint(amount);
 
         // test sequential mint
         String prev = null;
@@ -279,7 +283,12 @@ public class AutoIdGeneratorTest implements Comparator<String> {
     public void testRandomRootLength(String prefix, boolean sansVowel, TokenType tokenType,
             int rootLength, int amount) {
 
-        Set<Id> randomSet = testRandomMint(prefix, sansVowel, tokenType, rootLength, amount);
+        AutoIdGenerator minter = new AutoIdGenerator(prefix, sansVowel, tokenType, rootLength);
+        long total = minter.calculatePermutations();
+        if (amount > total) {
+            amount = (int) total;
+        }
+        Set<Id> randomSet = minter.randomMint(amount);
 
         // test random mint
         int nameLength = prefix.length() + rootLength;
