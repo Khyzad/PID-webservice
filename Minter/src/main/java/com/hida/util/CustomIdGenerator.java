@@ -70,22 +70,23 @@ public class CustomIdGenerator extends IdGenerator {
         //Logger.info("in genIdCustomSequential: " + amount);
 
         // checks to see if its possible to produce or add requested amount of
+        long total = calculatePermutations();
+        if (total < amount) {
+            throw new NotEnoughPermutationsException();
+        }
+        
         // ids to database
         String[] tokenMapArray = getBaseCharMapping();
-
         Set<Id> idSet = new TreeSet();
-
+                
         int[] previousIdBaseMap = new int[CharMap.length()];
-        CustomId firstId = new CustomId(Prefix, previousIdBaseMap, tokenMapArray);
-        Logger.info("Custom Sequential ID Generated: " + firstId);
-        idSet.add(firstId);
-
-        for (int i = 0; i < amount - 1; i++) {
-            CustomId currentId = new CustomId(firstId);
-            Logger.info("Custom Sequential ID Generated: " + currentId);
-            currentId.incrementId();
+        CustomId currentId = new CustomId(Prefix, previousIdBaseMap, tokenMapArray);        
+        for (int i = 0; i < amount; i++) {            
+            CustomId nextId = new CustomId(currentId);
             idSet.add(currentId);
-            firstId = new CustomId(currentId);
+            Logger.info("Generated Custom Sequential ID: " + currentId);
+            nextId.incrementId();            
+            currentId = new CustomId(nextId); 
         }
 
         return idSet;
@@ -100,8 +101,13 @@ public class CustomIdGenerator extends IdGenerator {
      */
     @Override
     public Set<Id> randomMint(long amount) {
+        // checks to see if its possible to produce or add requested amount of
+        long total = calculatePermutations();
+        if (total < amount) {
+            throw new NotEnoughPermutationsException();
+        }
+        
         String[] tokenMapArray = getBaseCharMapping();
-
         Set<Id> tempIdList = new LinkedHashSet((int) amount);
 
         for (int i = 0; i < amount; i++) {

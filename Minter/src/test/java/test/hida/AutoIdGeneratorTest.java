@@ -8,6 +8,7 @@ package test.hida;
 import com.hida.util.AutoIdGenerator;
 import com.hida.util.Id;
 import com.hida.util.IdGenerator;
+import com.hida.util.NotEnoughPermutationsException;
 import com.hida.util.TokenType;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -113,11 +114,10 @@ public class AutoIdGeneratorTest implements Comparator<String> {
      * @param amount
      */
     @Test(dataProvider = "sansVowel")
-    public void testSansVowels(String prefix, boolean sansVowel, TokenType tokenType,
+    public void testSequentialMintSansVowels(String prefix, boolean sansVowel, TokenType tokenType,
             int rootLength, int amount) {
         Set<Id> sequentialSet
                 = testSequentialMint(prefix, sansVowel, tokenType, rootLength, amount);
-        Set<Id> randomSet = testRandomMint(prefix, sansVowel, tokenType, rootLength, amount);
 
         // test sequential mint
         String prev = null;
@@ -138,6 +138,23 @@ public class AutoIdGeneratorTest implements Comparator<String> {
             prev = current;
         }
 
+        Assert.assertEquals(sequentialSet.size(), amount);
+    }
+
+    /**
+     * missing javadoc
+     *
+     * @param prefix
+     * @param sansVowel
+     * @param tokenType
+     * @param rootLength
+     * @param amount
+     */
+    @Test(dataProvider = "sansVowel")
+    public void testRandomMintSansVowels(String prefix, boolean sansVowel, TokenType tokenType,
+            int rootLength, int amount) {
+        Set<Id> randomSet = testRandomMint(prefix, sansVowel, tokenType, rootLength, amount);
+
         // test random mint
         for (Id id : randomSet) {
             // fail if the id does not match the token 
@@ -146,6 +163,8 @@ public class AutoIdGeneratorTest implements Comparator<String> {
                         id.toString(), tokenType, sansVowel));
             }
         }
+        // test to see if the amount matches the size of the generated set        
+        Assert.assertEquals(randomSet.size(), amount);
     }
 
     /**
@@ -158,11 +177,10 @@ public class AutoIdGeneratorTest implements Comparator<String> {
      * @param amount
      */
     @Test(dataProvider = "prefix")
-    public void testPrefix(String prefix, boolean sansVowel, TokenType tokenType, int rootLength,
-            int amount) {
+    public void testSequentialMintPrefix(String prefix, boolean sansVowel, TokenType tokenType,
+            int rootLength, int amount) {
         Set<Id> sequentialSet
                 = testSequentialMint(prefix, sansVowel, tokenType, rootLength, amount);
-        Set<Id> randomSet = testRandomMint(prefix, sansVowel, tokenType, rootLength, amount);
 
         // test sequential mint
         String prev = null;
@@ -181,12 +199,8 @@ public class AutoIdGeneratorTest implements Comparator<String> {
             prev = current;
         }
 
-        // test random mint
-        for (Id id : randomSet) {
-            if (!id.toString().startsWith(prefix)) {
-                Assert.fail(String.format("Id \"%s\" does not start with \"$s\"", id, prefix));
-            }
-        }
+        // test to see if the amount matches the size of the generated set
+        Assert.assertEquals(sequentialSet.size(), amount);
     }
 
     /**
@@ -198,11 +212,36 @@ public class AutoIdGeneratorTest implements Comparator<String> {
      * @param rootLength
      * @param amount
      */
-    public void testRootLength(String prefix, boolean sansVowel, TokenType tokenType,
+    @Test(dataProvider = "prefix")
+    public void testRandomMintPrefix(String prefix, boolean sansVowel, TokenType tokenType,
+            int rootLength, int amount) {
+
+        Set<Id> randomSet = testRandomMint(prefix, sansVowel, tokenType, rootLength, amount);
+
+        // test random mint
+        for (Id id : randomSet) {
+            if (!id.toString().startsWith(prefix)) {
+                Assert.fail(String.format("Id \"%s\" does not start with \"$s\"", id, prefix));
+            }
+        }
+
+        // test to see if the amount matches the size of the generated set
+        Assert.assertEquals(randomSet.size(), amount);
+    }
+
+    /**
+     * missing javadoc
+     *
+     * @param prefix
+     * @param sansVowel
+     * @param tokenType
+     * @param rootLength
+     * @param amount
+     */
+    public void testSequentialRootLength(String prefix, boolean sansVowel, TokenType tokenType,
             int rootLength, int amount) {
         Set<Id> sequentialSet
                 = testSequentialMint(prefix, sansVowel, tokenType, rootLength, amount);
-        Set<Id> randomSet = testRandomMint(prefix, sansVowel, tokenType, rootLength, amount);
 
         // test sequential mint
         String prev = null;
@@ -211,9 +250,8 @@ public class AutoIdGeneratorTest implements Comparator<String> {
         while (iter.hasNext()) {
             // fail if the length does not match
             String current = iter.next().toString();
-            if (current.length() != nameLength) {
-                Assert.fail(String.format("Id \"%s\" length is not %d", current, nameLength));
-            }
+            Assert.assertEquals(current.length(), nameLength,
+                    String.format("Id \"%s\" length is not %d", current, nameLength));
 
             // fail the test if ids aren't ordered
             if (prev != null && compare(prev, current) > -1) {
@@ -223,13 +261,128 @@ public class AutoIdGeneratorTest implements Comparator<String> {
             prev = current;
         }
 
-        // test random mint
-        for (Id id : randomSet) {
-            if (id.toString().length() != nameLength) {
-                Assert.fail(String.format("Id \"%s\" length is not %d", id, nameLength));
-            }
-        }
+        // test to see if the amount matches the size of the generated set
+        Assert.assertEquals(sequentialSet.size(), amount);
     }
+
+    /**
+     * missing javadoc
+     *
+     * @param prefix
+     * @param sansVowel
+     * @param tokenType
+     * @param rootLength
+     * @param amount
+     */
+    public void testRandomRootLength(String prefix, boolean sansVowel, TokenType tokenType,
+            int rootLength, int amount) {
+
+        Set<Id> randomSet = testRandomMint(prefix, sansVowel, tokenType, rootLength, amount);
+
+        // test random mint
+        int nameLength = prefix.length() + rootLength;
+        for (Id id : randomSet) {
+            Assert.assertEquals(id.toString().length(), nameLength,
+                    String.format("Id \"%s\" length is not %d", id, nameLength));
+        }
+
+        // test to see if the amount matches the size of the generated set
+        Assert.assertEquals(randomSet.size(), amount);
+    }
+
+    /**
+     * missing javadoc
+     */
+    @Test
+    public void testSequentialMintMax() {
+        IdGenerator minter = new AutoIdGenerator("", true, TokenType.DIGIT, 5);
+        long total = minter.calculatePermutations();
+
+        Set<Id> sequentialSet = minter.sequentialMint(total);
+
+        Assert.assertEquals(sequentialSet.size(), total);
+    }
+    /**
+     * missing javadoc
+     */
+    @Test
+    public void testRandomMintMax() {
+        IdGenerator minter = new AutoIdGenerator("", true, TokenType.DIGIT, 5);
+        long total = minter.calculatePermutations();
+
+        Set<Id> randomSet = minter.randomMint(total);
+
+        Assert.assertEquals(randomSet.size(), total);
+    }
+
+    /**
+     * missing javadoc
+     */
+    @Test(expectedExceptions = NotEnoughPermutationsException.class)
+    public void testSequentialNotEnoughPermutationException() {
+        IdGenerator minter = new AutoIdGenerator("", true, TokenType.DIGIT, 5);
+        long total = minter.calculatePermutations();
+
+        Set<Id> sequentialSet = minter.randomMint(total + 1);
+    }
+
+    /**
+     * missing javadoc
+     */
+    @Test(expectedExceptions = NotEnoughPermutationsException.class)
+    public void testRandomNotEnoughPermutationException() {
+        IdGenerator minter = new AutoIdGenerator("", true, TokenType.DIGIT, 5);
+        long total = minter.calculatePermutations();
+
+        Set<Id> randomSet = minter.randomMint(total + 1);
+    }
+    
+    /**
+     * missing javadoc
+     */
+    @Test
+    public void testRandomMintNegativeAmount(){
+        IdGenerator minter = new AutoIdGenerator("", true, TokenType.DIGIT, 5);
+        
+        Set<Id> randomSet = minter.randomMint(-1);
+        Assert.assertEquals(randomSet.isEmpty(), true);        
+    }
+    
+    /**
+     * missing javadoc
+     */
+    @Test
+    public void testSequentialMintNegativeAmount(){
+        IdGenerator minter = new AutoIdGenerator("", true, TokenType.DIGIT, 5);
+        long total = minter.calculatePermutations();
+
+        Set<Id> sequentialSet = minter.sequentialMint(-1);
+        Assert.assertEquals(sequentialSet.isEmpty(), true);        
+    }
+    
+    /**
+     * missing javadoc
+     */
+    @Test
+    public void testRandomMintZeroAmount(){
+        IdGenerator minter = new AutoIdGenerator("", true, TokenType.DIGIT, 5);
+        
+        Set<Id> randomSet = minter.randomMint(0);
+        Assert.assertEquals(randomSet.isEmpty(), true);        
+    }
+    
+    /**
+     * missing javadoc
+     */
+    @Test
+    public void testSequentialMintZeroAmount(){
+        IdGenerator minter = new AutoIdGenerator("", true, TokenType.DIGIT, 5);
+        
+        Set<Id> sequentialSet = minter.sequentialMint(0);
+        Assert.assertEquals(sequentialSet.isEmpty(), true);        
+    }
+    
+    
 
     /**
      * missing javadoc

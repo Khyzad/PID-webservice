@@ -37,10 +37,11 @@ public class AutoIdGenerator extends IdGenerator {
 
     /**
      * missing javadoc
+     *
      * @param prefix
      * @param sansVowel
      * @param tokenType
-     * @param rootLength 
+     * @param rootLength
      */
     public AutoIdGenerator(String prefix, boolean sansVowel, TokenType tokenType, int rootLength) {
         super(prefix, sansVowel);
@@ -79,9 +80,15 @@ public class AutoIdGenerator extends IdGenerator {
      */
     @Override
     public Set<Id> randomMint(long amount) {
+        // checks to see if its possible to produce or add requested amount of
+        long total = calculatePermutations();
+        if (total < amount) {
+            throw new NotEnoughPermutationsException();
+        }
+        
+        // generate ids
         String tokenMap = BaseMap.get(TokenType);
-
-        Set<Id> tempIdList = new LinkedHashSet((int) amount);
+        Set<Id> tempIdList = new LinkedHashSet();
 
         for (int i = 0; i < amount; i++) {
             int[] tempIdBaseMap = new int[RootLength];
@@ -111,26 +118,22 @@ public class AutoIdGenerator extends IdGenerator {
 
         // checks to see if its possible to produce or add requested amount of
         long total = calculatePermutations();
-        if(total < amount){
+        if (total < amount) {
             throw new NotEnoughPermutationsException();
         }
-        
+
         // generate ids
         String tokenMap = BaseMap.get(TokenType);
-
         Set<Id> idSet = new TreeSet();
 
-        int[] previousIdBaseMap = new int[RootLength];
-        AutoId firstId = new AutoId(Prefix, previousIdBaseMap, tokenMap);
-        Logger.info("Generated Auto Sequential ID: " + firstId);
-        idSet.add(firstId);
-
-        for (int i = 0; i < amount - 1; i++) {
-            AutoId currentId = new AutoId(firstId);
-            Logger.info("Generated Auto Sequential ID: " + currentId);
-            currentId.incrementId();
+        int[] previousIdBaseMap = new int[RootLength];        
+        AutoId currentId = new AutoId(Prefix, previousIdBaseMap, tokenMap);
+        for (int i = 0; i < amount; i++) {
+            AutoId nextId = new AutoId(currentId);
             idSet.add(currentId);
-            firstId = new AutoId(currentId);
+            Logger.info("Generated Auto Sequential ID: " + currentId);
+            nextId.incrementId();            
+            currentId = new AutoId(nextId);            
         }
 
         return idSet;
