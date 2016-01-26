@@ -1,30 +1,9 @@
 package test.hida;
 
-import com.hida.client.BadParameterException;
 import com.hida.client.Minter;
-import com.hida.util.Id;
-import com.hida.Minter;
-import com.hida.util.NotEnoughPermutationsException;
 import com.hida.util.TokenType;
-import java.io.File;
-import java.io.IOException;
-import java.sql.SQLException;
 import java.util.Comparator;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.Random;
-import org.testng.Assert;
-import org.testng.annotations.AfterTest;
-import org.testng.annotations.BeforeTest;
-import org.testng.annotations.Test;
-import java.util.Scanner;
-import java.util.Set;
-import org.slf4j.spi.LocationAwareLogger;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 
 
@@ -167,184 +146,8 @@ public class MinterTest implements Comparator<String> {
     }
 
 
-    /**
-     * Tests the AutoMinter to see if its capable of producing unique ids.
-     *
-     *
-     * @param expectedAmount The requested amount of ids
-     * @param tokenType The tokenType used to format the ids
-     */
-    @Test(dataProvider = "autoMinter parameters")
-    public void testUniqueIdRandomAutoMinter(int expectedAmount, TokenType tokenType) {
-        try {
-            // produce the ids using the given format
-            int rootLength = 5;
-
-            String prefix = "";
-            //Set<String> set = new HashSet<>();
-            Set<Id> set = new HashSet<>();
-
-            Minter AutoMinter
-                    = new Minter(DatabaseManager, "/:ark/NAAN/", tokenType, rootLength, prefix, false);
-
-            
-            DatabaseManager.getPermutations(prefix, tokenType, rootLength, false);
-            set = AutoMinter.genIdAutoRandom(expectedAmount);
-
-                        
-            // if the amount of ids produced is not the same as the number of ids in a set, fail
-            Assert.assertEquals(set.size(), expectedAmount);
-
-            // if any exceptions are caught, fail
-        } catch (SQLException | IOException | BadParameterException exception) {
-            Assert.fail(exception.getMessage(), exception);
-        }
-    }
-
-    /**
-     * Tests the minter to see if the AutoMinter can create ids in ascending
-     * order in a given format.
-     *
-     * @param expectedAmount The amount of ids requested.
-     * @param tokenType Designates what characters are contained in the id's
-     * root.
-     */
-    @Test(dataProvider = "autoMinter parameters")
-    public void testUniqueIdAutoSequentialMinter(int expectedAmount, TokenType tokenType) {
-        try {
-
-            // produce the ids using the given format
-            int rootLength = 5;
-
-            String prefix = "";
-            //Set<String> set = new LinkedHashSet<>();
-            Set<Id> set = new LinkedHashSet<>();
-
-            Minter AutoMinter
-                    = new Minter(DatabaseManager, "/:ark/NAAN/", tokenType, rootLength, prefix, false);
-
-            DatabaseManager.getPermutations(prefix, tokenType, rootLength, false);
-            set = AutoMinter.genIdAutoSequential(expectedAmount);
-
-            
-            // if the amount of ids produced is not the same as the number of ids in a set, fail            
-            Assert.assertEquals(set.size(), expectedAmount);
-            Iterator<Id> iter = set.iterator();            
-            String prev = iter.next().toString();
-            while (iter.hasNext()) {
-                String current = iter.next().toString();
-                // if the previous id has an equal or greater value than the current id, 
-                // fail the case
-                if (compare(prev, current) > -1) {
-                    Assert.fail(String.format("The ids are not sequential: prev=%s\tcurrent=%s",
-                            prev, current));
-                }
-                prev = current;
-            }
-            // if any exceptions are caught, fail
-        } catch (SQLException | IOException | BadParameterException | NotEnoughPermutationsException exception) {
-            System.out.println("");
-            Assert.fail(exception.getMessage() + "\nexpectedAmount = " + expectedAmount + "\ttokenType = " + tokenType, exception);
-            
-        }
-    }
-
-    /**
-     * Tests the CustomRandomMinter to see if unique ids are produced
-     *
-     * @param expectedAmount The amount of ids requested.
-     * @param charMap The mapping used to describe range of possible characters
-     * at each of the id's root's digits.
-     * @param tokenType Designates what characters are contained in the id's
-     * root.
-     */
-    @Test(dataProvider = "customMinter parameters")
-    public void testUniqueIdRandomCustomMinter(int expectedAmount, String charMap,
-            TokenType tokenType) {
-        try {
-            // produce the ids using the given format
-            String prefix = "";
-            //Set<String> set = new HashSet<>();
-            Set<Id> set = new HashSet<>();
-
-            Minter CustomMinter = new Minter(DatabaseManager, "", charMap, prefix, false);
-            DatabaseManager.getPermutations(prefix, false, charMap, CustomMinter.getTokenType());
-            set = CustomMinter.genIdCustomRandom(expectedAmount);
-            
-            // if the amount of ids produced is not the same as the number of ids in a set, fail
-            Assert.assertEquals(set.size(), expectedAmount);
-
-            // if any exceptions are caught, fail
-        } catch (SQLException | IOException | BadParameterException exception) {
-            Assert.fail(exception.getMessage(), exception);
-        }
-    }
-
-    /**
-     * Tests whether or not unique values are produced in ascending order by the
-     * Custom Sequential Minter.
-     *
-     * @param expectedAmount The amount of ids requested.
-     * @param charMap The mapping used to describe range of possible characters
-     * at each of the id's root's digits.
-     * @param tokenType Designates what characters are contained in the id's
-     * root.
-     */
-    @Test(dataProvider = "customMinter parameters")
-    public void testUniqueIdSequentialCustomMinter(int expectedAmount, String charMap,
-            TokenType tokenType) {
-        try {
-            // produce the ids using the given format
-            String prefix = "";
-            //Set<String> set = new LinkedHashSet<>();
-            Set<Id> set = new LinkedHashSet<>();
-            
-            Minter CustomMinter = new Minter(DatabaseManager, "", charMap, prefix, false);
-            DatabaseManager.getPermutations(prefix, false, charMap, CustomMinter.getTokenType());
-            set = CustomMinter.genIdCustomSequential(expectedAmount);
-
-            
-            // if the amount of ids produced is not the same as the number of ids in a set, fail
-            Assert.assertEquals(set.size(), expectedAmount);
-            Iterator<Id> iter = set.iterator();
-            String prev = iter.next().toString();
-            while (iter.hasNext()) {
-                String current = iter.next().toString();
-                // if the previous id has a higher value than the current id, fail the case
-                if (compare(prev, current) > -1) {
-                    Assert.fail(
-                            "The ids are not sequential: prev=" + prev + "\tcurrent=" + current);
-                }
-                prev = current;
-            }
-
-            // if any exceptions are caught, fail
-        } catch (SQLException | IOException | BadParameterException exception) {
-            Assert.fail(exception.getMessage(), exception);
-        }
-    }
-
-    /**
-     * Populates the database with a digit format so that
-     * NotEnoughPermutationsException can be tested.
-     */
-    @Test
-    public void populateAutoDigitFormat() throws SQLException{
-        
-        try {
-            Minter AutoMinter;
-            String prefix = "";
-
-            DatabaseManager.getPermutations(prefix, TokenType.DIGIT, 2, true);
-            AutoMinter
-                    = new Minter(DatabaseManager, prefix, TokenType.DIGIT, 2, prefix, true);
-
-            AutoMinter.genIdAutoRandom(100);
-        } catch (Exception exception) {
-            DatabaseManager.printFormat();
-            Assert.fail(exception.getMessage(), exception);
-        }
-    }
+    
+    
 
     /**
      * This tests to see if NotEnoughPermutationsException is properly thrown
@@ -363,7 +166,7 @@ public class MinterTest implements Comparator<String> {
      * root.
      * @param sansVowel Designates whether or not the id's root contains vowels.
      * @param rootLength Designates the length of the id's root.
-     */
+     
     @Test(dataProvider = "overlap parameters",
             expectedExceptions = NotEnoughPermutationsException.class,
             dependsOnMethods = "populateAutoDigitFormat")
@@ -386,7 +189,7 @@ public class MinterTest implements Comparator<String> {
             Assert.fail(exception.getMessage(), exception);
         }
     }
-
+*/
     /**
      * Tests the service to see if a format corresponding to a mint request is
      * stored in the format table.
@@ -397,7 +200,7 @@ public class MinterTest implements Comparator<String> {
      * root.
      * @param sansVowel Designates whether or not the id's root contains vowels.
      * @param rootLength Designates the length of the id's root.
-     */
+     
     @Test(dataProvider = "format parameters")
     public void testFormat(int expectedAmount, String prefix, TokenType tokenType,
             boolean sansVowel, int rootLength) {
@@ -416,7 +219,7 @@ public class MinterTest implements Comparator<String> {
             Assert.fail(exception.getMessage(), exception);
         }
     }
-
+*/
    
     /**
      *
@@ -427,7 +230,7 @@ public class MinterTest implements Comparator<String> {
      * @param rootLength Designates the length of the id's root.
      * @param sansVowel Designates whether or not the id's root contains vowels.
      * @throws Exception
-     */
+     
     @Test(dataProvider = "bad parameter auto", expectedExceptions = BadParameterException.class)
     public void testBadParameterExceptionAutoMinter(long amount, String prefix, 
             TokenType tokenType, int rootLength, boolean sansVowel) throws Exception {
@@ -437,7 +240,7 @@ public class MinterTest implements Comparator<String> {
             throw new BadParameterException(amount, "Requested Amount");
         }
     }
-
+*/
     /**
      *
      * @param amount The amount of ids requested.
@@ -445,7 +248,7 @@ public class MinterTest implements Comparator<String> {
      * @param charMap The mapping used to describe range of possible characters
      * at each of the id's root's digits.
      * @param sansVowel Designates whether or not the id's root contains vowels.
-     */
+     
     @Test(dataProvider = "bad parameter custom", expectedExceptions = BadParameterException.class)
     public void testBadParameterExceptionCustomMinter(long amount, String prefix, String charMap,
             boolean sansVowel) throws Exception {
@@ -455,54 +258,8 @@ public class MinterTest implements Comparator<String> {
             throw new BadParameterException(amount, "Requested Amount");
         }
     }
-
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-        File db = new File(DbName);
-        System.out.println(db.getAbsolutePath());
-        if (db.exists()) {
-            System.out.print("set up classfound test database; deleting..."+db.delete());
-            //db.delete();
-            System.out.print("done\n");
-        }
-    }
-
-    @AfterClass
-    public static void tearDownClass() throws Exception {
-        File db = new File(DbName);
-        if (db.exists()) {
-            System.out.print("tear down class found test database; deleting..."+db.delete());
-            //db.delete();
-            System.out.print("done\n");
-        }
-    }
-
-    @BeforeTest
-    public void setUpTest() throws Exception {
-        DatabaseManager.createConnection();
-        File db = new File(DbName);
-        System.out.println(db.getAbsolutePath());
-        if (db.exists()) {
-            System.out.print("set up testfound test database; deleting..."+db.delete());
-            //db.delete();
-            System.out.print("done\n");
-        }
-
-    }
+*/
     
-    
-    @AfterTest
-    public void tearDownTest() throws Exception {
-        DatabaseManager.closeConnection();
-        File db = new File(DbName);
-        System.out.println(db.getAbsolutePath());
-        if (db.exists()) {
-            System.out.print("tear down test found test database; deleting..."+db.delete());
-            //db.delete();
-            
-            System.out.print("done\n");
-        }
-    }
 
     /**
      * Used to compare to ids. If the first id has a smaller value than the
