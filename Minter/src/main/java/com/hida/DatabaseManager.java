@@ -13,6 +13,13 @@ import java.util.Iterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.reflect.ParameterizedType;
+
+import org.hibernate.Criteria;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+
 /**
  * A class used to manage http requests so that data integrity can be maintained
  *
@@ -65,6 +72,17 @@ public class DatabaseManager extends Function {
     private final String DatabaseName;
 
     /**
+     *
+     */
+    @Autowired
+    private SessionFactory SessionFactory;
+
+    /**
+     *
+     */
+    private final Session Session;
+
+    /**
      * Used to explicitly define the name and path of database
      *
      * @param DatabasePath path of the database
@@ -74,6 +92,7 @@ public class DatabaseManager extends Function {
         this.DatabasePath = DatabasePath;
         this.DatabaseName = DatabaseName;
 
+        Session = SessionFactory.getCurrentSession();
         this.DRIVER = "jdbc:sqlite:" + DatabasePath + DatabaseName;
     }
 
@@ -84,6 +103,8 @@ public class DatabaseManager extends Function {
     public DatabaseManager() {
         this.DatabasePath = "";
         this.DatabaseName = "PID.db";
+
+        Session = SessionFactory.getCurrentSession();
         this.DRIVER = "jdbc:sqlite:" + DatabaseName;
     }
 
@@ -181,14 +202,6 @@ public class DatabaseManager extends Function {
 
             return true;
         }
-    }
-
-    public void createAutoMinter() {
-
-    }
-
-    public void createCustomMinter() {
-
     }
 
     /**
@@ -337,35 +350,41 @@ public class DatabaseManager extends Function {
         Logger.info("ID inserted into: " + ID_TABLE + ", Column: " + ID_COLUMN);
         int counter = 1;
         Iterator<Id> listIterator = list.iterator();
-        while (listIterator.hasNext()) {
-            Id id = listIterator.next();
+        /*
+         while (listIterator.hasNext()) {
+         Id id = listIterator.next();
 
-            // concatenate valueQuery with the current id as a value to the statement
-            if (counter == 1) {
-                valueQuery += String.format(" ('%s')", id);
-            } else {
-                valueQuery += String.format(", ('%s')", id);
-            }
+         // concatenate valueQuery with the current id as a value to the statement
+         if (counter == 1) {
+         valueQuery += String.format(" ('%s')", id);
+         } else {
+         valueQuery += String.format(", ('%s')", id);
+         }
+         */
+        /* 500 is used because, to my knowledge, the max number of values that 
+         can be inserted at once is 500. The condition is also met whenever the
+         id is the last id in the list.            
+         */
+        /*
+         if (counter == 500 || !listIterator.hasNext()) {
+         // finalize query
+         String completeQuery = insertQuery + valueQuery + ";";
+         Statement updateDatabase = DatabaseConnection.createStatement();
 
-            /* 500 is used because, to my knowledge, the max number of values that 
-             can be inserted at once is 500. The condition is also met whenever the
-             id is the last id in the list.            
-             */
-            if (counter == 500 || !listIterator.hasNext()) {
-                // finalize query
-                String completeQuery = insertQuery + valueQuery + ";";
-                Statement updateDatabase = DatabaseConnection.createStatement();
+         // execute statement and cleanup
+         updateDatabase.executeUpdate(completeQuery);
+         updateDatabase.close();
+         Logger.info("Database Update Finished: IDs Added");
+         // reset counter and valueQuery
+         counter = 0;
+         valueQuery = "";
+         }
 
-                // execute statement and cleanup
-                updateDatabase.executeUpdate(completeQuery);
-                updateDatabase.close();
-                Logger.info("Database Update Finished: IDs Added");
-                // reset counter and valueQuery
-                counter = 0;
-                valueQuery = "";
-            }
-
-            counter++;
+         counter++;
+         }
+         */
+        for (Id id : list) {
+            Session.persist(id);
         }
 
         // update table format
