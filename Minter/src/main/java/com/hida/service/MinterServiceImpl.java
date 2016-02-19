@@ -1,9 +1,13 @@
 package com.hida.service;
 
 import com.hida.model.BadParameterException;
-import com.hida.model.Pid;
 import com.hida.model.TokenType;
 import com.hida.dao.PidDaoImpl;
+import com.hida.model.AutoIdGenerator;
+import com.hida.model.CustomIdGenerator;
+import com.hida.model.Pid;
+import com.hida.model.IdGenerator;
+import com.hida.model.NotEnoughPermutationsException;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
@@ -11,9 +15,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Set;
-import java.util.regex.Pattern;
-import org.sqlite.Function;
+
 import java.util.Iterator;
+import java.util.TreeSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,7 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Repository("pidDao")
 @Transactional
-public class MinterServiceImpl extends Function {
+public class MinterServiceImpl implements MinterService{
 
 // Logger; logfile to be stored in resource folder
     private static final Logger Logger = LoggerFactory.getLogger(MinterServiceImpl.class);
@@ -82,6 +86,11 @@ public class MinterServiceImpl extends Function {
     private PidDaoImpl PidDao;
 
     /**
+     * Declares a Generator object to manage
+     */
+    private IdGenerator Generator;
+
+    /**
      * Used to explicitly define the name and path of database
      *
      * @param DatabasePath path of the database
@@ -101,7 +110,6 @@ public class MinterServiceImpl extends Function {
     public MinterServiceImpl() {
         this.DatabasePath = "";
         this.DatabaseName = "PID.db";
-
         this.DRIVER = "jdbc:sqlite:" + DatabaseName;
     }
 
@@ -117,6 +125,7 @@ public class MinterServiceImpl extends Function {
      * found
      * @throws SQLException thrown whenever there is an error with the database
      */
+    @Override
     public boolean createConnection() throws ClassNotFoundException, SQLException {
         System.out.println("connection created: " + DRIVER);
 
@@ -125,8 +134,7 @@ public class MinterServiceImpl extends Function {
         DatabaseConnection = DriverManager.getConnection(DRIVER);
         //Logger.info("Database Connection Created Using: org.sqlite.JDBC");
         // allow the database connection to use regular expressions
-        Function.create(DatabaseConnection, "REGEXP", new MinterServiceImpl());
-
+        
         if (this.isTableCreatedFlag) {
             return true;
         } else {
@@ -171,7 +179,8 @@ public class MinterServiceImpl extends Function {
             }
 
             if (!tableExists(SETTINGS_TABLE)) {
-                Logger.info("Creating Table: " + SETTINGS_TABLE + " with Column Name: " + ID_COLUMN);
+                Logger.info("Creating Table: " + SETTINGS_TABLE + 
+                        " with Column Name: " + ID_COLUMN);
                 String createSettingsTable = String.format("CREATE TABLE %s "
                         + "(%s TEXT, "
                         + "%s TEXT, "
@@ -198,6 +207,277 @@ public class MinterServiceImpl extends Function {
             this.isTableCreatedFlag = true;
 
             return true;
+        }
+    }
+
+    /**
+     * missing javadoc
+     *          
+     * @param prefix
+     * @param sansVowel
+     * @param tokenType
+     * @param rootLength
+     * @throws BadParameterException
+     */
+    @Override
+    public void createAutoMinter(String prefix, boolean sansVowel,
+            TokenType tokenType, int rootLength) throws BadParameterException {
+        Generator = new AutoIdGenerator(prefix, sansVowel, tokenType, rootLength);
+    }
+
+    /**
+     * missing javadoc
+     *     
+     * @param prefix
+     * @param sansVowel
+     * @param charMap
+     * @throws BadParameterException
+     */
+    @Override
+    public void createCustomMinter(String prefix, boolean sansVowel,
+            String charMap) throws BadParameterException {
+        Generator = new CustomIdGenerator(prefix, sansVowel, charMap);
+    }
+
+    /**
+     * Used by AutoMinters to determine the number of permutations are
+     * available.
+     *
+     * Each id will be matched against a CachedFormat, specified by this
+     * method's parameter. If a matching CachedFormat does not exist, then a
+     * CachedFormat will be created for it and the database will be searched to
+     * see how many other ids exist in the similar formats.
+     *
+     * Once a format exists the database will calculate the remaining number of
+     * permutations that can be created using the given parameters
+     * @param minter
+     * @return
+     * @throws SQLException
+     * @throws BadParameterException
+     */
+    private long getRemainingPermutations(AutoIdGenerator minter) throws SQLException,
+            BadParameterException {
+        //Logger.info("in Permutations 1");
+        // calculate the total number of possible permuations        
+        long totalPermutations = minter.calculatePermutations();
+        long amountCreated = getAmountCreated(minter.getPrefix(), minter.getTokenType(),
+                minter.isSansVowel(), minter.getRootLength());
+
+        // format wasn't found
+        if (amountCreated == -1) {
+            Logger.warn("Format Doesn't Exist");
+            this.createFormat(minter.getPrefix(), minter.getTokenType(), minter.isSansVowel(),
+                    minter.getRootLength());
+            return totalPermutations;
+        } else {
+            // format was found
+            Logger.info("format Exists");
+            return totalPermutations - amountCreated;
+        }
+    }
+
+    /**
+     * Used by CustomMinters to determine the number of permutations are
+     * available.
+     *
+     * Each id will be matched against a CachedFormat, specified by this
+     * method's parameter. If a matching CachedFormat does not exist, then a
+     * CachedFormat will be created for it and the database will be searched to
+     * see how many other ids exist in the similar formats.
+     *
+     * Once a format exists the database will calculate the remaining number of
+     * permutations that can be created using the given parameters
+     * 
+     * @param minter
+     * @return
+     * @throws SQLException
+     * @throws BadParameterException
+     */
+    private long getRemainingPermutations(CustomIdGenerator minter) throws SQLException,
+            BadParameterException {
+        // calculate the total number of possible permuations
+        int charMapLength = minter.getCharMap().length();
+        TokenType token = convertToToken(minter.getCharMap());
+        long totalPermutations = minter.calculatePermutations();
+        long amountCreated = getAmountCreated(minter.getPrefix(), token,
+                minter.isSansVowel(), charMapLength);
+
+        // format wasn't found
+        if (amountCreated == -1) {
+            Logger.warn("Format Doesn;t Exist");
+            this.createFormat(minter.getPrefix(), token, minter.isSansVowel(), charMapLength);
+            return totalPermutations;
+        } else {
+            // format was found
+            Logger.info("format exists");
+            return totalPermutations - amountCreated;
+        }
+    }
+
+    /**
+     * missing javadoc
+     *
+     * @param total
+     * @param amountCreated
+     * @return
+     */
+    private boolean isValidRequest(long remaining, long amount) {
+        // throw an error if its impossible to generate ids 
+        if (remaining < amount) {
+            Logger.error("Not enough remaining Permutations, "
+                    + "Requested Amount=" + amount + " --> "
+                    + "Amount Remaining=" + remaining);
+            throw new NotEnoughPermutationsException(remaining, amount);
+
+        }
+        return remaining < amount;
+    }
+
+    /**
+     * missing javadoc
+     *
+     * @param amount
+     * @param isRandom
+     * @return
+     * @throws SQLException
+     * @throws BadParameterException
+     */
+    @Override
+    public Set<Pid> mint(long amount, boolean isRandom) throws SQLException, BadParameterException {
+        // calculate total number of permutations
+        long total = Generator.calculatePermutations();
+
+        // determine remaining amount of permutations
+        long remaining;
+        TokenType token;
+        int rootLength;
+        if (Generator instanceof AutoIdGenerator) {
+            remaining = getRemainingPermutations((AutoIdGenerator) Generator);
+            token = ((AutoIdGenerator) Generator).getTokenType();
+            rootLength = ((AutoIdGenerator) Generator).getRootLength();
+        } else {
+            remaining = getRemainingPermutations((CustomIdGenerator) Generator);
+            token = convertToToken(((CustomIdGenerator) Generator).getCharMap());
+            rootLength = ((CustomIdGenerator) Generator).getCharMap().length();
+        }
+
+        // determine if its possible to create the requested amount of ids
+        if (isValidRequest(remaining, amount)) {
+            Logger.error("Not enough remaining Permutations, "
+                    + "Requested Amount=" + amount + " --> "
+                    + "Amount Remaining=" + remaining);
+            throw new NotEnoughPermutationsException(remaining, amount);
+        }
+
+        // have Generator return a set of ids and check them   
+        Set<Pid> set;
+        if (isRandom) {
+            set = Generator.randomMint(amount);
+        } else {
+            set = Generator.sequentialMint(amount);
+        }
+
+        // check ids and increment them appropriately
+        set = rollIdSet(set, total, amount, token, rootLength);
+
+        // add the set of ids to the id table in the database and their formats
+        addIdList(set, amount, Generator.getPrefix(), token, Generator.isSansVowel(), rootLength);
+
+        // return the set of ids
+        return set;
+    }
+
+    /**
+     * Continuously increments a set of ids until the set is completely filled
+     * with unique ids.
+     *
+     * @param set the set of ids
+     * @param order determines whether or not the ids will be ordered
+     * @param isAuto determines whether or not the ids are AutoId or CustomId
+     * @param amount the amount of ids to be created.
+     * @return A set of unique ids
+     * @throws SQLException - thrown whenever there is an error with the
+     * database.
+     */
+    private Set<Pid> rollIdSet(Set<Pid> set, long totalPermutations, long amount,
+            TokenType token, int rootLength)
+            throws SQLException, NotEnoughPermutationsException, BadParameterException {
+        // Used to count the number of unique ids. Size methods aren't used because int is returned
+        long uniqueIdCounter = 0;
+
+        // Declares and initializes a list that holds unique values.          
+        Set<Pid> uniqueList = new TreeSet<>();
+
+        // iterate through every id 
+        for (Pid currentId : set) {
+            // counts the number of times an id has been rejected
+            long counter = 0;
+
+            // continuously increments invalid or non-unique ids
+            while (!isValidId(currentId) || uniqueList.contains(currentId)) {
+                /* 
+                 if counter exceeds totalPermutations, then id has iterated through every 
+                 possible permutation. Related format is updated as a quick look-up reference
+                 with the number of ids that were inadvertedly been created using other formats.
+                 NotEnoughPermutationsException is thrown stating remaining number of ids.
+                 */
+                if (counter > totalPermutations) {
+                    long amountTaken = totalPermutations - uniqueIdCounter;
+
+                    Logger.error("Total number of Permutations Exceeded: Total Permutation Count=" 
+                            + totalPermutations);
+                    setAmountCreated(Generator.getPrefix(), token, Generator.isSansVowel(), 
+                            rootLength, amountTaken);
+                    throw new NotEnoughPermutationsException(uniqueIdCounter, amount);
+                }
+                currentId.incrementId();
+                counter++;
+            }
+            // unique ids are added to list and uniqueIdCounter is incremented.
+            // Size methods aren't used because int is returned
+            uniqueIdCounter++;
+            uniqueList.add(currentId);
+        }
+        return uniqueList;
+    }
+
+    /**
+     * This method returns an equivalent token for any given charMap
+     *
+     * @param charMap The mapping used to describe range of possible characters
+     * at each of the id's root's digits
+     * @return the token equivalent to the charMap
+     * @throws BadParameterException thrown whenever a malformed or invalid
+     * parameter is passed
+     */
+    private TokenType convertToToken(String charMap) throws BadParameterException {
+
+        // true if charMap only contains character 'd'
+        if (charMap.matches("^[d]+$")) {
+            return TokenType.DIGIT;
+        } // true if charMap only contains character 'l'.
+        else if (charMap.matches("^[l]+$")) {
+            return TokenType.LOWERCASE;
+        } // true if charMap only contains character 'u'
+        else if (charMap.matches("^[u]+$")) {
+            return TokenType.UPPERCASE;
+        } // true if charMap only contains character groups 'lu' or 'm'
+        else if (charMap.matches("(^(?=[lum]*l)(?=[lum]*u)[lum]*$)" + "|"
+                + "(^(?=[lum]*m)[lum]*$)")) {
+            return TokenType.MIXEDCASE;
+        } // true if charMap only contains characters 'dl'
+        else if (charMap.matches("(^(?=[dl]*l)(?=[ld]*d)[dl]*$)")) {
+            return TokenType.LOWER_EXTENDED;
+        } // true if charMap only contains characters 'du'
+        else if (charMap.matches("(^(?=[du]*u)(?=[du]*d)[du]*$)")) {
+            return TokenType.UPPER_EXTENDED;
+        } // true if charMap at least contains character groups 'dlu' or 'md' or 'e' respectively
+        else if (charMap.matches("(^(?=[dlume]*d)(?=[dlume]*l)(?=[dlume]*u)[dlume]*$)" + "|"
+                + "(^(?=[dlume]*m)(?=[dlume]*d)[dlume]*$)" + "|"
+                + "(^(?=[dlume]*e)[dlume]*$)")) {
+            return TokenType.MIXED_EXTENDED;
+        } else {
+            throw new BadParameterException(charMap, "detected in getToken method");
         }
     }
 
@@ -230,10 +510,10 @@ public class MinterServiceImpl extends Function {
         databaseStatement.executeUpdate(sqlQuery);
 
         databaseStatement.close();
-
     }
 
     /**
+     * Updates values given by the parameter to the settings table
      *
      * @param prepend the prepended String to be attached to each id
      * @param prefix The string that will be at the front of every id.
@@ -262,13 +542,11 @@ public class MinterServiceImpl extends Function {
                 autoFlag, randomFlag, vowelFlag);
 
         databaseStatement.executeUpdate(sqlQuery);
-
         databaseStatement.close();
-
     }
 
     /**
-     * Assigns values given by the parameter to the settings table
+     * Updates values given by the parameter to the settings table
      *
      * @param prepend the prepended String to be attached to each id
      * @param prefix The string that will be at the front of every id.
@@ -347,41 +625,36 @@ public class MinterServiceImpl extends Function {
         Logger.info("ID inserted into: " + ID_TABLE + ", Column: " + ID_COLUMN);
         int counter = 1;
         Iterator<Pid> listIterator = list.iterator();
-        /*
-         while (listIterator.hasNext()) {
-         Pid id = listIterator.next();
+        while (listIterator.hasNext()) {
+            Pid id = listIterator.next();
 
-         // concatenate valueQuery with the current id as a value to the statement
-         if (counter == 1) {
-         valueQuery += String.format(" ('%s')", id);
-         } else {
-         valueQuery += String.format(", ('%s')", id);
-         }
-         */
-        /* 500 is used because, to my knowledge, the max number of values that 
-         can be inserted at once is 500. The condition is also met whenever the
-         id is the last id in the list.            
-         */
-        /*
-         if (counter == 500 || !listIterator.hasNext()) {
-         // finalize query
-         String completeQuery = insertQuery + valueQuery + ";";
-         Statement updateDatabase = DatabaseConnection.createStatement();
+            // concatenate valueQuery with the current id as a value to the statement
+            if (counter == 1) {
+                valueQuery += String.format(" ('%s')", id);
+            } else {
+                valueQuery += String.format(", ('%s')", id);
+            }
 
-         // execute statement and cleanup
-         updateDatabase.executeUpdate(completeQuery);
-         updateDatabase.close();
-         Logger.info("Database Update Finished: IDs Added");
-         // reset counter and valueQuery
-         counter = 0;
-         valueQuery = "";
-         }
+            /* 
+             500 is used because, to my knowledge, the max number of values that 
+             can be inserted at once is 500. The condition is also met whenever the
+             id is the last id in the list.            
+             */
+            if (counter == 500 || !listIterator.hasNext()) {
+                // finalize query
+                String completeQuery = insertQuery + valueQuery + ";";
+                Statement updateDatabase = DatabaseConnection.createStatement();
 
-         counter++;
-         }
-         */
-        for (Pid id : list) {
-            PidDao.persist(id);
+                // execute statement and cleanup
+                updateDatabase.executeUpdate(completeQuery);
+                updateDatabase.close();
+                Logger.info("Database Update Finished: IDs Added");
+                // reset counter and valueQuery
+                counter = 0;
+                valueQuery = "";
+            }
+
+            counter++;
         }
 
         // update table format
@@ -391,35 +664,35 @@ public class MinterServiceImpl extends Function {
     }
 
     /**
-     * Checks to see if the Pid is valid in the database.
+     * Checks to see if the Id is valid in the database.
      *
-     * @param id Pid to check
-     * @return true if the id doesn't exist in the database; false otherwise
+     * @param pid Id to check
+     * @return true if the pid doesn't exist in the database; false otherwise
      * @throws SQLException thrown whenever there is an error with the database
      */
-    public boolean isValidId(Pid id) throws SQLException {
+    public boolean isValidId(Pid pid) throws SQLException {
 
         boolean isUnique;
-        // a string to query a specific id for existence in database
+        // a string to query a specific pid for existence in database
         String sqlQuery = String.format("SELECT %s FROM %2$s WHERE "
-                + "%1$s = '%3$s'", ID_COLUMN, ID_TABLE, id);
+                + "%1$s = '%3$s'", ID_COLUMN, ID_TABLE, pid);
 
         Statement databaseStatement = DatabaseConnection.createStatement();
 
         // execute statement and retrieves the result
         ResultSet databaseResponse = databaseStatement.executeQuery(sqlQuery);
 
-        // adds id to redundantIdList if it already exists in database
+        // adds pid to redundantIdList if it already exists in database
         if (databaseResponse.next()) {
 
-            // the id is not unique and is therefore set to false
-            id.setUnique(false);
+            // the pid is not unique and is therefore set to false
+            pid.setUnique(false);
 
             // because one of the ids weren't unique, isIdListUnique returns false
             isUnique = false;
         } else {
-            // the id was unique and is therefore set to true
-            id.setUnique(true);
+            // the pid was unique and is therefore set to true
+            pid.setUnique(true);
             isUnique = true;
         }
         // clean-up                
@@ -430,8 +703,8 @@ public class MinterServiceImpl extends Function {
     }
 
     /**
-     * For any valid MinterServiceImpl, a regular expression is returned that'll
- match that MinterServiceImpl's mapping.
+     * For any valid Generator, a regular expression is returned that'll
+ match that Generator's mapping.
      *
      * @param tokenType Designates what characters are contained in the id's
      * root
@@ -461,83 +734,7 @@ public class MinterServiceImpl extends Function {
         }
 
     }
-
-    /**
-     * Gets the total number of permutations using the given parameters.
-     * Primarily used by AutoMinters
-     *
-     * @param tokenType Designates what characters are contained in the id's
-     * root.
-     * @param rootLength Designates the length of the id's root.
-     * @param sansVowel Designates whether or not the id's root contains vowels.
-     * @return the number of total possible permutations.
-     * @throws BadParameterException thrown whenever a malformed or invalid
-     * parameter is passed
-     */
-    public long getTotalPermutations(TokenType tokenType, int rootLength, boolean sansVowel)
-            throws BadParameterException {
-
-        // get the base of each character
-        int base;
-        switch (tokenType) {
-            case DIGIT:
-                base = 10;
-                break;
-            case LOWERCASE:
-            case UPPERCASE:
-                base = (sansVowel) ? 20 : 26;
-                break;
-            case MIXEDCASE:
-                base = (sansVowel) ? 40 : 52;
-                break;
-            case LOWER_EXTENDED:
-            case UPPER_EXTENDED:
-                base = (sansVowel) ? 30 : 36;
-                break;
-            case MIXED_EXTENDED:
-                base = (sansVowel) ? 50 : 62;
-                break;
-            default:
-                throw new BadParameterException(tokenType, "Token Type");
-        }
-
-        // raise it to the power of how ever long the rootLength is
-        return ((long) Math.pow(base, rootLength));
-    }
-
-    /**
-     * Gets the total number of permutations using the given parameters.
-     * Primarily used by CustomMinters
-     *
-     * @param charMap The mapping used to describe range of possible characters
-     * at each of the id's root's digits.
-     * @param sansVowel Designates whether or not the id's root contains vowels.
-     * @return the number of total possible permutations
-     * @throws BadParameterException thrown whenever a malformed or invalid
-     * parameter is passed
-     */
-    public long getTotalPermutations(String charMap, boolean sansVowel)
-            throws BadParameterException {
-
-        long totalPermutations = 1;
-        for (int i = 0; i < charMap.length(); i++) {
-            if (charMap.charAt(i) == 'd') {
-                totalPermutations *= 10;
-            } else if (charMap.charAt(i) == 'l' || charMap.charAt(i) == 'u') {
-                totalPermutations *= (sansVowel) ? 20 : 26;
-            } else if (charMap.charAt(i) == 'm') {
-                totalPermutations *= (sansVowel) ? 40 : 52;
-            } else if (charMap.charAt(i) == 'e') {
-                totalPermutations *= (sansVowel) ? 50 : 62;
-            } else {
-                Logger.error("Error in Total permutations");
-                throw new BadParameterException(charMap,
-                        "Char Map");
-            }
-        }
-        return totalPermutations;
-    }
-
+    
     /**
      * Creates a format using the given parameters. The format will be stored in
      * the FORMAT table of the database. The amount created column of the format
@@ -613,7 +810,7 @@ public class MinterServiceImpl extends Function {
      * @param amountCreated The number of ids to insert into the format.
      * @throws SQLException thrown whenever there is an error with the database.
      */
-    public void setAmountCreated(String prefix, TokenType tokenType, boolean sansVowel,
+    protected void setAmountCreated(String prefix, TokenType tokenType, boolean sansVowel,
             int rootLength, long amountCreated) throws SQLException {
 
         Statement databaseStatement = DatabaseConnection.createStatement();
@@ -707,101 +904,7 @@ public class MinterServiceImpl extends Function {
         result.close();
         databaseStatement.close();
         return value;
-    }
-
-    /**
-     * Used by AutoMinters to determine the number of permutations are
-     * available.
-     *
-     * Each id will be matched against a CachedFormat, specified by this
-     * method's parameter. If a matching CachedFormat does not exist, then a
-     * CachedFormat will be created for it and the database will be searched to
-     * see how many other ids exist in the similar formats.
-     *
-     * Once a format exists the database will calculate the remaining number of
-     * permutations that can be created using the given parameters
-     *
-     * @param prefix The string that will be at the front of every id
-     * @param tokenType Designates what characters are contained in the id's
-     * root
-     * @param rootLength Designates the length of the id's root
-     * @param sansVowel Designates whether or not the id's root contains vowels.
-     * @return the number of possible permutations that can be added to the
-     * database with the given parameters
-     * @throws SQLException thrown whenever there is an error with the database
-     * @throws BadParameterException thrown whenever a malformed or invalid
-     * parameter is passed
-     */
-    public long getPermutations(String prefix, TokenType tokenType, int rootLength,
-            boolean sansVowel)
-            throws SQLException, BadParameterException {
-
-        //Logger.info("in Permutations 1");
-        // calculate the total number of possible permuations        
-        long totalPermutations = getTotalPermutations(tokenType, rootLength, sansVowel);
-        long amountCreated = getAmountCreated(prefix, tokenType, sansVowel, rootLength);
-
-        // format wasn't found
-        if (amountCreated == -1) {
-
-            Logger.warn("Format Doesn't Exist");
-            this.createFormat(prefix, tokenType, sansVowel, rootLength);
-            return totalPermutations;
-        } else {
-            // format was found
-
-            Logger.info("format Exists");
-            return totalPermutations - amountCreated;
-        }
-
-    }
-
-    /**
-     * Used by CustomMinters to determine the number of permutations are
-     * available.
-     *
-     * Each id will be matched against a CachedFormat, specified by this
-     * method's parameter. If a matching CachedFormat does not exist, then a
-     * CachedFormat will be created for it and the database will be searched to
-     * see how many other ids exist in the similar formats.
-     *
-     * Once a format exists the database will calculate the remaining number of
-     * permutations that can be created using the given parameters
-     *
-     * @param prefix The string that will be at the front of every id
-     * @param sansVowel Designates whether or not the id's root contains vowels.
-     * If the root does not contain vowels, the sansVowel is true; false
-     * otherwise.
-     * @param charMap The mapping used to describe range of possible characters
-     * at each of the id's root's digits
-     * @param tokenType Designates what characters are contained in the id's
-     * root
-     * @return the number of possible permutations that can be added to the
-     * database with the given parameters
-     * @throws SQLException thrown whenever there is an error with the database
-     * @throws BadParameterException thrown whenever a malformed or invalid
-     * parameter is passed
-     */
-    public long getPermutations(String prefix, boolean sansVowel, String charMap,
-            TokenType tokenType) throws SQLException, BadParameterException {
-
-        // calculate the total number of possible permuations        
-        long totalPermutations = this.getTotalPermutations(charMap, sansVowel);
-        long amountCreated = getAmountCreated(prefix, tokenType, sansVowel, charMap.length());
-
-        // format wasn't found
-        if (amountCreated == -1) {
-
-            Logger.warn("Format Doesn;t Exist");
-            this.createFormat(prefix, tokenType, sansVowel, charMap.length());
-            return totalPermutations;
-        } else {
-            // format was found
-
-            Logger.info("format exists");
-            return totalPermutations - amountCreated;
-        }
-    }
+    }       
 
     /**
      * Refers to retrieveRegex method to build regular expressions to match each
@@ -862,7 +965,6 @@ public class MinterServiceImpl extends Function {
             System.out.println("id " + i + ")" + ") " + curr);
             //Logger.info("Generated ID: "+i+" "+curr);
         }
-
         //Logger.info("Done with Print");
     }
 
@@ -921,54 +1023,22 @@ public class MinterServiceImpl extends Function {
     /**
      * Used by an external method to close this connection.
      *
+     * @return 
      * @throws SQLException thrown whenever there is an error with the database
      */
-    public void closeConnection() throws SQLException {
+    @Override
+    public boolean closeConnection() throws SQLException {
         Logger.info("DB Connection Closed");
         DatabaseConnection.close();
+        return true;
     }
-
-    /**
-     * Checks to see if the database already has a minted and format tables
-     * created. This method is used to prevent constant checking on whether or
-     * not the database was created along with a table on every request.
-     *
-     * @param c connection to the database
-     * @return true if table exists in database, false otherwise
-     * @throws SQLException thrown whenever there is an error with the database
-     */
-    private boolean isDbSetup() throws SQLException {
-
-        if (!isTableCreatedFlag) {
-            DatabaseMetaData metaData = DatabaseConnection.getMetaData();
-            ResultSet idTableExists = metaData.getTables(null, null, ID_TABLE, null);
-            ResultSet formatTableExists = metaData.getTables(null, null, FORMAT_TABLE, null);
-
-            if (!(idTableExists.next() && formatTableExists.next())) {
-                idTableExists.close();
-                formatTableExists.close();
-                Logger.info("Database has not been Setup");
-
-                return false;
-            }
-
-            // set the flag to prevent database being called for table existence every request
-            idTableExists.close();
-            formatTableExists.close();
-            Logger.info("Database has been configured");
-
-            isTableCreatedFlag = true;
-        }
-        // raise the flag to prevent constant requerying
-        return isTableCreatedFlag;
-
-    }
-
+    
     /**
      * Checks to see if the database for the existence of a particular table. If
      * the database returns a null value then the given tableName does not exist
      * within the database.
      *
+     * @param tableName
      * @return true if table exists in database, false otherwise
      * @throws SQLException thrown whenever there is an error with the database
      */
@@ -989,25 +1059,7 @@ public class MinterServiceImpl extends Function {
         databaseResponse.close();
         return flag;
     }
-
-    /**
-     * Creates a method to allow a database connection to use regular
-     * expressions.
-     *
-     * @throws SQLException thrown whenever there is an error with the database
-     */
-    @Override
-    protected void xFunc() throws SQLException {
-        String expression = value_text(0);
-        String value = value_text(1);
-        if (value == null) {
-            value = "";
-        }
-
-        Pattern pattern = Pattern.compile(expression);
-        result(pattern.matcher(value).find() ? 1 : 0);
-    }
-
+    
     /* typical getters and setters */
     public String getPREFIX_COLUMN() {
         return PREFIX_COLUMN;
@@ -1068,5 +1120,5 @@ public class MinterServiceImpl extends Function {
     public String getDatabaseName() {
         return DatabaseName;
     }
-
+    
 }

@@ -1,11 +1,11 @@
 package com.hida.controller;
 
 import com.hida.model.BadParameterException;
-import com.hida.service.MinterServiceImpl;
-import com.hida.model.Minter;
+
 import com.hida.model.NotEnoughPermutationsException;
 import com.hida.model.Pid;
 import com.hida.model.TokenType;
+import com.hida.service.MinterService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -39,11 +40,10 @@ import org.springframework.web.servlet.ModelAndView;
 @RequestMapping("/")
 public class MinterController {
 
-    /**
+    /* 
      * Logger; logfile to be stored in resource folder    
-    */
+     */
     private static final Logger Logger = LoggerFactory.getLogger(MinterController.class);
-    
     /**
      * Creates a fair reentrant RequestLock to serialize each request
      * sequentially instead of concurrently. pids
@@ -59,9 +59,8 @@ public class MinterController {
      * create a database to be used to create and count number of ids
      */
     @Autowired
-    private final MinterServiceImpl DatabaseManager;
+    private final MinterService MinterService;
 
- 
     /**
      *
      */
@@ -73,7 +72,11 @@ public class MinterController {
      * a database called PID.db will be made at the default location specified
      * by the server.
      *
+     *
      * @throws IOException Thrown if the property file was not found.
+     * @throws SQLException
+     * @throws BadParameterException
+     * @throws ClassNotFoundException
      */
     public MinterController() throws IOException, SQLException, BadParameterException, ClassNotFoundException {
 
@@ -94,23 +97,23 @@ public class MinterController {
                 path += "\\";
                 Logger.warn("Database Path not set correctly: adding \\");
             }
-            DatabaseManager = new MinterServiceImpl(path, name);
+            MinterService = new MinterService(path, name);
             Logger.info("Creating DataBase Manager with Path=" + path + ", Name=" + name);
         } else {
-            DatabaseManager = new MinterServiceImpl();
+            MinterService = new MinterService();
             Logger.info("Creating DatabaseManager with "
-                    + "Path=" + DatabaseManager.getDatabasePath() + ", "
-                    + "Name=" + DatabaseManager.getDatabaseName());
+                    + "Path=" + MinterService.getDatabasePath() + ", "
+                    + "Name=" + MinterService.getDatabaseName());
         }
         // create connection and sets up the database if need be
-        DatabaseManager.createConnection();
-        Logger.info("Database Connection Created to: " + DatabaseManager.getDatabaseName());
+        MinterService.createConnection();
+        Logger.info("Database Connection Created to: " + MinterService.getDatabaseName());
 
         // retrieve the default settings from the database and store it in Settings
         Settings = new CachedSettings();
         Settings.retrieveSettings();
 
-        DatabaseManager.closeConnection();
+        MinterService.closeConnection();
     }
 
     /**
@@ -134,7 +137,7 @@ public class MinterController {
             // prevents other clients from accessing the database whenever the form is submitted
             RequestLock.lock();
 
-            DatabaseManager.createConnection();
+            MinterService.createConnection();
 
             Logger.info("in handleForm");
             String prepend = request.getParameter("prepend");
@@ -192,7 +195,7 @@ public class MinterController {
                     throw new BadParameterException();
                 }
 
-                DatabaseManager.assignSettings(
+                MinterService.assignSettings(
                         prepend, prefix, tokenType, length, auto, random, vowels);
             } else {
 
@@ -201,17 +204,17 @@ public class MinterController {
                     throw new BadParameterException();
                 }
 
-                DatabaseManager.assignSettings(prepend, prefix, charMap, auto, random, vowels);
+                MinterService.assignSettings(prepend, prefix, charMap, auto, random, vowels);
             }
             // close the connection and update the cache
             Settings.retrieveSettings();
-            DatabaseManager.closeConnection();
+            MinterService.closeConnection();
         } finally {
             // unlocks RequestLock and gives access to longest waiting thread            
             RequestLock.unlock();
             Logger.warn("Request to update default settings finished, UNLOCKING MINTER");
         }
-        // redirect to the administration panel
+        // redirect to the administration panel located at http://[domain]/
         return "redirect:";
 
     }
@@ -242,70 +245,22 @@ public class MinterController {
         String message;
         try {
             // create a connection  
-            DatabaseManager.createConnection();
-            Logger.info("Database Connection Created to: " + DatabaseManager.getDatabaseName());
+            MinterService.createConnection();
+            //Logger.info("Database Connection Created to: " + MinterService.getDatabaseName());
 
             // override default settings
             CachedSettings tempSettings = overrideDefaults(parameters);
-
-            // instantiate the correct minter and calculate remaining number of permutations
-            long remainingPermutations;
-            Minter minter;
-            if (Settings.isAuto()) {
-                minter = createAutoMinter(requestedAmount, tempSettings);
-                remainingPermutations
-                        = DatabaseManager.getPermutations(tempSettings.getPrefix(),
-                                tempSettings.getTokenType(),
-                                tempSettings.getRootLength(),
-                                tempSettings.isSansVowels());
+            if (tempSettings.Auto) {
+                MinterService.createAutoMinter(tempSettings.getPrefix(),
+                        tempSettings.isSansVowels(),
+                        tempSettings.getTokenType(),
+                        tempSettings.getRootLength());
             } else {
-                minter = createCustomMinter(requestedAmount, tempSettings);
-                remainingPermutations
-                        = DatabaseManager.getPermutations(tempSettings.getPrefix(),
-                                tempSettings.isSansVowels(),
-                                tempSettings.getCharMap(),
-                                minter.getTokenType());
+                MinterService.createCustomMinter(tempSettings.getPrefix(),
+                        tempSettings.isSansVowels(),
+                        tempSettings.getCharMap());
             }
-
-            // throw an exception if the requested amount of ids can't be generated
-            if (remainingPermutations < requestedAmount) {
-                Logger.error("Not enough remaining Permutations, "
-                        + "Requested Amount=" + requestedAmount + " --> "
-                        + "Amount Remaining=" + remainingPermutations);
-                throw new NotEnoughPermutationsException(remainingPermutations, requestedAmount);
-            }
-            Set<Pid> idList;
-            // have the minter create the ids and assign it to message
-            if (tempSettings.isAuto()) {
-                if (Settings.isRandom()) {
-
-                    idList = minter.genIdAutoRandom(requestedAmount);
-                    Logger.info("Generated IDs will use the Format: " + Settings);
-                    Logger.info("Making autoRandom Generated IDs, Amount Requested="
-                            + requestedAmount);
-                } else {
-
-                    idList = minter.genIdAutoSequential(requestedAmount);
-                    Logger.info("Generated IDs will use the Format: " + Settings);
-                    Logger.info("Making autoSequential Generated IDs, Amount Requested="
-                            + requestedAmount);
-                }
-            } else {
-                if (tempSettings.isRandom()) {
-
-                    idList = minter.genIdCustomRandom(requestedAmount);
-                    Logger.info("Generated IDs will use the Format: " + Settings);
-                    Logger.info("Making customRandom Generated IDs, Amount Requested="
-                            + requestedAmount);
-
-                } else {
-
-                    idList = minter.genIdCustomSequential(requestedAmount);
-                    Logger.info("Generated IDs will use the Format: " + Settings);
-                    Logger.info("Making customSequential Generated IDs, Amount Requested="
-                            + requestedAmount);
-                }
-            }
+            Set<Pid> idList = MinterService.mint(requestedAmount, tempSettings.Random);
 
             message = convertListToJson(idList, tempSettings.getPrepend());
             //Logger.info("Message from Minter: "+message);
@@ -314,7 +269,7 @@ public class MinterController {
             model.addAttribute("message", message);
 
             // close the connection
-            DatabaseManager.closeConnection();
+            MinterService.closeConnection();
         } finally {
             // unlocks RequestLock and gives access to longest waiting thread            
             RequestLock.unlock();
@@ -346,34 +301,6 @@ public class MinterController {
         model.setViewName("settings");
 
         return model;
-    }
-
-    /**
-     * Because the minter construction checks the parameters for validity, this
-     * method not only instantiates an AutoMinter but also checks whether or not
-     * the requested amount of ids is valid.
-     *
-     * @param tempSettings The parameters of the minter given by the rest end
-     * point and default values.
-     * @param requestedAmount The amount of ids requested.
-     * @return an AutoMinter
-     * @throws BadParameterException thrown whenever a malformed or invalid
-     * parameter is passed
-     */
-    private Minter createAutoMinter(long requestedAmount, CachedSettings tempSettings)
-            throws BadParameterException {
-        Minter minter = new Minter(DatabaseManager,
-                tempSettings.getPrepend(),
-                tempSettings.getTokenType(),
-                tempSettings.getRootLength(),
-                tempSettings.getPrefix(),
-                tempSettings.isSansVowels());
-
-        if (minter.isValidAmount(requestedAmount)) {
-            return minter;
-        } else {
-            throw new BadParameterException(requestedAmount, "Requested Amount");
-        }
     }
 
     /**
@@ -413,34 +340,6 @@ public class MinterController {
         }
 
         return tempSetting;
-    }
-
-    /**
-     * Because the minter construction checks the parameters for validity, this
-     * method not only instantiates a CustomMinter but also checks whether or
-     * not the requested amount of ids is valid.
-     *
-     * @param tempSettings The parameters of the minter given by the rest end
-     * point and default values.
-     * @param requestedAmount The amount of ids requested.
-     * @return a CustomMinter
-     * @throws BadParameterException thrown whenever a malformed or invalid
-     * parameter is passed
-     */
-    private Minter createCustomMinter(long requestedAmount, CachedSettings tempSettings)
-            throws BadParameterException {
-        Minter minter = new Minter(DatabaseManager,
-                tempSettings.getPrepend(),
-                tempSettings.getCharMap(),
-                tempSettings.getPrefix(),
-                tempSettings.isSansVowels());
-
-        if (minter.isValidAmount(requestedAmount)) {
-            return minter;
-        } else {
-            Logger.error("Request amount of " + requestedAmount + " IDs is unavailable");
-            throw new BadParameterException(requestedAmount, "Requested Amount");
-        }
     }
 
     /**
@@ -529,51 +428,35 @@ public class MinterController {
     }
 
     /**
-     * Gets the current length of the queue of RequestLock
+     * Creates a Json object based off a list of ids given in the parameter
      *
-     * @return length of the queue
-     */
-    public int getRequestLockQueueLength() {
-        return this.RequestLock.getQueueLength();
-    }
-
-    /**
-     * Creates a Json object based off a set of ids given in the parameter
-     *
-     * @param set A set of ids to display into JSON
+     * @param list A list of ids to display into JSON
      * @param prepend A value to attach to the beginning of every id. Typically
      * used to determine the format of the id. For example, ARK or DOI.
-     * @return A reference to a String that contains Json set of ids
+     * @return A reference to a String that contains Json list of ids
      * @throws IOException thrown whenever a file could not be found
      */
-    public String convertListToJson(Set<Pid> set, String prepend) throws IOException {
-
-        // Jackson objects to format JSON strings
-        String jsonString;
+    public String convertListToJson(Set<Pid> list, String prepend) throws IOException {
+        // Jackson objects to create formatted Json string
+        String jsonString = "";
         ObjectMapper mapper = new ObjectMapper();
         Object formattedJson;
-        
-        // Javax objects to create JSON strings
-        JsonBuilderFactory factory = Json.createBuilderFactory(null);
-        JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
-        JsonArray jsonArray;
-        
-        // convert the set of ids into a json array
-        int counter = 0;
-        for (Pid id : set) {
-            arrayBuilder.add(factory.createObjectBuilder()
-                    .add("id", counter)
-                    .add("name", id.toString()));
-            counter++;
-        }
-        jsonArray = arrayBuilder.build();
 
-        // format json array
-        formattedJson = mapper.readValue(jsonArray.toString(), Object.class);
-        jsonString = mapper.writerWithDefaultPrettyPrinter().
-                writeValueAsString(formattedJson);
-        
-        return jsonString;       
+        // Object used to iterate through list of ids
+        Iterator<Pid> iterator = list.iterator();
+        for (int i = 0; iterator.hasNext(); i++) {
+
+            // Creates desired JSON format and adds the prepended string to be displayed
+            String id = String.format("{\"id\":%d,\"name\":\"%s%s\"}",
+                    i, prepend, iterator.next());
+
+            formattedJson = mapper.readValue(id, Object.class);
+
+            // append formatted json
+            jsonString += mapper.writerWithDefaultPrettyPrinter().
+                    writeValueAsString(formattedJson) + "\n";
+        }
+        return jsonString;
     }
 
     /**
@@ -655,8 +538,8 @@ public class MinterController {
          */
         public void retrieveSettings() throws SQLException, BadParameterException {
 
-            Prepend = (String) DatabaseManager.retrieveSetting(DatabaseManager.getPREPEND_COLUMN());
-            Prefix = (String) DatabaseManager.retrieveSetting(DatabaseManager.getPREFIX_COLUMN());
+            Prepend = (String) MinterService.retrieveSetting(MinterService.getPREPEND_COLUMN());
+            Prefix = (String) MinterService.retrieveSetting(MinterService.getPREFIX_COLUMN());
 
             if (Prepend == null) {
                 Prepend = "";
@@ -665,14 +548,13 @@ public class MinterController {
                 Prefix = "";
             }
 
-            TokenType = getValidTokenType((String) DatabaseManager.retrieveSetting(
-                    DatabaseManager.getTOKEN_TYPE_COLUMN()));
-            CharMap = (String) DatabaseManager.retrieveSetting(DatabaseManager.getCHAR_MAP_COLUMN());
-            RootLength = (int) DatabaseManager.retrieveSetting(DatabaseManager.getROOT_LENGTH_COLUMN());
+            TokenType = getValidTokenType((String) MinterService.retrieveSetting(MinterService.getTOKEN_TYPE_COLUMN()));
+            CharMap = (String) MinterService.retrieveSetting(MinterService.getCHAR_MAP_COLUMN());
+            RootLength = (int) MinterService.retrieveSetting(MinterService.getROOT_LENGTH_COLUMN());
 
-            int autoFlag = (int) DatabaseManager.retrieveSetting(DatabaseManager.getAUTO_COLUMN());
-            int randomFlag = (int) DatabaseManager.retrieveSetting(DatabaseManager.getRANDOM_COLUMN());
-            int vowelFlag = (int) DatabaseManager.retrieveSetting(DatabaseManager.getSANS_VOWEL_COLUMN());
+            int autoFlag = (int) MinterService.retrieveSetting(MinterService.getAUTO_COLUMN());
+            int randomFlag = (int) MinterService.retrieveSetting(MinterService.getRANDOM_COLUMN());
+            int vowelFlag = (int) MinterService.retrieveSetting(MinterService.getSANS_VOWEL_COLUMN());
 
             SansVowels = (vowelFlag == 1);
             Auto = (autoFlag == 1);
