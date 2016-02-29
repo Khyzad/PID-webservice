@@ -1,13 +1,17 @@
 package com.hida.service;
 
+import com.hida.dao.PidDao;
 import com.hida.model.BadParameterException;
 import com.hida.model.TokenType;
-import com.hida.dao.PidDaoImpl;
+import com.hida.dao.SettingDao;
 import com.hida.model.AutoIdGenerator;
 import com.hida.model.CustomIdGenerator;
+import com.hida.model.DefaultSetting;
 import com.hida.model.Pid;
 import com.hida.model.IdGenerator;
 import com.hida.model.NotEnoughPermutationsException;
+import com.hida.model.Setting;
+import com.hida.model.UsedSetting;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
@@ -31,9 +35,9 @@ import org.springframework.transaction.annotation.Transactional;
  *
  * @author lruffin
  */
-@Repository("pidDao")
+@Repository("minterService")
 @Transactional
-public class MinterServiceImpl implements MinterService{
+public class MinterServiceImpl implements MinterService {
 
 // Logger; logfile to be stored in resource folder
     private static final Logger Logger = LoggerFactory.getLogger(MinterServiceImpl.class);
@@ -83,7 +87,10 @@ public class MinterServiceImpl implements MinterService{
      * missing javadoc
      */
     @Autowired
-    private PidDaoImpl PidDao;
+    private PidDao PidDao;
+
+    @Autowired
+    private SettingDao SettingDao;
 
     /**
      * Declares a Generator object to manage
@@ -134,7 +141,7 @@ public class MinterServiceImpl implements MinterService{
         DatabaseConnection = DriverManager.getConnection(DRIVER);
         //Logger.info("Database Connection Created Using: org.sqlite.JDBC");
         // allow the database connection to use regular expressions
-        
+
         if (this.isTableCreatedFlag) {
             return true;
         } else {
@@ -179,8 +186,8 @@ public class MinterServiceImpl implements MinterService{
             }
 
             if (!tableExists(SETTINGS_TABLE)) {
-                Logger.info("Creating Table: " + SETTINGS_TABLE + 
-                        " with Column Name: " + ID_COLUMN);
+                Logger.info("Creating Table: " + SETTINGS_TABLE
+                        + " with Column Name: " + ID_COLUMN);
                 String createSettingsTable = String.format("CREATE TABLE %s "
                         + "(%s TEXT, "
                         + "%s TEXT, "
@@ -212,7 +219,7 @@ public class MinterServiceImpl implements MinterService{
 
     /**
      * missing javadoc
-     *          
+     *
      * @param prefix
      * @param sansVowel
      * @param tokenType
@@ -227,7 +234,7 @@ public class MinterServiceImpl implements MinterService{
 
     /**
      * missing javadoc
-     *     
+     *
      * @param prefix
      * @param sansVowel
      * @param charMap
@@ -250,6 +257,7 @@ public class MinterServiceImpl implements MinterService{
      *
      * Once a format exists the database will calculate the remaining number of
      * permutations that can be created using the given parameters
+     *
      * @param minter
      * @return
      * @throws SQLException
@@ -287,7 +295,7 @@ public class MinterServiceImpl implements MinterService{
      *
      * Once a format exists the database will calculate the remaining number of
      * permutations that can be created using the given parameters
-     * 
+     *
      * @param minter
      * @return
      * @throws SQLException
@@ -424,9 +432,9 @@ public class MinterServiceImpl implements MinterService{
                 if (counter > totalPermutations) {
                     long amountTaken = totalPermutations - uniqueIdCounter;
 
-                    Logger.error("Total number of Permutations Exceeded: Total Permutation Count=" 
+                    Logger.error("Total number of Permutations Exceeded: Total Permutation Count="
                             + totalPermutations);
-                    setAmountCreated(Generator.getPrefix(), token, Generator.isSansVowel(), 
+                    setAmountCreated(Generator.getPrefix(), token, Generator.isSansVowel(),
                             rootLength, amountTaken);
                     throw new NotEnoughPermutationsException(uniqueIdCounter, amount);
                 }
@@ -439,6 +447,11 @@ public class MinterServiceImpl implements MinterService{
             uniqueList.add(currentId);
         }
         return uniqueList;
+    }
+
+    @Override
+    public DefaultSetting getDefaultSetting() {
+        
     }
 
     /**
@@ -617,50 +630,86 @@ public class MinterServiceImpl implements MinterService{
      * @throws BadParameterException thrown whenever a malformed or invalid
      * parameter is passed
      */
-    public void addIdList(Set<Pid> list, long amountCreated, String prefix, TokenType tokenType,
+    private void addIdList(Set<Pid> list, long amountCreated, String prefix, TokenType tokenType,
             boolean sansVowel, int rootLength) throws SQLException, BadParameterException {
         Logger.info("Database being updated");
-        String valueQuery = "";
-        String insertQuery = "INSERT INTO " + ID_TABLE + "('" + ID_COLUMN + "') VALUES ";
-        Logger.info("ID inserted into: " + ID_TABLE + ", Column: " + ID_COLUMN);
-        int counter = 1;
-        Iterator<Pid> listIterator = list.iterator();
-        while (listIterator.hasNext()) {
-            Pid id = listIterator.next();
+        /*
+         String valueQuery = "";
+         String insertQuery = "INSERT INTO " + ID_TABLE + "('" + ID_COLUMN + "') VALUES ";
+         Logger.info("ID inserted into: " + ID_TABLE + ", Column: " + ID_COLUMN);
+         int counter = 1;
+         Iterator<Pid> listIterator = list.iterator();
+         while (listIterator.hasNext()) {
+         Pid id = listIterator.next();
 
-            // concatenate valueQuery with the current id as a value to the statement
-            if (counter == 1) {
-                valueQuery += String.format(" ('%s')", id);
-            } else {
-                valueQuery += String.format(", ('%s')", id);
-            }
+         // concatenate valueQuery with the current id as a value to the statement
+         if (counter == 1) {
+         valueQuery += String.format(" ('%s')", id);
+         } else {
+         valueQuery += String.format(", ('%s')", id);
+         }
+         */
+        /* 
+         500 is used because, to my knowledge, the max number of values that 
+         can be inserted at once is 500. The condition is also met whenever the
+         id is the last id in the list.            
+         */
+        /*
+         if (counter == 500 || !listIterator.hasNext()) {
+         // finalize query
+         String completeQuery = insertQuery + valueQuery + ";";
+         Statement updateDatabase = DatabaseConnection.createStatement();
 
-            /* 
-             500 is used because, to my knowledge, the max number of values that 
-             can be inserted at once is 500. The condition is also met whenever the
-             id is the last id in the list.            
-             */
-            if (counter == 500 || !listIterator.hasNext()) {
-                // finalize query
-                String completeQuery = insertQuery + valueQuery + ";";
-                Statement updateDatabase = DatabaseConnection.createStatement();
+         // execute statement and cleanup
+         updateDatabase.executeUpdate(completeQuery);
+         updateDatabase.close();
+         Logger.info("Database Update Finished: IDs Added");
+         // reset counter and valueQuery
+         counter = 0;
+         valueQuery = "";
+         }
 
-                // execute statement and cleanup
-                updateDatabase.executeUpdate(completeQuery);
-                updateDatabase.close();
-                Logger.info("Database Update Finished: IDs Added");
-                // reset counter and valueQuery
-                counter = 0;
-                valueQuery = "";
-            }
-
-            counter++;
+         counter++;
+         }*/
+        for (Pid pid : list) {
+            PidDao.savePid(pid);
         }
 
         // update table format
         this.addAmountCreated(prefix, tokenType, sansVowel, rootLength, amountCreated);
 
         //Logger.info("Finished; IDs printed to Database");
+    }
+
+    /**
+     * missing javadoc
+     *
+     * @param amount
+     * @param setting
+     */
+    private void recordSettings(long amount, Setting setting) {
+        UsedSetting usedSetting = SettingDao.findSetting(setting.getPrefix(), 
+                setting.getTokenType(), 
+                setting.getCharMap(), 
+                setting.getRootLength(), 
+                setting.isSansVowels()).get(0);
+        
+        
+                
+
+    }
+
+    /**
+     *
+     * @param amountCreated
+     * @param prefix
+     * @param tokenType
+     * @param sansVowel
+     * @param rootLength
+     */
+    private void checkUsedSetting(long amountCreated, String prefix, TokenType tokenType,
+            boolean sansVowel, int rootLength) {
+        Query query = PidDao.
     }
 
     /**
@@ -703,8 +752,8 @@ public class MinterServiceImpl implements MinterService{
     }
 
     /**
-     * For any valid Generator, a regular expression is returned that'll
- match that Generator's mapping.
+     * For any valid Generator, a regular expression is returned that'll match
+     * that Generator's mapping.
      *
      * @param tokenType Designates what characters are contained in the id's
      * root
@@ -734,7 +783,7 @@ public class MinterServiceImpl implements MinterService{
         }
 
     }
-    
+
     /**
      * Creates a format using the given parameters. The format will be stored in
      * the FORMAT table of the database. The amount created column of the format
@@ -904,7 +953,7 @@ public class MinterServiceImpl implements MinterService{
         result.close();
         databaseStatement.close();
         return value;
-    }       
+    }
 
     /**
      * Refers to retrieveRegex method to build regular expressions to match each
@@ -1023,7 +1072,7 @@ public class MinterServiceImpl implements MinterService{
     /**
      * Used by an external method to close this connection.
      *
-     * @return 
+     * @return
      * @throws SQLException thrown whenever there is an error with the database
      */
     @Override
@@ -1032,7 +1081,7 @@ public class MinterServiceImpl implements MinterService{
         DatabaseConnection.close();
         return true;
     }
-    
+
     /**
      * Checks to see if the database for the existence of a particular table. If
      * the database returns a null value then the given tableName does not exist
@@ -1059,7 +1108,7 @@ public class MinterServiceImpl implements MinterService{
         databaseResponse.close();
         return flag;
     }
-    
+
     /* typical getters and setters */
     public String getPREFIX_COLUMN() {
         return PREFIX_COLUMN;
@@ -1120,5 +1169,5 @@ public class MinterServiceImpl implements MinterService{
     public String getDatabaseName() {
         return DatabaseName;
     }
-    
+
 }
