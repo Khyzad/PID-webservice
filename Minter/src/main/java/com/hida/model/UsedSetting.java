@@ -1,5 +1,4 @@
 package com.hida.model;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
@@ -7,28 +6,22 @@ import javax.validation.constraints.NotNull;
 import org.hibernate.annotations.Type;
 
 /**
- * missing javadoc
  *
  * @author lruffin
  */
 @Entity
 @Table(name = "USED_SETTING")
-public class UsedSetting extends Setting {
-
-    @NotNull    
-    @Column(name = "AMOUNT", nullable = false)
-    @Type(type = "long")
-    private long Amount;
+public class UsedSetting extends Setting{
     
-    /**
-     * Default constructor
-     */
-    public UsedSetting() {
+    
+    @NotNull
+    @Column(name="AMOUNT")
+    @Type(type="long")
+    private long Amount;
 
-    }
 
     /**
-     * missing javadoc
+     * Constructor; missing javadoc
      *
      * @param Prepend
      * @param Prefix
@@ -36,16 +29,30 @@ public class UsedSetting extends Setting {
      * @param CharMap
      * @param RootLength
      * @param SansVowels
-     * @param Auto
-     * @param Random
+     * @param Amount
      */
     public UsedSetting(String Prepend, String Prefix, TokenType TokenType, String CharMap,
-            int RootLength, boolean SansVowels, long RequestedAmount) {
+            int RootLength, boolean SansVowels, long Amount) {
         super(Prefix, TokenType, CharMap, RootLength, SansVowels);
-        this.Amount = RequestedAmount;
-        
+        this.Amount = Amount;
+                
     }
-    
+
+    /**
+     * Default constructor
+     */
+    public UsedSetting() {
+
+    }
+
+    public long getAmount() {
+        return Amount;
+    }
+
+    public void setAmount(long Amount) {
+        this.Amount = Amount;
+    }
+
     
 
 }
