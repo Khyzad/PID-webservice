@@ -16,9 +16,11 @@ public interface PidDao {
     
     public Pid findByName(String name);
       
-    public void saveEmployee(Pid pid);
+    public void savePid(Pid pid);
  
     public List<Pid> findAllPids();
  
     public Pid findPidByRegex(String regex);
+    
+    
 }
