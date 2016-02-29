@@ -6,6 +6,7 @@
 package com.hida.service;
 
 import com.hida.model.BadParameterException;
+import com.hida.model.DefaultSetting;
 import com.hida.model.Pid;
 import com.hida.model.TokenType;
 import java.sql.SQLException;
@@ -32,4 +33,6 @@ public interface MinterService {
             boolean isAuto, boolean isRandom, boolean sansVowel) throws SQLException;
     public void assignSettings(String prepend, String prefix, String charMap, boolean isAuto,
             boolean isRandom, boolean sansVowel) throws SQLException;
+    
+    public DefaultSetting getDefaultSetting();
 }
