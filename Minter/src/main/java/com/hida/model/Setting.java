@@ -18,8 +18,9 @@ import org.hibernate.annotations.Type;
 public class Setting {
 
     @Id
+    @Column(name = "ID", updatable = false, nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private int Id;
 
     @NotNull
     @Size(min = 0, max = 10)
@@ -28,7 +29,7 @@ public class Setting {
     private String Prefix;
 
     @Column(name = "TOKENTYPE")
-    @Type(type = "com.hida.model.TokenType")
+    //@Type(type = "com.hida.model.TokenType")
     private TokenType TokenType;
 
     @Column(name = "CHARMAP")
@@ -83,11 +84,11 @@ public class Setting {
 
     // Typical getters and setters    
     public int getId() {
-        return id;
+        return Id;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setId(int Id) {
+        this.Id = Id;
     }
 
     public String getPrefix() {
