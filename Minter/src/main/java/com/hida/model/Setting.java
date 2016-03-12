@@ -23,7 +23,7 @@ public class Setting {
 
     @NotNull
     @Size(min = 0, max = 10)
-    @Column(name = "PREFIX", nullable = false)
+    @Column(name = "PID_PREFIX", nullable = false)
     @Type(type = "java.lang.String")
     private String Prefix;
 
