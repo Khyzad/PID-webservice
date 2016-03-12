@@ -23,7 +23,6 @@ public class UsedSetting extends Setting{
     /**
      * Constructor; missing javadoc
      *
-     * @param Prepend
      * @param Prefix
      * @param TokenType
      * @param CharMap
@@ -31,7 +30,7 @@ public class UsedSetting extends Setting{
      * @param SansVowels
      * @param Amount
      */
-    public UsedSetting(String Prepend, String Prefix, TokenType TokenType, String CharMap,
+    public UsedSetting(String Prefix, TokenType TokenType, String CharMap,
             int RootLength, boolean SansVowels, long Amount) {
         super(Prefix, TokenType, CharMap, RootLength, SansVowels);
         this.Amount = Amount;
