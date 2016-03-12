@@ -1,11 +1,12 @@
 package com.hida.dao;
 
-import com.hida.model.Setting;
 import com.hida.model.TokenType;
+import com.hida.model.UsedSetting;
 import java.util.List;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.criterion.Restrictions;
+import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,9 +15,8 @@ import org.springframework.transaction.annotation.Transactional;
  *
  * @author lruffin
  */
-@Service("settingDao")
-@Transactional
-public class SettingDaoImpl extends AbstractDao<Integer, Setting> implements SettingDao {
+@Repository("usedSettingDao")
+public class UsedSettingDaoImpl extends AbstractDao<Integer, UsedSetting> implements UsedSettingDao {
 
     /**
      * missing javadoc
@@ -24,7 +24,7 @@ public class SettingDaoImpl extends AbstractDao<Integer, Setting> implements Set
      * @param setting
      */
     @Override
-    public void save(Setting setting) {
+    public void save(UsedSetting setting) {
         persist(setting);
     }
 
@@ -34,7 +34,7 @@ public class SettingDaoImpl extends AbstractDao<Integer, Setting> implements Set
      * @param setting
      */
     @Override
-    public void deleteSetting(Setting setting) {
+    public void deleteSetting(UsedSetting setting) {
         delete(setting);
     }
 
@@ -44,9 +44,9 @@ public class SettingDaoImpl extends AbstractDao<Integer, Setting> implements Set
      * @return
      */
     @Override
-    public List<Setting> findAllSettings() {
+    public List<UsedSetting> findAllUsedSettings() {
         Criteria criteria = createEntityCriteria();
-        return (List<Setting>) criteria.list();
+        return (List<UsedSetting>) criteria.list();
     }
 
     /**
@@ -56,10 +56,10 @@ public class SettingDaoImpl extends AbstractDao<Integer, Setting> implements Set
      * @return
      */
     @Override
-    public Setting findSettingById(int id) {
+    public UsedSetting findUsedSettingById(int id) {
         Criteria criteria = createEntityCriteria();
         criteria.add(Restrictions.eq("id", id));
-        return (Setting) criteria.uniqueResult();
+        return (UsedSetting) criteria.uniqueResult();
     }
 
     /**
@@ -73,7 +73,7 @@ public class SettingDaoImpl extends AbstractDao<Integer, Setting> implements Set
      * @return
      */
     @Override
-    public List<Setting> findSetting(String Prefix, TokenType TokenType, String CharMap,
+    public List<UsedSetting> findUsedSetting(String Prefix, TokenType TokenType, String CharMap,
             int RootLength, boolean SansVowels) {
         Query query = this.getSession().createSQLQuery(
                 String.format("Select from USED_SETTING where prefix='%s' and tokenType='%s' "
@@ -82,6 +82,8 @@ public class SettingDaoImpl extends AbstractDao<Integer, Setting> implements Set
 
         return query.list();
     }
+
+   
         
 
 }
