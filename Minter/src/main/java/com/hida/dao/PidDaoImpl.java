@@ -12,7 +12,7 @@ import org.springframework.stereotype.Repository;
  */
 @Repository("pidDao")
 public class PidDaoImpl extends AbstractDao<String, Pid> implements PidDao {
-
+    
     /**
      * missing javadoc
      *
@@ -23,14 +23,14 @@ public class PidDaoImpl extends AbstractDao<String, Pid> implements PidDao {
     public Pid findByName(String name) {
         return getByKey(name);
     }
-
+    
     /**
      * missing javadoc
      *
      * @param pid
      */
     @Override
-    public void saveEmployee(Pid pid) {
+    public void savePid(Pid pid) {
         persist(pid);
     }
 
