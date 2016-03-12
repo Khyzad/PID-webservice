@@ -1,9 +1,11 @@
 package com.hida.controller;
 
 import com.hida.model.BadParameterException;
+import com.hida.model.DefaultSetting;
 
 import com.hida.model.NotEnoughPermutationsException;
 import com.hida.model.Pid;
+import com.hida.model.Setting;
 import com.hida.model.TokenType;
 import com.hida.service.MinterService;
 import org.springframework.stereotype.Controller;
@@ -15,16 +17,11 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.util.concurrent.locks.ReentrantLock;
-import javax.json.Json;
-import javax.json.JsonArray;
-import javax.json.JsonArrayBuilder;
-import javax.json.JsonBuilderFactory;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -49,72 +46,15 @@ public class MinterController {
      * sequentially instead of concurrently. pids
      */
     private static final ReentrantLock RequestLock = new ReentrantLock(true);
-
-    /**
-     * fields for minter's default values, cached values
-     */
-    private static final String CONFIG_FILE = "minter_config.properties";
+    
 
     /**
      * create a database to be used to create and count number of ids
      */
     @Autowired
-    private final MinterService MinterService;
-
-    /**
-     *
-     */
-    private final CachedSettings Settings;
-
-    /**
-     * Constructor that loads the property file and retrieves the values stored
-     * at the databasePath and databaseName keys. If the the keys are empty then
-     * a database called PID.db will be made at the default location specified
-     * by the server.
-     *
-     *
-     * @throws IOException Thrown if the property file was not found.
-     * @throws SQLException
-     * @throws BadParameterException
-     * @throws ClassNotFoundException
-     */
-    public MinterController() throws IOException, SQLException, BadParameterException, ClassNotFoundException {
-
-        Properties properties = new Properties();
-
-        properties.load(Thread.currentThread().
-                getContextClassLoader().getResourceAsStream(CONFIG_FILE));
-
-        // Retrieves the path and the name of a database from the property file for this session                            
-        String path = properties.getProperty("databasePath");
-        Logger.info("Getting database path: " + path);
-        String name = properties.getProperty("databaseName");
-        Logger.info("getting Database Name: " + name);
-
-        // Creates the database at a location specified by the properties file
-        if (!name.isEmpty()) {
-            if (!path.endsWith("\\")) {
-                path += "\\";
-                Logger.warn("Database Path not set correctly: adding \\");
-            }
-            MinterService = new MinterService(path, name);
-            Logger.info("Creating DataBase Manager with Path=" + path + ", Name=" + name);
-        } else {
-            MinterService = new MinterService();
-            Logger.info("Creating DatabaseManager with "
-                    + "Path=" + MinterService.getDatabasePath() + ", "
-                    + "Name=" + MinterService.getDatabaseName());
-        }
-        // create connection and sets up the database if need be
-        MinterService.createConnection();
-        Logger.info("Database Connection Created to: " + MinterService.getDatabaseName());
-
-        // retrieve the default settings from the database and store it in Settings
-        Settings = new CachedSettings();
-        Settings.retrieveSettings();
-
-        MinterService.closeConnection();
-    }
+    private MinterService MinterService;
+   
+    
 
     /**
      * Redirects to the index after retrieving updated settings from the
@@ -136,20 +76,22 @@ public class MinterController {
         try {
             // prevents other clients from accessing the database whenever the form is submitted
             RequestLock.lock();
+            DefaultSetting oldSetting = MinterService.getCurrentSetting();
+            DefaultSetting newSetting;
 
             MinterService.createConnection();
-
-            Logger.info("in handleForm");
+            // Logger.info("in handleForm");
             String prepend = request.getParameter("prepend");
             String prefix = request.getParameter("idprefix");
             String isAuto = request.getParameter("mintType");
             String isRandom = request.getParameter("mintOrder");
             String sansVowels = request.getParameter("vowels");
+            String rootLength = request.getParameter("idlength");
             String digitToken;
             String lowerToken;
             String upperToken;
             String charMap;
-            String rootLength = request.getParameter("idlength");
+            
 
             boolean auto = isAuto.equals("auto");
             boolean random = isRandom.equals("random");
@@ -195,19 +137,35 @@ public class MinterController {
                     throw new BadParameterException();
                 }
 
-                MinterService.assignSettings(
-                        prepend, prefix, tokenType, length, auto, random, vowels);
+                newSetting = new DefaultSetting(prepend,
+                        prefix,
+                        tokenType,
+                        oldSetting.getCharMap(),
+                        length,
+                        vowels,
+                        auto, 
+                        random);               
             } else {
 
                 charMap = request.getParameter("charmapping");
                 if (charMap == null || charMap.isEmpty()) {
                     throw new BadParameterException();
                 }
+                
+                newSetting = new DefaultSetting(prepend,
+                        prefix,
+                        oldSetting.getTokenType(),
+                        charMap,
+                        oldSetting.getRootLength(),
+                        vowels,
+                        auto, 
+                        random);
 
-                MinterService.assignSettings(prepend, prefix, charMap, auto, random, vowels);
             }
-            // close the connection and update the cache
-            Settings.retrieveSettings();
+
+            MinterService.updateCurrentSetting(newSetting);
+
+            // close the connection and update the cache            
             MinterService.closeConnection();
         } finally {
             // unlocks RequestLock and gives access to longest waiting thread            
@@ -248,21 +206,15 @@ public class MinterController {
             MinterService.createConnection();
             //Logger.info("Database Connection Created to: " + MinterService.getDatabaseName());
 
-            // override default settings
-            CachedSettings tempSettings = overrideDefaults(parameters);
-            if (tempSettings.Auto) {
-                MinterService.createAutoMinter(tempSettings.getPrefix(),
-                        tempSettings.isSansVowels(),
-                        tempSettings.getTokenType(),
-                        tempSettings.getRootLength());
-            } else {
-                MinterService.createCustomMinter(tempSettings.getPrefix(),
-                        tempSettings.isSansVowels(),
-                        tempSettings.getCharMap());
-            }
-            Set<Pid> idList = MinterService.mint(requestedAmount, tempSettings.Random);
+            // override default settings where applicable
+            DefaultSetting tempSetting = overrideDefaultSetting(parameters,
+                    MinterService.getCurrentSetting());
 
-            message = convertListToJson(idList, tempSettings.getPrepend());
+            // create the set of ids
+            Set<Pid> idList = MinterService.mint(requestedAmount, tempSetting);
+
+            // convert the set of ids into a json array
+            message = convertListToJson(idList, tempSetting.getPrepend());
             //Logger.info("Message from Minter: "+message);
 
             // print list of ids to screen
@@ -289,15 +241,17 @@ public class MinterController {
     public ModelAndView displayIndex() {
         ModelAndView model = new ModelAndView();
 
+        DefaultSetting defaultSetting = MinterService.getCurrentSetting();
+
         Logger.info("index page called");
-        model.addObject("prepend", Settings.getPrepend());
-        model.addObject("prefix", Settings.getPrefix());
-        model.addObject("charMap", Settings.getCharMap());
-        model.addObject("tokenType", Settings.getTokenType());
-        model.addObject("rootLength", Settings.getRootLength());
-        model.addObject("isAuto", Settings.isAuto());
-        model.addObject("isRandom", Settings.isRandom());
-        model.addObject("sansVowel", Settings.isSansVowels());
+        model.addObject("prepend", defaultSetting.getPrepend());
+        model.addObject("prefix", defaultSetting.getPrefix());
+        model.addObject("charMap", defaultSetting.getCharMap());
+        model.addObject("tokenType", defaultSetting.getTokenType());
+        model.addObject("rootLength", defaultSetting.getRootLength());
+        model.addObject("isAuto", defaultSetting.isAuto());
+        model.addObject("isRandom", defaultSetting.isRandom());
+        model.addObject("sansVowel", defaultSetting.isSansVowels());
         model.setViewName("settings");
 
         return model;
@@ -309,37 +263,45 @@ public class MinterController {
      * the default values are maintained.
      *
      * @param parameters List of parameters given by the client.
+     * @param entity
      * @return The settings used for the particular session it was called.
      * @throws BadParameterException
      */
-    private CachedSettings overrideDefaults(Map<String, String> parameters) throws BadParameterException {
-        CachedSettings tempSetting = new CachedSettings(Settings);
-        if (parameters.containsKey("prepend")) {
-            tempSetting.Prepend = parameters.get("prepend");
-        }
-        if (parameters.containsKey("prefix")) {
-            tempSetting.Prefix = (parameters.get("prefix"));
-        }
-        if (parameters.containsKey("rootLength")) {
-            tempSetting.RootLength = (Integer.parseInt(parameters.get("rootLength")));
-        }
-        if (parameters.containsKey("charMap")) {
-            tempSetting.CharMap = (parameters.get("charMap"));
-        }
-        if (parameters.containsKey("tokenType")) {
-            tempSetting.TokenType = getValidTokenType(parameters.get("tokenType"));
-        }
-        if (parameters.containsKey("auto")) {
-            tempSetting.Auto = convertBoolean(parameters.get("auto"), "auto");
-        }
-        if (parameters.containsKey("random")) {
-            tempSetting.Random = convertBoolean(parameters.get("random"), "random");
-        }
-        if (parameters.containsKey("sansVowels")) {
-            tempSetting.SansVowels = convertBoolean(parameters.get("sansVowels"), "sansVowels");
-        }
+    private DefaultSetting overrideDefaultSetting(final Map<String, String> parameters,
+            final DefaultSetting entity) throws BadParameterException {
 
-        return tempSetting;
+        String prepend = (parameters.containsKey("prepend"))
+                ? parameters.get("prepend") : entity.getPrepend();
+
+        String prefix = (parameters.containsKey("prefix"))
+                ? parameters.get("prefix") : entity.getPrefix();
+
+        int rootLength = (parameters.containsKey("rootLength"))
+                ? Integer.parseInt(parameters.get("rootLength")) : entity.getRootLength();
+
+        String charMap = (parameters.containsKey("charMap"))
+                ? parameters.get("charMap") : entity.getCharMap();
+
+        TokenType tokenType = (parameters.containsKey("tokenType"))
+                ? getValidTokenType(parameters.get("tokenType")) : entity.getTokenType();
+
+        boolean isAuto = (parameters.containsKey("auto"))
+                ? convertBoolean(parameters.get("auto"), "auto") : entity.isAuto();
+
+        boolean isRandom = (parameters.containsKey("random"))
+                ? convertBoolean(parameters.get("random"), "random") : entity.isRandom();
+
+        boolean isSansVowels = (parameters.containsKey("sansVowels"))
+                ? convertBoolean(parameters.get("sansVowels"), "sansVowels") : entity.isSansVowels();
+
+        return new DefaultSetting(prepend,
+                prefix,
+                tokenType,
+                charMap,
+                rootLength,
+                isSansVowels,
+                isAuto,
+                isRandom);
     }
 
     /**
@@ -491,148 +453,4 @@ public class MinterController {
         }
     }
 
-    /**
-     * A class used to store the minter settings of a given session.
-     */
-    private class CachedSettings {
-
-        // Fields; detailed description in Minter class
-        private String Prepend;
-        private String Prefix;
-        private TokenType TokenType;
-        private String CharMap;
-        private int RootLength;
-        private boolean SansVowels;
-        private boolean Auto;
-        private boolean Random;
-
-        /**
-         * Copy constructor
-         *
-         * @param s the CachedSetting to copy
-         */
-        public CachedSettings(CachedSettings s) {
-            Prepend = s.getPrepend();
-            Prefix = s.getPrefix();
-            TokenType = s.getTokenType();
-            CharMap = s.getCharMap();
-            RootLength = s.getRootLength();
-            SansVowels = s.isSansVowels();
-            Auto = s.isAuto();
-            Random = s.isRandom();
-        }
-
-        /**
-         * Default constructor
-         */
-        public CachedSettings() {
-        }
-
-        /**
-         * Retrieves the default settings stored in a database
-         *
-         * @throws SQLException thrown whenever there is an error with the
-         * database.
-         * @throws BadParameterException thrown whenever a malformed or invalid
-         * parameter is passed
-         */
-        public void retrieveSettings() throws SQLException, BadParameterException {
-
-            Prepend = (String) MinterService.retrieveSetting(MinterService.getPREPEND_COLUMN());
-            Prefix = (String) MinterService.retrieveSetting(MinterService.getPREFIX_COLUMN());
-
-            if (Prepend == null) {
-                Prepend = "";
-            }
-            if (Prefix == null) {
-                Prefix = "";
-            }
-
-            TokenType = getValidTokenType((String) MinterService.retrieveSetting(MinterService.getTOKEN_TYPE_COLUMN()));
-            CharMap = (String) MinterService.retrieveSetting(MinterService.getCHAR_MAP_COLUMN());
-            RootLength = (int) MinterService.retrieveSetting(MinterService.getROOT_LENGTH_COLUMN());
-
-            int autoFlag = (int) MinterService.retrieveSetting(MinterService.getAUTO_COLUMN());
-            int randomFlag = (int) MinterService.retrieveSetting(MinterService.getRANDOM_COLUMN());
-            int vowelFlag = (int) MinterService.retrieveSetting(MinterService.getSANS_VOWEL_COLUMN());
-
-            SansVowels = (vowelFlag == 1);
-            Auto = (autoFlag == 1);
-            Random = (randomFlag == 1);
-
-        }
-
-        @Override
-        public String toString() {
-            return String.format("prepend=%s\tprefix=%s\ttokenType=%s\tlength=%d\tcharMap=%s"
-                    + "\tauto=%b\trandom=%b\tsans%b",
-                    Prepend, Prefix, TokenType, RootLength, CharMap, Auto, Random, SansVowels);
-        }
-
-        // Typical getters and setters
-        public String getPrepend() {
-            return Prepend;
-        }
-
-        public void setPrepend(String Prepend) {
-            this.Prepend = Prepend;
-        }
-
-        public String getPrefix() {
-            return Prefix;
-        }
-
-        public void setPrefix(String Prefix) {
-            this.Prefix = Prefix;
-        }
-
-        public TokenType getTokenType() {
-            return TokenType;
-        }
-
-        public void setTokenType(TokenType TokenType) {
-            this.TokenType = TokenType;
-        }
-
-        public String getCharMap() {
-            return CharMap;
-        }
-
-        public void setCharMap(String CharMap) {
-            this.CharMap = CharMap;
-        }
-
-        public int getRootLength() {
-            return RootLength;
-        }
-
-        public void setRootLength(int RootLength) {
-            this.RootLength = RootLength;
-        }
-
-        public boolean isSansVowels() {
-            return SansVowels;
-        }
-
-        public void setSansVowels(boolean SansVowels) {
-            this.SansVowels = SansVowels;
-        }
-
-        public boolean isAuto() {
-            return Auto;
-        }
-
-        public void setAuto(boolean Auto) {
-            this.Auto = Auto;
-        }
-
-        public boolean isRandom() {
-            return Random;
-        }
-
-        public void setRandom(boolean Random) {
-            this.Random = Random;
-        }
-
-    }
 }
