@@ -9,6 +9,7 @@ import javax.persistence.Entity;
 
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import org.hibernate.annotations.Type;
 
 
@@ -37,8 +38,13 @@ public abstract class Pid implements Comparable<Pid> {
     
     
     // fields
+    @Transient
     protected int[] BaseMap;
+    
+    @Transient
     protected boolean Unique = true;
+    
+    @Transient
     protected String Prefix;
     
     // Logger; logfile to be stored in resource folder
