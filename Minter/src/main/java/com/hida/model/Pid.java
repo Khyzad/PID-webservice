@@ -1,6 +1,7 @@
 package com.hida.model;
 
 import java.util.Arrays;
+import javax.persistence.Column;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,7 +32,7 @@ public abstract class Pid implements Comparable<Pid> {
      * missing javadoc 
      */
     @Id
-    @Type(type="string")
+    @Column(name = "NAME", updatable = false, nullable = false)
     private String Name;
     
     
