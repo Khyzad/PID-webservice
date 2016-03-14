@@ -16,7 +16,7 @@ public interface UsedSettingDao {
     public UsedSetting findUsedSettingById(int id);
     
     public List<UsedSetting> findAllUsedSettings();    
-    public List<UsedSetting> findUsedSetting(String Prefix, TokenType TokenType, String CharMap,
+    public UsedSetting findUsedSetting(String Prefix, TokenType TokenType, String CharMap,
             int RootLength, boolean SansVowels);
     
     

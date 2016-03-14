@@ -345,7 +345,7 @@ public class MinterServiceImpl implements MinterService {
                 CurrentSetting.getTokenType(),
                 CurrentSetting.getCharMap(),
                 CurrentSetting.getRootLength(),
-                CurrentSetting.isSansVowels()).get(0);
+                CurrentSetting.isSansVowels());
     }
 
     /**
