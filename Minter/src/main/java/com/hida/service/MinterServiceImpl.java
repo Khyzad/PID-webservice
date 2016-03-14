@@ -141,6 +141,7 @@ public class MinterServiceImpl implements MinterService {
      * @throws BadParameterException
      */
     private long getRemainingPermutations() throws BadParameterException {
+        Logger.info("in getRemainingPerumtations");
         long totalPermutations = Generator.calculatePermutations();
         long amountCreated = getAmountCreated();
 
@@ -165,8 +166,10 @@ public class MinterServiceImpl implements MinterService {
      * @return
      */
     private boolean isValidRequest(long remaining, long amount) {
+        Logger.info("in isValidRequest");
         // throw an error if its impossible to generate ids 
         if (remaining < amount) {
+            Logger.info("request is invalid");
             /*
             Logger.error("Not enough remaining Permutations, "
                     + "Requested Amount=" + amount + " --> "
@@ -175,6 +178,7 @@ public class MinterServiceImpl implements MinterService {
             throw new NotEnoughPermutationsException(remaining, amount);
 
         }
+        Logger.info("request is valid");
         return remaining < amount;
     }
 
@@ -182,17 +186,21 @@ public class MinterServiceImpl implements MinterService {
      * missing javadoc
      */
     private void createGenerator() {
+        Logger.info("in createGenerator");
         if (CurrentSetting.isAuto()) {
             Generator = new AutoIdGenerator(
                     CurrentSetting.getPrefix(),
                     CurrentSetting.isSansVowels(),
                     CurrentSetting.getTokenType(),
                     CurrentSetting.getRootLength());
+            
+            Logger.info("AutoGenerator created");
         } else {
             Generator = new CustomIdGenerator(
                     CurrentSetting.getPrefix(),
                     CurrentSetting.isSansVowels(),
                     CurrentSetting.getCharMap());
+            Logger.info("CustomIdGenerator created");
         }
     }
 
@@ -207,6 +215,8 @@ public class MinterServiceImpl implements MinterService {
      */
     @Override
     public Set<Pid> mint(long amount, DefaultSetting setting) throws SQLException, BadParameterException {
+        Logger.info("in mint");
+        
         // store the desired setting values 
         this.CurrentSetting = setting;
 
@@ -258,6 +268,7 @@ public class MinterServiceImpl implements MinterService {
      */
     private Set<Pid> rollIdSet(Set<Pid> set, long totalPermutations, long amount)
             throws SQLException, NotEnoughPermutationsException, BadParameterException {
+        Logger.info("in rollIdSet");
         // Used to count the number of unique ids. Size methods aren't used because int is returned
         long uniqueIdCounter = 0;
 
@@ -310,12 +321,13 @@ public class MinterServiceImpl implements MinterService {
      * parameter is passed
      */
     private void addIdList(Set<Pid> list, long amountCreated) throws SQLException, BadParameterException {
-        Logger.info("Database being updated");
+        Logger.info("in addIdlIst");
         
         for (Pid pid : list) {
             PidDao.savePid(pid);
         }
 
+        Logger.info("DatabaseUpdated with new pids");
         // update table format
         recordSettings(amountCreated);
 
@@ -328,6 +340,7 @@ public class MinterServiceImpl implements MinterService {
      * @return
      */
     private UsedSetting findUsedSetting() {
+        Logger.info("in findUsedSetting");
         return UsedSettingDao.findUsedSetting(CurrentSetting.getPrefix(),
                 CurrentSetting.getTokenType(),
                 CurrentSetting.getCharMap(),
@@ -342,6 +355,8 @@ public class MinterServiceImpl implements MinterService {
      * @param setting
      */
     private void recordSettings(long amount) {
+        Logger.info("in recordSettings");
+        
         UsedSetting entity = findUsedSetting();
 
         if (entity == null) {
@@ -366,6 +381,7 @@ public class MinterServiceImpl implements MinterService {
      * @return 
      */
     private boolean isValidId(Pid pid){
+        Logger.info("in isValidId");
         Pid entity = this.PidDao.findByName(pid.getName());
         return entity != null;        
     }            
@@ -373,6 +389,7 @@ public class MinterServiceImpl implements MinterService {
            
     @Override
     public void updateCurrentSetting(DefaultSetting newSetting){
+        Logger.info("in updateCurrentSetting");
         CurrentSetting.setPrepend(newSetting.getPrepend());
         CurrentSetting.setPrefix(newSetting.getPrefix());
         CurrentSetting.setCharMap(newSetting.getCharMap());
