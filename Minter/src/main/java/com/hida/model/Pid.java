@@ -25,7 +25,7 @@ import org.hibernate.annotations.Type;
  * @author lruffin
  */
 @Entity
-@Table(name="ID_TABLE")
+@Table(name="PIDS")
 public abstract class Pid implements Comparable<Pid> {
 
     
