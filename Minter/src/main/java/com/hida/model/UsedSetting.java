@@ -2,8 +2,6 @@ package com.hida.model;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
-import org.hibernate.annotations.Type;
 
 /**
  *
@@ -14,9 +12,7 @@ import org.hibernate.annotations.Type;
 public class UsedSetting extends Setting{
     
     
-    @NotNull
     @Column(name="AMOUNT")
-    @Type(type="long")
     private long Amount;
 
 

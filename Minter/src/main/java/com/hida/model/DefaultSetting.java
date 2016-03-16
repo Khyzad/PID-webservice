@@ -3,8 +3,6 @@ package com.hida.model;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
-import org.hibernate.annotations.Type;
 
 /**
  * missing javadoc
@@ -14,19 +12,13 @@ import org.hibernate.annotations.Type;
 @Table(name = "DEFAULT_SETTING")
 public class DefaultSetting extends Setting {
 
-    @NotNull
     @Column(name = "PREPEND", nullable = false)
-    @Type(type="java.lang.String")
     private String Prepend;
     
-    @NotNull
     @Column(name="ISAUTO")
-    @Type(type="boolean")
     private boolean Auto;
     
-    @NotNull
     @Column(name="ISRANDOM")
-    @Type(type="boolean")
     private boolean Random;
 
 
