@@ -240,9 +240,9 @@ public class MinterController {
             method = {org.springframework.web.bind.annotation.RequestMethod.GET})
     public ModelAndView displayIndex() {
         ModelAndView model = new ModelAndView();
-
+                                 
         DefaultSetting defaultSetting = MinterService.getCurrentSetting();
-
+        
         Logger.info("index page called");
         model.addObject("prepend", defaultSetting.getPrepend());
         model.addObject("prefix", defaultSetting.getPrefix());
@@ -382,9 +382,16 @@ public class MinterController {
         mav.addObject("status", 500);
         mav.addObject("exception", exception.getClass().getSimpleName());
         mav.addObject("message", exception.getMessage());
-        Logger.error("Error"
+        Logger.error("Error "
                 + "General Error: " + exception.getMessage());
 
+        StackTraceElement[] stacktrace = exception.getStackTrace();
+        String traceList = "";
+        for(StackTraceElement s : stacktrace){
+            traceList += s.toString() + "\n";
+        }
+        mav.addObject("stacktrace", traceList);
+        
         mav.setViewName("error");
         return mav;
     }

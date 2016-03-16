@@ -14,6 +14,11 @@
 {
     "Status" :      "${status}",
     "Exception" :   "${exception}",
-    "Message" :     "${message}"
+    "Messages" :     "${message}"
 }</pre>
+
+<pre>
+"${stacktrace}"    
+
+</pre>
 </html>
