@@ -126,31 +126,7 @@ public class MinterServiceImpl implements MinterService {
         }else{
             return entity.getAmount();
         }        
-    }
-
-    /**
-     * missing javadoc
-     *
-     * @param total
-     * @param amountCreated
-     * @return
-     */
-    private boolean isValidRequest(long remaining, long amount) {
-        Logger.info("in isValidRequest");
-        // throw an error if its impossible to generate ids 
-        if (remaining < amount) {
-            Logger.info("request is invalid");
-            /*
-            Logger.error("Not enough remaining Permutations, "
-                    + "Requested Amount=" + amount + " --> "
-                    + "Amount Remaining=" + remaining);
-            */
-            throw new NotEnoughPermutationsException(remaining, amount);
-
-        }
-        Logger.info("request is valid");
-        return remaining < amount;
-    }
+    }   
 
     /**
      * missing javadoc
@@ -200,12 +176,13 @@ public class MinterServiceImpl implements MinterService {
         long remaining = getRemainingPermutations();
         
         // determine if its possible to create the requested amount of ids
-        if (isValidRequest(remaining, amount)) {
+        if (remaining < amount) {
             Logger.error("Not enough remaining Permutations, "
                     + "Requested Amount=" + amount + " --> "
                     + "Amount Remaining=" + remaining);
             throw new NotEnoughPermutationsException(remaining, amount);
-        }
+        }        
+        Logger.info("request is valid");
 
         /* 
          if the current setting is random, have the generator return a random set,
