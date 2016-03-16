@@ -57,7 +57,7 @@ public class UsedSettingDaoImpl extends AbstractDao<Integer, UsedSetting> implem
     @Override
     public UsedSetting findUsedSettingById(int id) {
         Criteria criteria = createEntityCriteria();
-        criteria.add(Restrictions.eq("id", id));
+        criteria.add(Restrictions.eq("Id", id));
         return (UsedSetting) criteria.uniqueResult();
     }
 
@@ -75,8 +75,8 @@ public class UsedSettingDaoImpl extends AbstractDao<Integer, UsedSetting> implem
     public UsedSetting findUsedSetting(String Prefix, TokenType TokenType, String CharMap,
             int RootLength, boolean SansVowels) {
         Query query = this.getSession().createSQLQuery(
-                String.format("Select from USED_SETTING where prefix='%s' "
-                        + "and charmap='%s' and rootlength='%d' and sansvowels='%b'",
+                String.format("Select Id from USED_SETTING where Pid_Prefix='%s' "
+                        + "and Charmap='%s' and RootLength='%d' and SansVowels='%b'",
                         Prefix, CharMap, RootLength, SansVowels));
 
         List list = query.list();
