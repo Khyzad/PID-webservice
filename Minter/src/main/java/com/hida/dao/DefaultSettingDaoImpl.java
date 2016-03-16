@@ -4,7 +4,6 @@ import com.hida.model.DefaultSetting;
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * missing javadoc
@@ -43,7 +42,7 @@ public class DefaultSettingDaoImpl extends AbstractDao<Integer, DefaultSetting>
     @Override
     public DefaultSetting getDefaultSetting() {
         Criteria criteria = createEntityCriteria();
-        criteria.add(Restrictions.eq("id", 0));
+        criteria.add(Restrictions.eq("Id", 1));
         return (DefaultSetting) criteria.uniqueResult();
     }
 
