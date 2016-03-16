@@ -75,9 +75,13 @@ public class UsedSettingDaoImpl extends AbstractDao<Integer, UsedSetting> implem
     public UsedSetting findUsedSetting(String Prefix, TokenType TokenType, String CharMap,
             int RootLength, boolean SansVowels) {
         Query query = this.getSession().createSQLQuery(
-                String.format("Select Id from USED_SETTING where Pid_Prefix='%s' "
-                        + "and Charmap='%s' and RootLength='%d' and SansVowels='%b'",
-                        Prefix, CharMap, RootLength, SansVowels));
+                String.format("Select Id from USED_SETTING where "
+                        + "Pid_Prefix='%s' and "
+                        + "TokenType='%s' and "
+                        + "Charmap='%s' and "
+                        + "RootLength='%d' and "
+                        + "SansVowels='%b'",
+                        Prefix, TokenType, CharMap, RootLength, SansVowels));
 
         List list = query.list();
         if (list.isEmpty()) {

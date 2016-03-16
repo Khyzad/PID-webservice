@@ -1,13 +1,14 @@
 package com.hida.model;
 
 import javax.persistence.Column;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-import org.hibernate.annotations.Type;
+
 
 /**
  * missing javadoc
@@ -23,26 +24,20 @@ public class Setting {
     private int Id;
 
     @NotNull
-    @Size(min = 0, max = 10)
     @Column(name = "PID_PREFIX", nullable = false)
-    @Type(type = "java.lang.String")
     private String Prefix;
 
     @Column(name = "TOKENTYPE")
-    //@Type(type = "com.hida.model.TokenType")
+    @Enumerated(EnumType.STRING)
     private TokenType TokenType;
 
     @Column(name = "CHARMAP")
-    @Type(type = "java.lang.String")
     private String CharMap;
 
-    @Type(type = "short")
     @Column(name = "ROOTLENGTH")
     private int RootLength;
 
-    @NotNull
     @Column(name = "SANSVOWELS")
-    @Type(type = "boolean")
     private boolean SansVowels;
 
     /**

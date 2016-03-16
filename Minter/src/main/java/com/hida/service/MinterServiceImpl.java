@@ -388,7 +388,7 @@ public class MinterServiceImpl implements MinterService {
                     true, // is auto
                     true); // is random
 
-            //DefaultSettingDao.save(defaultEntity);
+            DefaultSettingDao.save(CurrentSetting);
         }              
         return CurrentSetting;
     }
