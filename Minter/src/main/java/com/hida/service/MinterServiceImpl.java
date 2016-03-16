@@ -72,41 +72,7 @@ public class MinterServiceImpl implements MinterService {
     public MinterServiceImpl() {
         
     }
-
-    /**
-     * Attempts to connect to the database.
-     *
-     * Upon connecting to the database, the method will try to detect whether or
-     * not a table exists. A table is created if it does not already exists.
-     *
-     * @return true if connection and table creation was successful, false
-     * otherwise
-     * @throws ClassNotFoundException thrown whenever the JDBC driver is not
-     * found
-     * @throws SQLException thrown whenever there is an error with the database
-     */
-    @Override
-    public boolean createConnection() throws ClassNotFoundException, SQLException {        
-        DefaultSetting defaultEntity = DefaultSettingDao.getDefaultSetting();
-        if (defaultEntity == null) {
-
-            // create initial default values to be stored in the database
-            defaultEntity = new DefaultSetting("", // prepend
-                    "", // prefix
-                    TokenType.DIGIT, // token type
-                    "ddddd", // charmap
-                    5, // rootlength
-                    true, // sans vowel
-                    true, // is auto
-                    true); // is random
-
-            //DefaultSettingDao.save(defaultEntity);
-        }
-        
-        CurrentSetting = defaultEntity;
-        return true;
-    }
-
+    
     /**
      * missing javadoc
      *
@@ -398,25 +364,27 @@ public class MinterServiceImpl implements MinterService {
         CurrentSetting.setAuto(newSetting.isAuto());
         CurrentSetting.setRandom(newSetting.isRandom());
         CurrentSetting.setSansVowels(newSetting.isSansVowels());
-    }
-    
-    
-    /**
-     * Used by an external method to close this connection.
-     *
-     * @return
-     * @throws SQLException thrown whenever there is an error with the database
-     */
-    @Override
-    public boolean closeConnection() throws SQLException {
-        Logger.info("DB Connection Closed");
-        return true;
-    }
+    }            
     
     
     /* typical getters and setters */
     @Override
     public DefaultSetting getCurrentSetting() {
+        CurrentSetting = DefaultSettingDao.getDefaultSetting();
+        if (CurrentSetting == null) {
+
+            // create initial default values to be stored in the database
+            CurrentSetting = new DefaultSetting("", // prepend
+                    "", // prefix
+                    TokenType.DIGIT, // token type
+                    "ddddd", // charmap
+                    5, // rootlength
+                    true, // sans vowel
+                    true, // is auto
+                    true); // is random
+
+            //DefaultSettingDao.save(defaultEntity);
+        }              
         return CurrentSetting;
     }
 

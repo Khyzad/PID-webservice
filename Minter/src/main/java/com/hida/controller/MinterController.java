@@ -79,7 +79,6 @@ public class MinterController {
             DefaultSetting oldSetting = MinterService.getCurrentSetting();
             DefaultSetting newSetting;
 
-            MinterService.createConnection();
             // Logger.info("in handleForm");
             String prepend = request.getParameter("prepend");
             String prefix = request.getParameter("idprefix");
@@ -163,10 +162,7 @@ public class MinterController {
 
             }
 
-            MinterService.updateCurrentSetting(newSetting);
-
-            // close the connection and update the cache            
-            MinterService.closeConnection();
+            MinterService.updateCurrentSetting(newSetting);           
         } finally {
             // unlocks RequestLock and gives access to longest waiting thread            
             RequestLock.unlock();
@@ -202,10 +198,6 @@ public class MinterController {
         // message variable to be sent to mint.jsp
         String message;
         try {
-            // create a connection  
-            MinterService.createConnection();
-            //Logger.info("Database Connection Created to: " + MinterService.getDatabaseName());
-
             // override default settings where applicable
             DefaultSetting tempSetting = overrideDefaultSetting(parameters,
                     MinterService.getCurrentSetting());
@@ -220,8 +212,6 @@ public class MinterController {
             // print list of ids to screen
             model.addAttribute("message", message);
 
-            // close the connection
-            MinterService.closeConnection();
         } finally {
             // unlocks RequestLock and gives access to longest waiting thread            
             RequestLock.unlock();

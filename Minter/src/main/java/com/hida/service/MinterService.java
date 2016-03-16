@@ -10,12 +10,7 @@ import java.util.Set;
  *
  * @author lruffin
  */
-public interface MinterService {            
-    public boolean createConnection() throws ClassNotFoundException, SQLException;
-    public boolean closeConnection() throws SQLException;
-            
-    
-    
+public interface MinterService {                                    
     public Set<Pid> mint(long amount, DefaultSetting setting) throws SQLException, 
             BadParameterException;
     
