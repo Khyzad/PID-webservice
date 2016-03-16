@@ -121,7 +121,11 @@ public class MinterServiceImpl implements MinterService {
      */
     private long getAmountCreated() {
         UsedSetting entity = findUsedSetting();
-        return entity.getAmount();
+        if(entity == null){
+            return 0;
+        }else{
+            return entity.getAmount();
+        }        
     }
 
     /**
