@@ -227,6 +227,11 @@ public class CustomIdGenerator extends IdGenerator {
             }
             return charId;
         }
+        
+        @Override
+        public String getName(){
+            return Prefix + this.getRootName();
+        }
 
         @Override
         public String toString() {

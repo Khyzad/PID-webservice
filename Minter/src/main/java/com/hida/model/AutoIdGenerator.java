@@ -245,6 +245,11 @@ public class AutoIdGenerator extends IdGenerator {
             }
             return charId;
         }
+        
+        @Override
+        public String getName(){
+            return Prefix + this.getRootName();
+        }
 
         @Override
         public String toString() {
