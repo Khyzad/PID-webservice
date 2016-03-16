@@ -7,6 +7,8 @@ import static com.hida.model.IdGenerator.Logger;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.TreeSet;
+import javax.persistence.Entity;
+import javax.persistence.Transient;
 
 /**
  *
@@ -193,10 +195,16 @@ public class AutoIdGenerator extends IdGenerator {
     /**
      * Created and used by AutoIdGenerator
      */
+    @Entity
     private class AutoId extends Pid {
 
+        @Transient
         private String TokenMap;
 
+        public AutoId(){
+            
+        }
+        
         public AutoId(AutoId id) {
             super(id);
             this.TokenMap = id.getTokenMap();

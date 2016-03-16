@@ -8,6 +8,8 @@ import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.TreeSet;
+import javax.persistence.Entity;
+import javax.persistence.Transient;
 
 /**
  *
@@ -172,9 +174,15 @@ public class CustomIdGenerator extends IdGenerator {
     /**
      * Created and used by CustomMinters
      */
+    @Entity
     private class CustomId extends Pid {
 
+        @Transient
         private String[] TokenMapArray;
+        
+        public CustomId(){
+            
+        }
 
         public CustomId(CustomId id) {
             super(id);
