@@ -9,7 +9,6 @@ import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.Table;
 import javax.persistence.Transient;
-import org.hibernate.annotations.Type;
 
 /**
  * An object used to model every Pid. By definition, each Pid will have a unique

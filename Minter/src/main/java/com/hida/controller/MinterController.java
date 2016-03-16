@@ -5,7 +5,6 @@ import com.hida.model.DefaultSetting;
 
 import com.hida.model.NotEnoughPermutationsException;
 import com.hida.model.Pid;
-import com.hida.model.Setting;
 import com.hida.model.TokenType;
 import com.hida.service.MinterService;
 import org.springframework.stereotype.Controller;
@@ -15,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import org.springframework.web.bind.annotation.ExceptionHandler;
