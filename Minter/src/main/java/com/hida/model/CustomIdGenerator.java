@@ -57,7 +57,6 @@ public class CustomIdGenerator extends IdGenerator {
             this.BaseMap.put("m", VOWEL_TOKEN + VOWEL_TOKEN.toUpperCase());
             this.BaseMap.put("e", DIGIT_TOKEN + VOWEL_TOKEN + VOWEL_TOKEN.toUpperCase());
         }
-        Logger.info("BaseMap values set to: " + BaseMap);
     }
 
     /**

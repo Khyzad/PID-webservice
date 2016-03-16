@@ -71,7 +71,6 @@ public class AutoIdGenerator extends IdGenerator {
             this.BaseMap.put(TokenType.MIXED_EXTENDED,
                     DIGIT_TOKEN + VOWEL_TOKEN + VOWEL_TOKEN.toUpperCase());
         }
-        Logger.info("BaseMap values set to: " + BaseMap);
     }
 
     /**
