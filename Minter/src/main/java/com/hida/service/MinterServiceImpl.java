@@ -294,6 +294,7 @@ public class MinterServiceImpl implements MinterService {
         Logger.info("in addIdlIst");
         
         for (Pid pid : list) {
+            pid.setName(pid.getName());
             PidDao.savePid(pid);
         }
 
@@ -353,7 +354,7 @@ public class MinterServiceImpl implements MinterService {
     private boolean isValidId(Pid pid){
         Logger.info("in isValidId");
         Pid entity = this.PidDao.findByName(pid.getName());
-        return entity != null;        
+        return entity == null;        
     }            
        
            
