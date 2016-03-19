@@ -28,6 +28,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
 /**
@@ -48,15 +49,12 @@ public class MinterController {
      * sequentially instead of concurrently. pids
      */
     private static final ReentrantLock RequestLock = new ReentrantLock(true);
-    
 
     /**
      * create a database to be used to create and count number of ids
      */
     @Autowired
     private MinterService MinterService;
-   
-    
 
     /**
      * Redirects to the index after retrieving updated settings from the
@@ -71,8 +69,7 @@ public class MinterController {
      * detected.
      * @throws ClassNotFoundException Thrown whenever a class does not exist.
      */
-    @RequestMapping(value = {"/confirmation"},
-            method = {org.springframework.web.bind.annotation.RequestMethod.POST})
+    @RequestMapping(value = {"/confirmation"}, method = {RequestMethod.POST})
     public String handleForm(HttpServletRequest request, HttpServletResponse response)
             throws ClassNotFoundException, SQLException, BadParameterException {
         try {
@@ -81,7 +78,7 @@ public class MinterController {
             DefaultSetting oldSetting = MinterService.getCurrentSetting();
             DefaultSetting newSetting;
 
-            // Logger.info("in handleForm");
+            Logger.info("in handleForm");
             String prepend = request.getParameter("prepend");
             String prefix = request.getParameter("idprefix");
             String isAuto = request.getParameter("mintType");
@@ -92,7 +89,6 @@ public class MinterController {
             String lowerToken;
             String upperToken;
             String charMap;
-            
 
             boolean auto = isAuto.equals("auto");
             boolean random = isRandom.equals("random");
@@ -122,50 +118,60 @@ public class MinterController {
                 // gets the tokenmap value
                 if (digitToken != null && lowerToken == null && upperToken == null) {
                     tokenType = TokenType.DIGIT;
-                } else if (digitToken == null && lowerToken != null && upperToken == null) {
+                }
+                else if (digitToken == null && lowerToken != null && upperToken == null) {
                     tokenType = TokenType.LOWERCASE;
-                } else if (digitToken == null && lowerToken == null && upperToken != null) {
+                }
+                else if (digitToken == null && lowerToken == null && upperToken != null) {
                     tokenType = TokenType.UPPERCASE;
-                } else if (digitToken == null && lowerToken != null && upperToken != null) {
+                }
+                else if (digitToken == null && lowerToken != null && upperToken != null) {
                     tokenType = TokenType.MIXEDCASE;
-                } else if (digitToken != null && lowerToken != null && upperToken == null) {
+                }
+                else if (digitToken != null && lowerToken != null && upperToken == null) {
                     tokenType = TokenType.LOWER_EXTENDED;
-                } else if (digitToken == null && lowerToken == null && upperToken != null) {
+                }
+                else if (digitToken == null && lowerToken == null && upperToken != null) {
                     tokenType = TokenType.UPPER_EXTENDED;
-                } else if (digitToken != null && lowerToken != null && upperToken != null) {
+                }
+                else if (digitToken != null && lowerToken != null && upperToken != null) {
                     tokenType = TokenType.MIXED_EXTENDED;
-                } else {
+                }
+                else {
                     throw new BadParameterException();
                 }
 
+                // create new defaultsetting bject
                 newSetting = new DefaultSetting(prepend,
                         prefix,
                         tokenType,
                         oldSetting.getCharMap(),
                         length,
                         vowels,
-                        auto, 
-                        random);               
-            } else {
+                        auto,
+                        random);
+            }
+            else {
 
                 charMap = request.getParameter("charmapping");
                 if (charMap == null || charMap.isEmpty()) {
                     throw new BadParameterException();
                 }
-                
+
                 newSetting = new DefaultSetting(prepend,
                         prefix,
                         oldSetting.getTokenType(),
                         charMap,
                         oldSetting.getRootLength(),
                         vowels,
-                        auto, 
+                        auto,
                         random);
 
             }
 
-            MinterService.updateCurrentSetting(newSetting);           
-        } finally {
+            MinterService.updateCurrentSetting(newSetting);
+        }
+        finally {
             // unlocks RequestLock and gives access to longest waiting thread            
             RequestLock.unlock();
             Logger.warn("Request to update default settings finished, UNLOCKING MINTER");
@@ -187,11 +193,9 @@ public class MinterController {
      * @throws Exception catches all sorts of exceptions that may be thrown by
      * any methods
      */
-    @RequestMapping(value = {"/mint/{requestedAmount}"},
-            method = {org.springframework.web.bind.annotation.RequestMethod.GET})
+    @RequestMapping(value = {"/mint/{requestedAmount}"}, method = {RequestMethod.GET})
     public String printPids(@PathVariable long requestedAmount, ModelMap model,
-            @RequestParam Map<String, String> parameters)
-            throws Exception {
+            @RequestParam Map<String, String> parameters) throws Exception {
 
         // ensure that only one thread access the minter at any given time
         RequestLock.lock();
@@ -214,7 +218,8 @@ public class MinterController {
             // print list of ids to screen
             model.addAttribute("message", message);
 
-        } finally {
+        }
+        finally {
             // unlocks RequestLock and gives access to longest waiting thread            
             RequestLock.unlock();
             Logger.warn("Request to Minter Finished, UNLOCKING MINTER");
@@ -228,13 +233,14 @@ public class MinterController {
      *
      * @return name of the index page
      */
-    @RequestMapping(value = {""},
-            method = {org.springframework.web.bind.annotation.RequestMethod.GET})
+    @RequestMapping(value = {""}, method = {RequestMethod.GET})
     public ModelAndView displayIndex() {
         ModelAndView model = new ModelAndView();
-                                 
+
+        // retrieve default values stored in the database
         DefaultSetting defaultSetting = MinterService.getCurrentSetting();
-        
+
+        // add the values to the settings page so that they can be displayed 
         Logger.info("index page called");
         model.addObject("prepend", defaultSetting.getPrepend());
         model.addObject("prefix", defaultSetting.getPrefix());
@@ -247,6 +253,76 @@ public class MinterController {
         model.setViewName("settings");
 
         return model;
+    }
+
+    /**
+     * Returns a view that displays the error message of
+     * NotEnoughPermutationsException.
+     *
+     * @param req The HTTP request.
+     * @param exception NotEnoughPermutationsException.
+     * @return The view of the error message in json format.
+     */
+    @ExceptionHandler(NotEnoughPermutationsException.class)
+    public ModelAndView handlePermutationError(HttpServletRequest req, Exception exception) {
+        Logger.error("Request: " + req.getRequestURL()
+                + " raised " + exception
+                + " with message " + exception.getMessage());
+
+        ModelAndView mav = new ModelAndView();
+        mav.addObject("status", 400);
+        mav.addObject("exception", exception.getClass().getSimpleName());
+        mav.addObject("message", exception.getMessage());
+        mav.setViewName("error");
+        return mav;
+
+    }
+
+    /**
+     * Returns a view that displays the error message of BadParameterException.
+     *
+     * @param req The HTTP request.
+     * @param exception BadParameterException.
+     * @return The view of the error message in json format.
+     */
+    @ExceptionHandler(BadParameterException.class)
+    public ModelAndView handleBadParameterError(HttpServletRequest req, Exception exception) {
+        Logger.error("Request: " + req.getRequestURL() + " raised " + exception);
+        ModelAndView mav = new ModelAndView();
+        mav.addObject("status", 400);
+        mav.addObject("exception", exception.getClass().getSimpleName());
+        mav.addObject("message", exception.getMessage());
+        Logger.error("Error with bad parameter: " + exception.getMessage());
+
+        mav.setViewName("error");
+        return mav;
+    }
+
+    /**
+     * Throws any exception that may be caught within the program
+     *
+     * @param req the HTTP request
+     * @param exception the caught exception
+     * @return The view of the error message
+     */
+    @ExceptionHandler(Exception.class)
+    public ModelAndView handleGeneralError(HttpServletRequest req, Exception exception) {
+        ModelAndView mav = new ModelAndView();
+        mav.addObject("status", 500);
+        mav.addObject("exception", exception.getClass().getSimpleName());
+        mav.addObject("message", exception.getMessage());
+        Logger.error("General Error: " + exception.getMessage());
+
+        // display stack trace
+        StackTraceElement[] stacktrace = exception.getStackTrace();
+        String traceList = "";
+        for (StackTraceElement s : stacktrace) {
+            traceList += s.toString() + "\n";
+        }
+        mav.addObject("stacktrace", traceList);
+
+        mav.setViewName("error");
+        return mav;
     }
 
     /**
@@ -263,28 +339,36 @@ public class MinterController {
             final DefaultSetting entity) throws BadParameterException {
 
         String prepend = (parameters.containsKey("prepend"))
-                ? parameters.get("prepend") : entity.getPrepend();
+                ? parameters.get("prepend")
+                : entity.getPrepend();
 
         String prefix = (parameters.containsKey("prefix"))
-                ? parameters.get("prefix") : entity.getPrefix();
+                ? parameters.get("prefix")
+                : entity.getPrefix();
 
         int rootLength = (parameters.containsKey("rootLength"))
-                ? Integer.parseInt(parameters.get("rootLength")) : entity.getRootLength();
+                ? Integer.parseInt(parameters.get("rootLength"))
+                : entity.getRootLength();
 
         String charMap = (parameters.containsKey("charMap"))
-                ? parameters.get("charMap") : entity.getCharMap();
+                ? parameters.get("charMap")
+                : entity.getCharMap();
 
         TokenType tokenType = (parameters.containsKey("tokenType"))
-                ? getValidTokenType(parameters.get("tokenType")) : entity.getTokenType();
+                ? getValidTokenType(parameters.get("tokenType"))
+                : entity.getTokenType();
 
         boolean isAuto = (parameters.containsKey("auto"))
-                ? convertBoolean(parameters.get("auto"), "auto") : entity.isAuto();
+                ? convertBoolean(parameters.get("auto"), "auto")
+                : entity.isAuto();
 
         boolean isRandom = (parameters.containsKey("random"))
-                ? convertBoolean(parameters.get("random"), "random") : entity.isRandom();
+                ? convertBoolean(parameters.get("random"), "random")
+                : entity.isRandom();
 
         boolean isSansVowels = (parameters.containsKey("sansVowels"))
-                ? convertBoolean(parameters.get("sansVowels"), "sansVowels") : entity.isSansVowels();
+                ? convertBoolean(parameters.get("sansVowels"), "sansVowels")
+                : entity.isSansVowels();
 
         return new DefaultSetting(prepend,
                 prefix,
@@ -312,80 +396,13 @@ public class MinterController {
             throws BadParameterException {
         if (parameter.equals("true")) {
             return true;
-        } else if (parameter.equals("false")) {
+        }
+        else if (parameter.equals("false")) {
             return false;
-        } else {
+        }
+        else {
             throw new BadParameterException(parameter, parameterType);
         }
-    }
-
-    /**
-     * Returns a view that displays the error message of
-     * NotEnoughPermutationsException.
-     *
-     * @param req The HTTP request.
-     * @param exception NotEnoughPermutationsException.
-     * @return The view of the error message in json format.
-     */
-    @ExceptionHandler(NotEnoughPermutationsException.class)
-    public ModelAndView handlePermutationError(HttpServletRequest req, Exception exception) {
-        //logger.error("Request: " + req.getRequestURL() + " raised " + exception);
-
-        ModelAndView mav = new ModelAndView();
-        mav.addObject("status", 400);
-        mav.addObject("exception", exception.getClass().getSimpleName());
-        mav.addObject("message", exception.getMessage());
-        Logger.error("Error with permutation: " + exception.getMessage());
-        mav.setViewName("error");
-        return mav;
-
-    }
-
-    /**
-     * Returns a view that displays the error message of BadParameterException.
-     *
-     * @param req The HTTP request.
-     * @param exception BadParameterException.
-     * @return The view of the error message in json format.
-     */
-    @ExceptionHandler(BadParameterException.class)
-    public ModelAndView handleBadParameterError(HttpServletRequest req, Exception exception) {
-        //logger.error("Request: " + req.getRequestURL() + " raised " + exception);
-        ModelAndView mav = new ModelAndView();
-        mav.addObject("status", 400);
-        mav.addObject("exception", exception.getClass().getSimpleName());
-        mav.addObject("message", exception.getMessage());
-        Logger.error("Error with bad parameter: " + exception.getMessage());
-
-        mav.setViewName("error");
-        return mav;
-    }
-
-    /**
-     * Throws any exception that may be caught within the program
-     *
-     * @param req the HTTP request
-     * @param exception the caught exception
-     * @return The view of the error message
-     */
-    @ExceptionHandler(Exception.class)
-    public ModelAndView handleGeneralError(HttpServletRequest req, Exception exception) {
-        ModelAndView mav = new ModelAndView();
-        mav.addObject("status", 500);
-        mav.addObject("exception", exception.getClass().getSimpleName());
-        mav.addObject("message", exception.getMessage());
-        Logger.error("Error "
-                + "General Error: " + exception.getMessage());
-
-        StackTraceElement[] stacktrace = exception.getStackTrace();
-        String traceList = "";
-        for(StackTraceElement s : stacktrace){
-            traceList += s.toString() + "\n";
-        }
-        mav.addObject("stacktrace", traceList);
-        
-        mav.setViewName("error");
-        return mav;
     }
 
     /**
@@ -397,18 +414,18 @@ public class MinterController {
      * @return A reference to a String that contains Json set of ids
      * @throws IOException thrown whenever a file could not be found
      */
-    public String convertListToJson(Set<Pid> set, String prepend) throws IOException {
+    private String convertListToJson(Set<Pid> set, String prepend) throws IOException {
 
         // Jackson objects to format JSON strings
         String jsonString;
         ObjectMapper mapper = new ObjectMapper();
         Object formattedJson;
-        
+
         // Javax objects to create JSON strings
         JsonBuilderFactory factory = Json.createBuilderFactory(null);
         JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
         JsonArray jsonArray;
-        
+
         // convert the set of ids into a json array
         int counter = 0;
         for (Pid id : set) {
@@ -423,8 +440,8 @@ public class MinterController {
         formattedJson = mapper.readValue(jsonArray.toString(), Object.class);
         jsonString = mapper.writerWithDefaultPrettyPrinter().
                 writeValueAsString(formattedJson);
-        
-        return jsonString;       
+
+        return jsonString;
     }
 
     /**
@@ -437,7 +454,7 @@ public class MinterController {
      * @throws BadParameterException thrown whenever a malformed or invalid
      * parameter is passed
      */
-    public final TokenType getValidTokenType(String tokenType) throws BadParameterException {
+    private TokenType getValidTokenType(String tokenType) throws BadParameterException {
 
         switch (tokenType) {
             case "DIGIT":
