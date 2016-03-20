@@ -17,6 +17,5 @@ public enum TokenType {
     MIXEDCASE,
     LOWER_EXTENDED,
     UPPER_EXTENDED,
-    MIXED_EXTENDED,
-    ERROR;
+    MIXED_EXTENDED;   
 }
