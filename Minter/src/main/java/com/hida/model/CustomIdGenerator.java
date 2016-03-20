@@ -238,7 +238,8 @@ public class CustomIdGenerator extends IdGenerator {
         
         @Override
         public String getName(){
-            return Prefix + this.getRootName();
+            Name = Prefix + this.getRootName();
+            return Name;
         }
 
         @Override

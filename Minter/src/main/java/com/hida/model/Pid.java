@@ -31,7 +31,7 @@ public abstract class Pid implements Comparable<Pid> {
      */
     @Id
     @Column(name = "NAME", updatable = false, nullable = false)
-    private String Name;
+    protected String Name;
 
     @Transient
     protected int[] BaseMap;

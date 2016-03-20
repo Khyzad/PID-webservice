@@ -271,7 +271,6 @@ public class MinterServiceImpl implements MinterService {
         Logger.info("in addIdlIst");
         
         for (Pid pid : list) {
-            pid.setName(pid.getName());
             PidDao.savePid(pid);
         }
 
