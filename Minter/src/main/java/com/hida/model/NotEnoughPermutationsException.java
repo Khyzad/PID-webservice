@@ -1,7 +1,5 @@
 package com.hida.model;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
@@ -15,9 +13,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
         + "of permutations")
 public class NotEnoughPermutationsException extends RuntimeException {
 
-    // Logger; logfile to be stored in resource folder
-    private static final Logger Logger = 
-            LoggerFactory.getLogger(NotEnoughPermutationsException.class);
     private long RemainingPermutations;
     private long RequestedAmount;
 
