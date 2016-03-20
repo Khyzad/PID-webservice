@@ -37,13 +37,23 @@ public class DefaultSettingDaoImpl extends AbstractDao<Integer, DefaultSetting>
     /**
      * missing javadoc
      *
+     * @param id
+     * @param name
+     * @return
+     */
+    private DefaultSetting findById(int id) {
+        return getByKey(id);
+    }
+
+    /**
+     * missing javadoc
+     *
      * @return
      */
     @Override
     public DefaultSetting getDefaultSetting() {
-        Criteria criteria = createEntityCriteria();
-        criteria.add(Restrictions.eq("Id", 1));
-        return (DefaultSetting) criteria.uniqueResult();
+        // An Id of 1 is sought after because they're automatically generated from 1
+        return findById(1);
     }
 
 }

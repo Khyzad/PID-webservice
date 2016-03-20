@@ -337,6 +337,8 @@ public class MinterServiceImpl implements MinterService {
     @Override
     public void updateCurrentSetting(DefaultSetting newSetting){
         Logger.info("in updateCurrentSetting");
+        
+        CurrentSetting = DefaultSettingDao.getDefaultSetting();  
         CurrentSetting.setPrepend(newSetting.getPrepend());
         CurrentSetting.setPrefix(newSetting.getPrefix());
         CurrentSetting.setCharMap(newSetting.getCharMap());
