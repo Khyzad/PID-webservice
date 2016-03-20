@@ -1,8 +1,6 @@
 package com.hida.dao;
 
 import com.hida.model.DefaultSetting;
-import org.hibernate.Criteria;
-import org.hibernate.criterion.Restrictions;
 import org.springframework.stereotype.Repository;
 
 /**
