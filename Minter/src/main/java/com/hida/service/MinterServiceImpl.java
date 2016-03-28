@@ -72,33 +72,7 @@ public class MinterServiceImpl implements MinterService {
     public MinterServiceImpl() {
         
     }
-    
-    /**
-     * missing javadoc
-     *
-     * @param prefix
-     * @param sansVowel
-     * @param tokenType
-     * @param rootLength
-     * @throws BadParameterException
-     */
-    public void createAutoMinter(String prefix, boolean sansVowel,
-            TokenType tokenType, int rootLength) throws BadParameterException {
-        Generator = new AutoIdGenerator(prefix, sansVowel, tokenType, rootLength);
-    }
-
-    /**
-     * missing javadoc
-     *
-     * @param prefix
-     * @param sansVowel
-     * @param charMap
-     * @throws BadParameterException
-     */
-    public void createCustomMinter(String prefix, boolean sansVowel,
-            String charMap) throws BadParameterException {
-        Generator = new CustomIdGenerator(prefix, sansVowel, charMap);
-    }
+        
 
     /**
      * missing javadoc
