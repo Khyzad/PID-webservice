@@ -29,11 +29,17 @@ public class MinterServiceImplTest {
     @Mock
     DefaultSettingDao DefaultSettingDao;
 
+    @Mock
+    PidDao PidDao;
+
+    @Mock
+    UsedSettingDao UsedSettingDao;
+
     @InjectMocks
     MinterServiceImpl MinterServiceImpl;
 
     DefaultSetting DefaultSetting;
-
+    
     @BeforeClass
     public void setUpClass() throws Exception {
         MockitoAnnotations.initMocks(this);
@@ -41,7 +47,22 @@ public class MinterServiceImplTest {
     }
 
     @Test
-    public void testMint() throws BadParameterException {
+    public void testMintWithNewUsedSetting() throws BadParameterException {
+        Assert.fail("unimplemented");
+    }
+    
+    @Test
+    public void testMintWithOldUsedSetting() throws BadParameterException{
+        Assert.fail("unimplemented");
+    }
+    
+    @Test
+    public void testMintBadParameterException() throws BadParameterException{
+        Assert.fail("unimplemented");
+    }
+    
+    @Test
+    public void testMintNotEnoughPermutationException() throws BadParameterException{
         Assert.fail("unimplemented");
     }
 
