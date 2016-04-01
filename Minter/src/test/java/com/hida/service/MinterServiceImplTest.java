@@ -51,15 +51,13 @@ public class MinterServiceImplTest {
                 true, // isAuto
                 true);  // isRandom
         
-        when(DefaultSettingDao.getDefaultSetting()).thenReturn(defaultSetting);
-        System.out.println("minterserviceimpl = " + MinterServiceImpl.getCurrentSetting());
-        System.out.println("default = " + defaultSetting);
+        when(DefaultSettingDao.getDefaultSetting()).thenReturn(defaultSetting);        
         Assert.assertEquals(MinterServiceImpl.getCurrentSetting(), defaultSetting);        
     }
 
     @Test
     public void updateCurrentSetting() {
-        Assert.fail("unimplemented");
+        
     }
 
 }
