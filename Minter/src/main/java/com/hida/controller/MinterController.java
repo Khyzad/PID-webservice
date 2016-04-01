@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.Map;
 import java.util.Set;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -64,14 +63,13 @@ public class MinterController {
      * @param response HTTP response that redirects to the administration panel
      * after updating the new settings.
      * @return The name of the page to redirect.
-     * @throws SQLException
      * @throws BadParameterException Thrown whenever a bad parameter is
      * detected.
      * @throws ClassNotFoundException Thrown whenever a class does not exist.
      */
     @RequestMapping(value = {"/confirmation"}, method = {RequestMethod.POST})
     public String handleForm(HttpServletRequest request, HttpServletResponse response)
-            throws ClassNotFoundException, SQLException, BadParameterException {
+            throws ClassNotFoundException, BadParameterException {
         try {
             // prevents other clients from accessing the database whenever the form is submitted
             RequestLock.lock();

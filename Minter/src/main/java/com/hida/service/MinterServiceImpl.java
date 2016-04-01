@@ -12,7 +12,6 @@ import com.hida.model.Pid;
 import com.hida.model.IdGenerator;
 import com.hida.model.NotEnoughPermutationsException;
 import com.hida.model.UsedSetting;
-import java.sql.SQLException;
 import java.util.Set;
 
 import java.util.TreeSet;
@@ -134,7 +133,7 @@ public class MinterServiceImpl implements MinterService {
      * @throws BadParameterException
      */
     @Override
-    public Set<Pid> mint(long amount, DefaultSetting setting) throws SQLException, BadParameterException {
+    public Set<Pid> mint(long amount, DefaultSetting setting) throws BadParameterException {
         Logger.info("in mint");
         
         // store the desired setting values 
@@ -188,7 +187,7 @@ public class MinterServiceImpl implements MinterService {
      * database.
      */
     private Set<Pid> rollIdSet(Set<Pid> set, long totalPermutations, long amount)
-            throws SQLException, NotEnoughPermutationsException, BadParameterException {
+            throws NotEnoughPermutationsException, BadParameterException {
         Logger.info("in rollIdSet");
         // Used to count the number of unique ids. Size methods aren't used because int is returned
         long uniqueIdCounter = 0;
@@ -241,7 +240,7 @@ public class MinterServiceImpl implements MinterService {
      * @throws BadParameterException thrown whenever a malformed or invalid
      * parameter is passed
      */
-    private void addIdList(Set<Pid> list, long amountCreated) throws SQLException, BadParameterException {
+    private void addIdList(Set<Pid> list, long amountCreated) throws BadParameterException {
         Logger.info("in addIdlIst");
         
         for (Pid pid : list) {
