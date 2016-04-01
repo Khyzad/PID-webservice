@@ -129,7 +129,6 @@ public class MinterServiceImpl implements MinterService {
      * @param amount
      * @param setting
      * @return
-     * @throws SQLException
      * @throws BadParameterException
      */
     @Override
