@@ -7,9 +7,14 @@ import com.hida.model.BadParameterException;
 import com.hida.model.DefaultSetting;
 import com.hida.model.Pid;
 import com.hida.model.TokenType;
+import com.hida.model.UsedSetting;
+import java.util.ArrayList;
+import java.util.Set;
+import java.util.TreeSet;
 import org.mockito.Mock;
 import org.mockito.InjectMocks;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyInt;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
@@ -21,6 +26,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 /**
+ * missing javadoc
  *
  * @author lruffin
  */
@@ -38,31 +44,69 @@ public class MinterServiceImplTest {
     @InjectMocks
     MinterServiceImpl MinterServiceImpl;
 
-    DefaultSetting DefaultSetting;
-    
+    ArrayList<DefaultSetting> DefaultSettingList = new ArrayList<>();
+
+    Set<Pid> PidSet = new TreeSet<>();
+
+    /**
+     * missing javadoc
+     *
+     * @throws Exception
+     */
     @BeforeClass
     public void setUpClass() throws Exception {
         MockitoAnnotations.initMocks(this);
         initializeDefaultSetting();
+        initializePidSet();
     }
 
+    /**
+     * missing javadoc
+     *
+     * @throws BadParameterException
+     */
     @Test
     public void testMintWithNewUsedSetting() throws BadParameterException {
+        DefaultSetting defaultSetting = DefaultSettingList.get(1);
+
+        when(PidDao.findByName(any(String.class))).thenReturn(null);
+        doNothing().when(PidDao).savePid(any(Pid.class));
+        when(UsedSettingDao.findUsedSettingById(anyInt())).thenReturn(null);
+        doNothing().when(UsedSettingDao).save(any(UsedSetting.class));
+
+        Set<Pid> testSet = MinterServiceImpl.mint(10, defaultSetting);
+        boolean containsAll = testSet.containsAll(PidSet);
+        Assert.assertEquals(containsAll, true);
+
+    }
+
+    /**
+     * missing javadoc
+     *
+     * @throws BadParameterException
+     */
+    @Test
+    public void testMintWithOldUsedSetting() throws BadParameterException {
         Assert.fail("unimplemented");
     }
-    
+
+    /**
+     * missing javadoc
+     *
+     * @throws BadParameterException
+     */
     @Test
-    public void testMintWithOldUsedSetting() throws BadParameterException{
+    public void testMintBadParameterException() throws BadParameterException {
         Assert.fail("unimplemented");
     }
-    
+
+    /**
+     * missing javadoc
+     *
+     * @throws BadParameterException
+     */
     @Test
-    public void testMintBadParameterException() throws BadParameterException{
-        Assert.fail("unimplemented");
-    }
-    
-    @Test
-    public void testMintNotEnoughPermutationException() throws BadParameterException{
+    public void testMintNotEnoughPermutationException() throws BadParameterException {
         Assert.fail("unimplemented");
     }
 
@@ -71,8 +115,9 @@ public class MinterServiceImplTest {
      */
     @Test
     public void testGetCurrentSettingWithExistingDefaultSetting() {
-        when(DefaultSettingDao.getDefaultSetting()).thenReturn(DefaultSetting);
-        Assert.assertEquals(MinterServiceImpl.getCurrentSetting(), DefaultSetting);
+        DefaultSetting defaultSetting = DefaultSettingList.get(0);
+        when(DefaultSettingDao.getDefaultSetting()).thenReturn(defaultSetting);
+        Assert.assertEquals(MinterServiceImpl.getCurrentSetting(), defaultSetting);
     }
 
     /**
@@ -80,17 +125,18 @@ public class MinterServiceImplTest {
      */
     @Test
     public void testGetCurrentSettingWithoutExistingDefaultSetting() {
+        DefaultSetting defaultSetting = DefaultSettingList.get(0);
         when(DefaultSettingDao.getDefaultSetting()).thenReturn(null);
         DefaultSetting actualSetting = MinterServiceImpl.getCurrentSetting();
-        
-        Assert.assertEquals(actualSetting.getCharMap(), DefaultSetting.getCharMap());
-        Assert.assertEquals(actualSetting.getPrefix(), DefaultSetting.getPrefix());
-        Assert.assertEquals(actualSetting.getPrepend(), DefaultSetting.getPrepend());
-        Assert.assertEquals(actualSetting.getRootLength(), DefaultSetting.getRootLength());
-        Assert.assertEquals(actualSetting.getTokenType(), DefaultSetting.getTokenType());
-        Assert.assertEquals(actualSetting.isAuto(), DefaultSetting.isAuto());
-        Assert.assertEquals(actualSetting.isRandom(), DefaultSetting.isRandom());
-        Assert.assertEquals(actualSetting.isSansVowels(), DefaultSetting.isSansVowels());        
+
+        Assert.assertEquals(actualSetting.getCharMap(), defaultSetting.getCharMap());
+        Assert.assertEquals(actualSetting.getPrefix(), defaultSetting.getPrefix());
+        Assert.assertEquals(actualSetting.getPrepend(), defaultSetting.getPrepend());
+        Assert.assertEquals(actualSetting.getRootLength(), defaultSetting.getRootLength());
+        Assert.assertEquals(actualSetting.getTokenType(), defaultSetting.getTokenType());
+        Assert.assertEquals(actualSetting.isAuto(), defaultSetting.isAuto());
+        Assert.assertEquals(actualSetting.isRandom(), defaultSetting.isRandom());
+        Assert.assertEquals(actualSetting.isSansVowels(), defaultSetting.isSansVowels());
     }
 
     /**
@@ -98,9 +144,10 @@ public class MinterServiceImplTest {
      */
     @Test
     public void testUpdateCurrentSetting() {
-        when(DefaultSettingDao.getDefaultSetting()).thenReturn(DefaultSetting);
+        DefaultSetting defaultSetting = DefaultSettingList.get(0);
+        when(DefaultSettingDao.getDefaultSetting()).thenReturn(defaultSetting);
 
-        MinterServiceImpl.updateCurrentSetting(DefaultSetting);
+        MinterServiceImpl.updateCurrentSetting(defaultSetting);
         verify(DefaultSettingDao, atLeastOnce()).getDefaultSetting();
     }
 
@@ -108,7 +155,7 @@ public class MinterServiceImplTest {
      * missing javadoc
      */
     private void initializeDefaultSetting() {
-        DefaultSetting = new DefaultSetting("", // prepend
+        DefaultSetting defaultSetting1 = new DefaultSetting("", // prepend
                 "", // prefix
                 TokenType.DIGIT, // token type
                 "ddddd", // charmap
@@ -116,6 +163,49 @@ public class MinterServiceImplTest {
                 true, // sans vowel
                 true, // is auto
                 true); // is random
+
+        DefaultSettingList.add(defaultSetting1);
+
+        DefaultSetting defaultSetting2 = new DefaultSetting("", // prepend
+                "", // prefix
+                TokenType.DIGIT, // token type
+                "d", // charmap
+                1, // rootlength
+                true, // sans vowel
+                true, // is auto
+                false); // is random
+
+        DefaultSettingList.add(defaultSetting2);
     }
 
+    /**
+     * missing javadoc
+     */
+    private void initializePidSet() {
+        for (int i = 0; i < 10; i++) {
+            PidSet.add(new TestPid(i));
+        }
+    }
+
+    /**
+     * missing javadoc
+     */
+    private class TestPid extends Pid {
+
+        public TestPid(int n) {
+            BaseMap = new int[1];
+            BaseMap[0] = n;
+        }
+
+        @Override
+        public boolean incrementId() {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        @Override
+        public String getRootName() {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+    }
 }
