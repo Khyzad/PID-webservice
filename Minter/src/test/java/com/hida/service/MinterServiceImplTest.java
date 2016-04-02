@@ -77,7 +77,6 @@ public class MinterServiceImplTest {
         Set<Pid> testSet = MinterServiceImpl.mint(10, defaultSetting);
         boolean containsAll = testSet.containsAll(PidSet);
         Assert.assertEquals(containsAll, true);
-
     }
 
     /**
@@ -87,7 +86,22 @@ public class MinterServiceImplTest {
      */
     @Test
     public void testMintWithOldUsedSetting() throws BadParameterException {
-        Assert.fail("unimplemented");
+        DefaultSetting defaultSetting = DefaultSettingList.get(1);
+        UsedSetting usedSetting = new UsedSetting("", // prefix
+                TokenType.DIGIT, // tokentype
+                "d", // charmap
+                1, // rootlength
+                true, //sans vowels
+                5); // amount
+
+        when(PidDao.findByName(any(String.class))).thenReturn(null);
+        doNothing().when(PidDao).savePid(any(Pid.class));
+        when(UsedSettingDao.findUsedSettingById(anyInt())).thenReturn(usedSetting);
+        doNothing().when(UsedSettingDao).save(any(UsedSetting.class));
+
+        Set<Pid> testSet = MinterServiceImpl.mint(5, defaultSetting);
+        boolean containsAll = PidSet.containsAll(testSet);
+        Assert.assertEquals(containsAll, true);
     }
 
     /**
