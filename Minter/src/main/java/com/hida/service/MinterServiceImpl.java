@@ -79,7 +79,7 @@ public class MinterServiceImpl implements MinterService {
      * @return
      * @throws BadParameterException
      */
-    private long getRemainingPermutations() throws BadParameterException {
+    private long getRemainingPermutations() {
         Logger.info("in getRemainingPerumtations");
         long totalPermutations = Generator.calculatePermutations();
         long amountCreated = getAmountCreated();
@@ -129,10 +129,9 @@ public class MinterServiceImpl implements MinterService {
      * @param amount
      * @param setting
      * @return
-     * @throws BadParameterException
      */
     @Override
-    public Set<Pid> mint(long amount, DefaultSetting setting) throws BadParameterException {
+    public Set<Pid> mint(long amount, DefaultSetting setting) {
         Logger.info("in mint");
         
         // store the desired setting values 
@@ -186,7 +185,7 @@ public class MinterServiceImpl implements MinterService {
      * database.
      */
     private Set<Pid> rollIdSet(Set<Pid> set, long totalPermutations, long amount)
-            throws NotEnoughPermutationsException, BadParameterException {
+            throws NotEnoughPermutationsException {
         Logger.info("in rollIdSet");
         // Used to count the number of unique ids. Size methods aren't used because int is returned
         long uniqueIdCounter = 0;
@@ -239,7 +238,7 @@ public class MinterServiceImpl implements MinterService {
      * @throws BadParameterException thrown whenever a malformed or invalid
      * parameter is passed
      */
-    private void addIdList(Set<Pid> list, long amountCreated) throws BadParameterException {
+    private void addIdList(Set<Pid> list, long amountCreated) {
         Logger.info("in addIdlIst");
         
         for (Pid pid : list) {

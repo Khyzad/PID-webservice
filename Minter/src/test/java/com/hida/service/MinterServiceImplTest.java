@@ -5,6 +5,7 @@ import com.hida.dao.PidDao;
 import com.hida.dao.UsedSettingDao;
 import com.hida.model.BadParameterException;
 import com.hida.model.DefaultSetting;
+import com.hida.model.NotEnoughPermutationsException;
 import com.hida.model.Pid;
 import com.hida.model.TokenType;
 import com.hida.model.UsedSetting;
@@ -14,6 +15,7 @@ import java.util.TreeSet;
 import org.mockito.Mock;
 import org.mockito.InjectMocks;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doNothing;
@@ -63,15 +65,18 @@ public class MinterServiceImplTest {
     /**
      * missing javadoc
      *
-     * @throws BadParameterException
      */
     @Test
-    public void testMintWithNewUsedSetting() throws BadParameterException {
+    public void testMintWithNewUsedSetting() {
         DefaultSetting defaultSetting = DefaultSettingList.get(1);
 
         when(PidDao.findByName(any(String.class))).thenReturn(null);
         doNothing().when(PidDao).savePid(any(Pid.class));
-        when(UsedSettingDao.findUsedSettingById(anyInt())).thenReturn(null);
+        when(UsedSettingDao.findUsedSetting(any(String.class), // any prefix
+                any(TokenType.class), // any tokentype
+                any(String.class), // any charmap
+                anyInt(), // any rootlength
+                anyBoolean())).thenReturn(null); // any sansVowel
         doNothing().when(UsedSettingDao).save(any(UsedSetting.class));
 
         Set<Pid> testSet = MinterServiceImpl.mint(10, defaultSetting);
@@ -82,10 +87,9 @@ public class MinterServiceImplTest {
     /**
      * missing javadoc
      *
-     * @throws BadParameterException
      */
     @Test
-    public void testMintWithOldUsedSetting() throws BadParameterException {
+    public void testMintWithOldUsedSetting() {
         DefaultSetting defaultSetting = DefaultSettingList.get(1);
         UsedSetting usedSetting = new UsedSetting("", // prefix
                 TokenType.DIGIT, // tokentype
@@ -96,7 +100,13 @@ public class MinterServiceImplTest {
 
         when(PidDao.findByName(any(String.class))).thenReturn(null);
         doNothing().when(PidDao).savePid(any(Pid.class));
-        when(UsedSettingDao.findUsedSettingById(anyInt())).thenReturn(usedSetting);
+        when(UsedSettingDao.findUsedSetting(any(String.class), // any prefix
+                any(TokenType.class), // any tokentype
+                any(String.class), // any charmap
+                anyInt(), // any rootlength
+                anyBoolean())).thenReturn(null); // any sansVowel
+
+        doNothing().when(UsedSettingDao).save(any(UsedSetting.class));
         doNothing().when(UsedSettingDao).save(any(UsedSetting.class));
 
         Set<Pid> testSet = MinterServiceImpl.mint(5, defaultSetting);
@@ -107,21 +117,80 @@ public class MinterServiceImplTest {
     /**
      * missing javadoc
      *
-     * @throws BadParameterException
      */
-    @Test
-    public void testMintBadParameterException() throws BadParameterException {
-        Assert.fail("unimplemented");
+    @Test(expectedExceptions = NotEnoughPermutationsException.class)
+    public void testMintNotEnoughPermutationsExceptionInFindUsedSetting() {
+        DefaultSetting defaultSetting = DefaultSettingList.get(1);
+        UsedSetting usedSetting = new UsedSetting("", // prefix
+                TokenType.DIGIT, // tokentype
+                "d", // charmap
+                1, // rootlength
+                true, //sans vowels
+                5); // amount
+
+        when(PidDao.findByName(any(String.class))).thenReturn(null);
+        doNothing().when(PidDao).savePid(any(Pid.class));
+        when(UsedSettingDao.findUsedSetting(usedSetting.getPrefix(),
+                usedSetting.getTokenType(),
+                usedSetting.getCharMap(),
+                usedSetting.getRootLength(),
+                usedSetting.isSansVowels())).thenReturn(usedSetting);
+        when(UsedSettingDao.findUsedSettingById(anyInt())).thenReturn(usedSetting);
+        doNothing().when(UsedSettingDao).save(any(UsedSetting.class));
+
+        Set<Pid> testSet = MinterServiceImpl.mint(6, defaultSetting);
     }
 
     /**
      * missing javadoc
      *
-     * @throws BadParameterException
      */
-    @Test
-    public void testMintNotEnoughPermutationException() throws BadParameterException {
-        Assert.fail("unimplemented");
+    @Test(expectedExceptions = NotEnoughPermutationsException.class)
+    public void testMintNotEnoughPermutationsExceptionInCalculatePermutations() {
+        DefaultSetting defaultSetting = DefaultSettingList.get(1);
+        UsedSetting usedSetting = new UsedSetting("", // prefix
+                TokenType.DIGIT, // tokentype
+                "d", // charmap
+                1, // rootlength
+                true, //sans vowels
+                0); // amount
+
+        when(PidDao.findByName(any(String.class))).thenReturn(null);
+        doNothing().when(PidDao).savePid(any(Pid.class));
+        when(UsedSettingDao.findUsedSetting(usedSetting.getPrefix(),
+                usedSetting.getTokenType(),
+                usedSetting.getCharMap(),
+                usedSetting.getRootLength(),
+                usedSetting.isSansVowels())).thenReturn(usedSetting);
+        doNothing().when(UsedSettingDao).save(any(UsedSetting.class));
+
+        Set<Pid> testSet = MinterServiceImpl.mint(11, defaultSetting);
+    }
+
+    /**
+     * missing javadoc
+     *
+     */
+    @Test(expectedExceptions = NotEnoughPermutationsException.class)
+    public void testMintNotEnoughPermutationExceptionInRollId() {
+        DefaultSetting defaultSetting = DefaultSettingList.get(1);
+        UsedSetting usedSetting = new UsedSetting("", // prefix
+                TokenType.DIGIT, // tokentype
+                "d", // charmap
+                1, // rootlength
+                true, //sans vowels
+                0); // amount
+
+        when(PidDao.findByName("0")).thenReturn(new TestPid(0));
+        doNothing().when(PidDao).savePid(any(Pid.class));
+        when(UsedSettingDao.findUsedSetting(usedSetting.getPrefix(),
+                usedSetting.getTokenType(),
+                usedSetting.getCharMap(),
+                usedSetting.getRootLength(),
+                usedSetting.isSansVowels())).thenReturn(usedSetting);
+        doNothing().when(UsedSettingDao).save(any(UsedSetting.class));
+
+        Set<Pid> testSet = MinterServiceImpl.mint(10, defaultSetting);
     }
 
     /**

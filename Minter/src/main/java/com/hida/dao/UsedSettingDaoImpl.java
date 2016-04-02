@@ -56,9 +56,12 @@ public class UsedSettingDaoImpl extends AbstractDao<Integer, UsedSetting> implem
      */
     @Override
     public UsedSetting findUsedSettingById(int id) {
+        /*
         Criteria criteria = createEntityCriteria();
         criteria.add(Restrictions.eq("Id", id));
         return (UsedSetting) criteria.uniqueResult();
+        */
+        return getByKey(id);
     }
 
     /**
@@ -97,3 +100,5 @@ public class UsedSettingDaoImpl extends AbstractDao<Integer, UsedSetting> implem
         
 
 }
+
+    
