@@ -25,6 +25,7 @@ import org.mockito.MockitoAnnotations;
 import org.testng.Assert;
 
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 /**
@@ -63,12 +64,28 @@ public class MinterServiceImplTest {
     }
 
     /**
+     *
+     * @return
+     */
+    @DataProvider(name = "mintSettings")
+    public Object[][] mintSettings() {
+        return new Object[][]{
+            {true, true},
+            {true, false},
+            {false, true},
+            {false, false}
+        };
+    }
+
+    /**
      * missing javadoc
      *
      */
-    @Test
-    public void testMintWithNewUsedSetting() {
+    @Test(dataProvider = "mintSettings")
+    public void testMintWithNewUsedSetting(boolean isRandom, boolean isAuto) {
         DefaultSetting defaultSetting = DefaultSettingList.get(1);
+        defaultSetting.setAuto(isAuto);
+        defaultSetting.setRandom(isRandom);
 
         when(PidDao.findByName(any(String.class))).thenReturn(null);
         doNothing().when(PidDao).savePid(any(Pid.class));
@@ -88,15 +105,11 @@ public class MinterServiceImplTest {
      * missing javadoc
      *
      */
-    @Test
-    public void testMintWithOldUsedSetting() {
+    @Test(dataProvider = "mintSettings")
+    public void testMintWithOldUsedSetting(boolean isAuto, boolean isRandom) {
         DefaultSetting defaultSetting = DefaultSettingList.get(1);
-        UsedSetting usedSetting = new UsedSetting("", // prefix
-                TokenType.DIGIT, // tokentype
-                "d", // charmap
-                1, // rootlength
-                true, //sans vowels
-                5); // amount
+        defaultSetting.setAuto(isAuto);
+        defaultSetting.setRandom(isRandom);
 
         when(PidDao.findByName(any(String.class))).thenReturn(null);
         doNothing().when(PidDao).savePid(any(Pid.class));
@@ -117,10 +130,16 @@ public class MinterServiceImplTest {
     /**
      * missing javadoc
      *
+     * @param isAuto
+     * @param isRandom
      */
-    @Test(expectedExceptions = NotEnoughPermutationsException.class)
-    public void testMintNotEnoughPermutationsExceptionInFindUsedSetting() {
+    @Test(expectedExceptions = NotEnoughPermutationsException.class, dataProvider = "mintSettings")
+    public void testMintNotEnoughPermutationsExceptionInFindUsedSetting(
+            boolean isAuto, boolean isRandom) {
         DefaultSetting defaultSetting = DefaultSettingList.get(1);
+        defaultSetting.setAuto(isAuto);
+        defaultSetting.setRandom(isRandom);
+
         UsedSetting usedSetting = new UsedSetting("", // prefix
                 TokenType.DIGIT, // tokentype
                 "d", // charmap
@@ -144,10 +163,16 @@ public class MinterServiceImplTest {
     /**
      * missing javadoc
      *
+     * @param isAuto
+     * @param isRandom
      */
-    @Test(expectedExceptions = NotEnoughPermutationsException.class)
-    public void testMintNotEnoughPermutationsExceptionInCalculatePermutations() {
+    @Test(expectedExceptions = NotEnoughPermutationsException.class, dataProvider = "mintSettings")
+    public void testMintNotEnoughPermutationsExceptionInCalculatePermutations(
+            boolean isAuto, boolean isRandom) {
         DefaultSetting defaultSetting = DefaultSettingList.get(1);
+        defaultSetting.setAuto(isAuto);
+        defaultSetting.setRandom(isRandom);
+        
         UsedSetting usedSetting = new UsedSetting("", // prefix
                 TokenType.DIGIT, // tokentype
                 "d", // charmap
@@ -170,10 +195,15 @@ public class MinterServiceImplTest {
     /**
      * missing javadoc
      *
+     * @param isAuto
+     * @param isRandom
      */
-    @Test(expectedExceptions = NotEnoughPermutationsException.class)
-    public void testMintNotEnoughPermutationExceptionInRollId() {
+    @Test(expectedExceptions = NotEnoughPermutationsException.class, dataProvider = "mintSettings")
+    public void testMintNotEnoughPermutationExceptionInRollId(boolean isAuto, boolean isRandom) {
         DefaultSetting defaultSetting = DefaultSettingList.get(1);
+        defaultSetting.setAuto(isAuto);
+        defaultSetting.setRandom(isRandom);
+        
         UsedSetting usedSetting = new UsedSetting("", // prefix
                 TokenType.DIGIT, // tokentype
                 "d", // charmap
