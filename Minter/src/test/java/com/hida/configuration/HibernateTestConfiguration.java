@@ -36,8 +36,8 @@ public class HibernateTestConfiguration {
     @Bean(name = "dataSource")
     public DataSource dataSource() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
-        dataSource.setDriverClassName("org.hsql.Driver");
-        dataSource.setUrl("jdbc:hsql:mem:test;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE");
+        dataSource.setDriverClassName("org.hsqldb.jdbcDriver");
+        dataSource.setUrl("jdbc:hsqldb:mem:test;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE");
         dataSource.setUsername("");
         dataSource.setPassword("");
         return dataSource;
