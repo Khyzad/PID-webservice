@@ -1,9 +1,16 @@
 
 package com.hida.dao;
 
+import com.hida.configuration.HsqlDataTypeFactory;
+import java.sql.Connection;
+import org.dbunit.database.DatabaseConfig;
+import org.dbunit.database.DatabaseConnection;
+import org.dbunit.database.IDatabaseConnection;
 import org.dbunit.dataset.IDataSet;
 import org.dbunit.dataset.xml.FlatXmlDataSet;
+import org.dbunit.operation.DatabaseOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -20,8 +27,9 @@ public class UsedSettingDaoImplTest extends EntityDaoImplTest{
     protected IDataSet getDataSet() throws Exception {
         IDataSet dataSet = new FlatXmlDataSet(this.getClass().getClassLoader().
                 getResourceAsStream("UsedSetting.xml"));
+        
         return dataSet; 
-    }
+    }       
     
     @Test
     public void save(){

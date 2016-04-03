@@ -38,7 +38,7 @@ public class AutoIdGenerator extends IdGenerator {
      * Designates the length of the id's root.
      */
     private int RootLength;
-
+      
     /**
      * missing javadoc
      *

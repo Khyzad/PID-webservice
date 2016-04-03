@@ -80,6 +80,8 @@ public class MinterServiceImplTest {
     /**
      * missing javadoc
      *
+     * @param isRandom
+     * @param isAuto
      */
     @Test(dataProvider = "mintSettings")
     public void testMintWithNewUsedSetting(boolean isRandom, boolean isAuto) {
@@ -104,6 +106,8 @@ public class MinterServiceImplTest {
     /**
      * missing javadoc
      *
+     * @param isAuto
+     * @param isRandom
      */
     @Test(dataProvider = "mintSettings")
     public void testMintWithOldUsedSetting(boolean isAuto, boolean isRandom) {

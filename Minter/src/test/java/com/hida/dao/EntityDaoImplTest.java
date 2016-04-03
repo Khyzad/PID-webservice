@@ -12,6 +12,8 @@ import org.springframework.test.context.testng.AbstractTransactionalTestNGSpring
 import org.testng.annotations.BeforeMethod;
  
 import com.hida.configuration.HibernateTestConfiguration;
+import com.hida.configuration.HsqlDataTypeFactory;
+import org.dbunit.database.DatabaseConfig;
  
  
 /**
@@ -26,8 +28,11 @@ public abstract class EntityDaoImplTest extends AbstractTransactionalTestNGSprin
  
     @BeforeMethod
     public void setUp() throws Exception {
-        IDatabaseConnection dbConn = new DatabaseDataSourceConnection(
-                dataSource);
+        IDatabaseConnection dbConn = new DatabaseDataSourceConnection(dataSource);
+        
+        DatabaseConfig config = dbConn.getConfig();
+	config.setProperty(DatabaseConfig.PROPERTY_DATATYPE_FACTORY, new HsqlDataTypeFactory());
+        
         DatabaseOperation.CLEAN_INSERT.execute(dbConn, getDataSet());
     }
      
