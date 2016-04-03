@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dataset>
+    <used_setting ID="1" PID_PREFIX="" TOKENTYPE="DIGIT" CHARMAP="d" ROOTLENGTH ="1" SANSVOWELS="TRUE" AMOUNT="1"/>
+    <used_setting ID="2" PID_PREFIX="" TOKENTYPE="DIGIT" CHARMAP="d" ROOTLENGTH ="1" SANSVOWELS="TRUE" AMOUNT="1"/>
+</dataset>
