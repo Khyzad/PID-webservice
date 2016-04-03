@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dataset>
+    <pids NAME="1" DTYPE="AutoIdGenerator$AutoId"/>
+    <pids NAME="2" DTYPE="CustomIdGenerator$CustomId"/>
+</dataset>
