@@ -35,7 +35,7 @@ public class UsedSettingDaoImplTest extends EntityDaoImplTest {
     @Test
     public void saveTest() {        
         UsedSettingDao.save(getSampleUsedSetting());
-        Assert.assertEquals(UsedSettingDao.findAllUsedSettings().size(), 3);
+        Assert.assertEquals(UsedSettingDao.findAllUsedSettings().size(), 2);
     }   
 
     @Test
@@ -47,7 +47,7 @@ public class UsedSettingDaoImplTest extends EntityDaoImplTest {
     @Test
     public void findAllUsedSettingsTest() {
         int size = UsedSettingDao.findAllUsedSettings().size();
-        Assert.assertEquals(size, 2);
+        Assert.assertEquals(size, 1);
     }
 
     @Test
