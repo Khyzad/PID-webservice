@@ -11,7 +11,6 @@ import java.util.List;
  */
 public interface UsedSettingDao {
     public void save(UsedSetting setting);    
-    public void deleteSetting(UsedSetting setting);
     
     public UsedSetting findUsedSettingById(int id);
     

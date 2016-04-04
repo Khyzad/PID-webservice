@@ -20,17 +20,7 @@ public class DefaultSettingDaoImpl extends AbstractDao<Integer, DefaultSetting>
     @Override
     public void save(DefaultSetting setting) {
         persist(setting);
-    }
-
-    /**
-     * missing javadoc
-     *
-     * @param setting
-     */
-    @Override
-    public void deleteSetting(DefaultSetting setting) {
-        this.delete(setting);
-    }
+    }   
 
     /**
      * missing javadoc

@@ -5,7 +5,6 @@ import com.hida.model.UsedSetting;
 import java.util.List;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
-import org.hibernate.criterion.Restrictions;
 import org.springframework.stereotype.Repository;
 
 
@@ -25,17 +24,7 @@ public class UsedSettingDaoImpl extends AbstractDao<Integer, UsedSetting> implem
     @Override
     public void save(UsedSetting setting) {
         persist(setting);
-    }
-
-    /**
-     * missing javadoc
-     *
-     * @param setting
-     */
-    @Override
-    public void deleteSetting(UsedSetting setting) {
-        delete(setting);
-    }
+    }   
 
     /**
      * missing javadoc
@@ -55,12 +44,7 @@ public class UsedSettingDaoImpl extends AbstractDao<Integer, UsedSetting> implem
      * @return
      */
     @Override
-    public UsedSetting findUsedSettingById(int id) {
-        /*
-        Criteria criteria = createEntityCriteria();
-        criteria.add(Restrictions.eq("Id", id));
-        return (UsedSetting) criteria.uniqueResult();
-        */
+    public UsedSetting findUsedSettingById(int id) {        
         return getByKey(id);
     }
 
