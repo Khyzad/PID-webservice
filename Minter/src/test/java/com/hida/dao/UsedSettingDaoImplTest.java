@@ -39,8 +39,9 @@ public class UsedSettingDaoImplTest extends EntityDaoImplTest {
     }   
 
     @Test
-    public void findUsedSettingById() {
-        Assert.fail("unimplemented");
+    public void findUsedSettingByIdTest() {
+        UsedSetting entity = UsedSettingDao.findUsedSettingById(1);
+        Assert.assertNotNull(entity);
     }
 
     @Test
