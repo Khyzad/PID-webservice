@@ -91,11 +91,7 @@ public class MinterServiceImplTest {
 
         when(PidDao.findByName(any(String.class))).thenReturn(null);
         doNothing().when(PidDao).savePid(any(Pid.class));
-        when(UsedSettingDao.findUsedSetting(any(String.class), // any prefix
-                any(TokenType.class), // any tokentype
-                any(String.class), // any charmap
-                anyInt(), // any rootlength
-                anyBoolean())).thenReturn(null); // any sansVowel
+        when(UsedSettingDao.findUsedSetting(any(UsedSetting.class))).thenReturn(null); 
         doNothing().when(UsedSettingDao).save(any(UsedSetting.class));
 
         Set<Pid> testSet = MinterServiceImpl.mint(10, defaultSetting);
@@ -117,12 +113,8 @@ public class MinterServiceImplTest {
 
         when(PidDao.findByName(any(String.class))).thenReturn(null);
         doNothing().when(PidDao).savePid(any(Pid.class));
-        when(UsedSettingDao.findUsedSetting(any(String.class), // any prefix
-                any(TokenType.class), // any tokentype
-                any(String.class), // any charmap
-                anyInt(), // any rootlength
-                anyBoolean())).thenReturn(null); // any sansVowel
-
+        when(UsedSettingDao.findUsedSetting(any(UsedSetting.class))).thenReturn(null); 
+        
         doNothing().when(UsedSettingDao).save(any(UsedSetting.class));
         doNothing().when(UsedSettingDao).save(any(UsedSetting.class));
 
@@ -153,11 +145,7 @@ public class MinterServiceImplTest {
 
         when(PidDao.findByName(any(String.class))).thenReturn(null);
         doNothing().when(PidDao).savePid(any(Pid.class));
-        when(UsedSettingDao.findUsedSetting(usedSetting.getPrefix(),
-                usedSetting.getTokenType(),
-                usedSetting.getCharMap(),
-                usedSetting.getRootLength(),
-                usedSetting.isSansVowels())).thenReturn(usedSetting);
+        when(UsedSettingDao.findUsedSetting(usedSetting)).thenReturn(usedSetting);
         when(UsedSettingDao.findUsedSettingById(anyInt())).thenReturn(usedSetting);
         doNothing().when(UsedSettingDao).save(any(UsedSetting.class));
 
@@ -186,11 +174,7 @@ public class MinterServiceImplTest {
 
         when(PidDao.findByName(any(String.class))).thenReturn(null);
         doNothing().when(PidDao).savePid(any(Pid.class));
-        when(UsedSettingDao.findUsedSetting(usedSetting.getPrefix(),
-                usedSetting.getTokenType(),
-                usedSetting.getCharMap(),
-                usedSetting.getRootLength(),
-                usedSetting.isSansVowels())).thenReturn(usedSetting);
+        when(UsedSettingDao.findUsedSetting(usedSetting)).thenReturn(usedSetting);
         doNothing().when(UsedSettingDao).save(any(UsedSetting.class));
 
         Set<Pid> testSet = MinterServiceImpl.mint(11, defaultSetting);
@@ -217,11 +201,7 @@ public class MinterServiceImplTest {
 
         when(PidDao.findByName("0")).thenReturn(new TestPid(0));
         doNothing().when(PidDao).savePid(any(Pid.class));
-        when(UsedSettingDao.findUsedSetting(usedSetting.getPrefix(),
-                usedSetting.getTokenType(),
-                usedSetting.getCharMap(),
-                usedSetting.getRootLength(),
-                usedSetting.isSansVowels())).thenReturn(usedSetting);
+        when(UsedSettingDao.findUsedSetting(usedSetting)).thenReturn(usedSetting);
         doNothing().when(UsedSettingDao).save(any(UsedSetting.class));
 
         Set<Pid> testSet = MinterServiceImpl.mint(10, defaultSetting);

@@ -36,12 +36,7 @@ public class UsedSettingDaoImplTest extends EntityDaoImplTest {
     public void saveTest() {        
         UsedSettingDao.save(getSampleUsedSetting());
         Assert.assertEquals(UsedSettingDao.findAllUsedSettings().size(), 3);
-    }
-
-    @Test
-    public void deleteSettingTest() {
-        Assert.fail("unimplemented");
-    }
+    }   
 
     @Test
     public void findUsedSettingById() {

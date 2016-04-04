@@ -259,11 +259,14 @@ public class MinterServiceImpl implements MinterService {
      */
     private UsedSetting findUsedSetting() {
         Logger.info("in findUsedSetting");
-        return UsedSettingDao.findUsedSetting(CurrentSetting.getPrefix(),
+        UsedSetting setting = new UsedSetting(CurrentSetting.getPrefix(),
                 CurrentSetting.getTokenType(),
                 CurrentSetting.getCharMap(),
                 CurrentSetting.getRootLength(),
-                CurrentSetting.isSansVowels());
+                CurrentSetting.isSansVowels(), 
+                0);
+        
+        return UsedSettingDao.findUsedSetting(setting);
     }
 
     /**
