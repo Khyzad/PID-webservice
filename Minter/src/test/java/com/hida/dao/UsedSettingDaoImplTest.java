@@ -51,8 +51,10 @@ public class UsedSettingDaoImplTest extends EntityDaoImplTest {
     }
 
     @Test
-    public void findUsedSetting() {
-        Assert.fail("unimplemented");
+    public void findUsedSettingTest() {
+        UsedSetting sampleSetting = getSampleUsedSetting();
+        UsedSetting entity = UsedSettingDao.findUsedSetting(sampleSetting);
+        Assert.assertNotNull(entity);
     }
 
     private UsedSetting getSampleUsedSetting() {
