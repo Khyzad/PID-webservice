@@ -45,8 +45,9 @@ public class UsedSettingDaoImplTest extends EntityDaoImplTest {
     }
 
     @Test
-    public void findAllUsedSettings() {
-        Assert.fail("unimplemented");
+    public void findAllUsedSettingsTest() {
+        int size = UsedSettingDao.findAllUsedSettings().size();
+        Assert.assertEquals(size, 2);
     }
 
     @Test
