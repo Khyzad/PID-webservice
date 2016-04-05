@@ -145,7 +145,7 @@ public class MinterServiceImplTest {
 
         when(PidDao.findByName(any(String.class))).thenReturn(null);
         doNothing().when(PidDao).savePid(any(Pid.class));
-        when(UsedSettingDao.findUsedSetting(usedSetting)).thenReturn(usedSetting);
+        when(UsedSettingDao.findUsedSetting(any(UsedSetting.class))).thenReturn(usedSetting);
         when(UsedSettingDao.findUsedSettingById(anyInt())).thenReturn(usedSetting);
         doNothing().when(UsedSettingDao).save(any(UsedSetting.class));
 
