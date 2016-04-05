@@ -44,20 +44,20 @@ public class AutoIdGeneratorTest implements Comparator<String> {
     @DataProvider(name = "sansVowel")
     public Object[][] sansVowelParameters() {
         return new Object[][]{
-            {"", true, TokenType.DIGIT, 4, 1000},
-            {"", true, TokenType.LOWERCASE, 4, 1000},
-            {"", true, TokenType.UPPERCASE, 4, 1000},
-            {"", true, TokenType.MIXEDCASE, 4, 1000},
-            {"", true, TokenType.LOWER_EXTENDED, 4, 1000},
-            {"", true, TokenType.UPPER_EXTENDED, 4, 1000},
-            {"", true, TokenType.MIXED_EXTENDED, 4, 1000},
-            {"", false, TokenType.DIGIT, 4, 1000},
-            {"", false, TokenType.LOWERCASE, 4, 1000},
-            {"", false, TokenType.UPPERCASE, 4, 1000},
-            {"", false, TokenType.MIXEDCASE, 4, 1000},
-            {"", false, TokenType.LOWER_EXTENDED, 4, 1000},
-            {"", false, TokenType.UPPER_EXTENDED, 4, 1000},
-            {"", false, TokenType.MIXED_EXTENDED, 4, 1000}
+            {"", true, TokenType.DIGIT, 1, 10},
+            {"", true, TokenType.LOWERCASE, 1, 20},
+            {"", true, TokenType.UPPERCASE, 1, 20},
+            {"", true, TokenType.MIXEDCASE, 1, 40},
+            {"", true, TokenType.LOWER_EXTENDED, 1, 30},
+            {"", true, TokenType.UPPER_EXTENDED, 1, 30},
+            {"", true, TokenType.MIXED_EXTENDED, 1, 50},
+            {"", false, TokenType.DIGIT, 1, 10},
+            {"", false, TokenType.LOWERCASE, 1, 26},
+            {"", false, TokenType.UPPERCASE, 1, 26},
+            {"", false, TokenType.MIXEDCASE, 1, 52},
+            {"", false, TokenType.LOWER_EXTENDED, 1, 36},
+            {"", false, TokenType.UPPER_EXTENDED, 1, 36},
+            {"", false, TokenType.MIXED_EXTENDED, 1, 62}
         };
     }
 
@@ -69,13 +69,13 @@ public class AutoIdGeneratorTest implements Comparator<String> {
     @DataProvider(name = "prefix")
     public Object[][] prefixParameters() {
         return new Object[][]{
-            {"", false, TokenType.DIGIT, 4, 1000},
-            {"!@*(", false, TokenType.DIGIT, 4, 1000},
-            {"www", false, TokenType.DIGIT, 4, 1000},
-            {"123", false, TokenType.DIGIT, 4, 1000},
-            {"123abc", false, TokenType.DIGIT, 4, 1000},
-            {"!a1", false, TokenType.DIGIT, 4, 1000},
-            {" ", false, TokenType.DIGIT, 4, 1000}
+            {"", false, TokenType.DIGIT, 1, 10},
+            {"!@*(", false, TokenType.DIGIT, 1, 10},
+            {"www", false, TokenType.DIGIT, 1, 10},
+            {"123", false, TokenType.DIGIT, 1, 10},
+            {"123abc", false, TokenType.DIGIT, 1, 10},
+            {"!a1", false, TokenType.DIGIT, 1, 10},
+            {" ", false, TokenType.DIGIT, 1, 10}
         };
     }
 
@@ -86,9 +86,9 @@ public class AutoIdGeneratorTest implements Comparator<String> {
      */
     @DataProvider(name = "rootLength")
     public Object[][] rootLengthParameters() {
-        Object[][] parameter = new Object[5][];
-        for (int i = 1; i <= 5; i++) {
-            Object[] array = {"", false, TokenType.DIGIT, i, 1000};
+        Object[][] parameter = new Object[2][];
+        for (int i = 1; i <= 2; i++) {
+            Object[] array = {"", false, TokenType.DIGIT, i, (int)Math.pow(10, i)};
             parameter[i - 1] = array;
         }
         return parameter;
@@ -289,33 +289,7 @@ public class AutoIdGeneratorTest implements Comparator<String> {
 
         // test to see if the amount matches the size of the generated set
         Assert.assertEquals(randomSet.size(), amount);
-    }
-
-    /**
-     * missing javadoc
-     */
-    @Test
-    public void testSequentialMintMax() {
-        IdGenerator minter = new AutoIdGenerator("", true, TokenType.DIGIT, 5);
-        long total = minter.calculatePermutations();
-
-        Set<Pid> sequentialSet = minter.sequentialMint(total);
-
-        Assert.assertEquals(sequentialSet.size(), total);
-    }
-
-    /**
-     * missing javadoc
-     */
-    @Test
-    public void testRandomMintMax() {
-        IdGenerator minter = new AutoIdGenerator("", true, TokenType.DIGIT, 5);
-        long total = minter.calculatePermutations();
-
-        Set<Pid> randomSet = minter.randomMint(total);
-
-        Assert.assertEquals(randomSet.size(), total);
-    }
+    }   
 
     /**
      * missing javadoc

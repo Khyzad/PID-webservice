@@ -82,7 +82,12 @@ public class CustomIdGenerator extends IdGenerator {
         Set<Pid> idSet = new TreeSet();
                 
         int[] previousIdBaseMap = new int[CharMap.length()];
-        CustomId currentId = new CustomId(Prefix, previousIdBaseMap, tokenMapArray);        
+        CustomId currentId = new CustomId(Prefix, previousIdBaseMap, tokenMapArray);   
+        for (int i = CharMap.length() - 1; i >= 0; i--) {
+            for (int j = CharMap.length() - 1; j >= 0; j--) {
+                
+            }
+        }
         for (int i = 0; i < amount; i++) {            
             CustomId nextId = new CustomId(currentId);
             idSet.add(currentId);

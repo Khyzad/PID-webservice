@@ -86,7 +86,7 @@ public class AutoIdGenerator extends IdGenerator {
         // checks to see if its possible to produce or add requested amount of
         long total = calculatePermutations();
         if (total < amount) {
-            throw new NotEnoughPermutationsException();
+            throw new NotEnoughPermutationsException(total, amount);
         }
         
         // generate ids
@@ -122,7 +122,7 @@ public class AutoIdGenerator extends IdGenerator {
         // checks to see if its possible to produce or add requested amount of
         long total = calculatePermutations();
         if (total < amount) {
-            throw new NotEnoughPermutationsException();
+            throw new NotEnoughPermutationsException(total, amount);
         }
 
         // generate ids

@@ -8,6 +8,8 @@ package com.hida.model;
 import java.util.Arrays;
 import javax.persistence.Entity;
 import javax.persistence.Transient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Created and used by CustomMinters
@@ -16,6 +18,9 @@ import javax.persistence.Transient;
  */
 @Entity
 public class CustomId extends Pid {
+    
+    
+protected static final Logger Logger = LoggerFactory.getLogger(CustomId.class);
 
     @Transient
     private String[] TokenMapArray;
@@ -41,21 +46,19 @@ public class CustomId extends Pid {
      */
     @Override
     public boolean incrementId() {
-        int range = this.getBaseMap().length - 1;
-
         boolean overflow = true;
-        for (int k = 0; k < this.getBaseMap().length && overflow; k++) {
-            // record value of current index
-            int value = this.getBaseMap()[range - k];
-
-            if (value == TokenMapArray[k].length() - 1) {
-                this.getBaseMap()[range - k] = 0;
-            }
-            else {
-                this.getBaseMap()[range - k]++;
-                overflow = false;
-            }
-        }
+        
+        int lastIndex = BaseMap.length - 1;     
+        for (int i = lastIndex; overflow && i >= 0; i--) {
+                if(BaseMap[i] == TokenMapArray[i].length() - 1){                         
+                    BaseMap[i] = 0;
+                }else{
+                    
+                    BaseMap[i]++;
+                    overflow = false;
+                }
+        }                
+        
         return !overflow;
     }
 
