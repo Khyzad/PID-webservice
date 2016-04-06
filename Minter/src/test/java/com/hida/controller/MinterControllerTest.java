@@ -1,15 +1,14 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.hida.controller;
 
-import static org.testng.Assert.*;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.AfterMethod;
+import com.hida.service.MinterServiceImpl;
+import junit.framework.Assert;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.mockito.Spy;
+import org.springframework.ui.ModelMap;
 import org.testng.annotations.BeforeClass;
-import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 /**
  *
@@ -17,28 +16,33 @@ import org.testng.annotations.BeforeMethod;
  */
 public class MinterControllerTest {
     
-    public MinterControllerTest() {
-    }
+    @Mock
+    MinterServiceImpl MinterServiceDao;
     
-    // TODO add test methods here.
-    // The methods must be annotated with annotation @Test. For example:
-    //
-    // @Test
-    // public void hello() {}
+    @InjectMocks
+    MinterController Controller;
+    
+    @Spy
+    ModelMap ModelMap;
     
     @BeforeClass
-    public static void setUpClass() throws Exception {
+    public void setUpClass() throws Exception {
+        MockitoAnnotations.initMocks(this);
     }
-
-    @AfterClass
-    public static void tearDownClass() throws Exception {
+    
+    @Test
+    public void testMintPrepend(){
+        Assert.fail("unimplemented");
     }
-
-    @BeforeMethod
-    public void setUpMethod() throws Exception {
+    
+    @Test
+    public void testBadParameterExceptionTokenType(){
+        Assert.fail("unimplemented");
     }
-
-    @AfterMethod
-    public void tearDownMethod() throws Exception {
+    
+    @Test
+    public void testBadParameterExceptionBoolean(){
+        Assert.fail("unimplemented");
     }
+    
 }
