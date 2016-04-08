@@ -67,7 +67,7 @@ public abstract class Pid implements Comparable<Pid> {
 
     public abstract boolean incrementId();
 
-    public abstract String getRootName();
+    protected abstract String getRootName();
 
     @Override
     public int hashCode() {
@@ -201,5 +201,6 @@ public abstract class Pid implements Comparable<Pid> {
     public void setPrefix(String Prefix) {
         this.Prefix = Prefix;
     }
+    
     
 }

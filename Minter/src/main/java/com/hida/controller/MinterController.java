@@ -214,6 +214,7 @@ public class MinterController {
             //Logger.info("Message from Minter: "+message);
 
             // print list of ids to screen
+            Logger.debug(message);
             model.addAttribute("message", message);
 
         }
@@ -429,7 +430,7 @@ public class MinterController {
         for (Pid id : set) {
             arrayBuilder.add(factory.createObjectBuilder()
                     .add("id", counter)
-                    .add("name", id.toString()));
+                    .add("name", prepend + id.toString()));
             counter++;
         }
         jsonArray = arrayBuilder.build();

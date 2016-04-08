@@ -20,11 +20,13 @@ public class AutoId extends Pid {
     public AutoId(AutoId id) {
         super(id);
         this.TokenMap = id.getTokenMap();
+        this.Name = id.getPrefix() + getRootName();
     }
 
     public AutoId(String prefix, int[] baseMap, String tokenMap) {
         super(baseMap, prefix);
         this.TokenMap = tokenMap;
+        this.Name = prefix + getRootName();
     }
 
     /**
@@ -59,7 +61,7 @@ public class AutoId extends Pid {
      * @return
      */
     @Override
-    public String getRootName() {
+    protected final String getRootName() {
         String charId = "";
         for (int i = 0; i < this.getBaseMap().length; i++) {
             charId += TokenMap.charAt(this.getBaseMap()[i]);
@@ -69,13 +71,12 @@ public class AutoId extends Pid {
 
     @Override
     public String getName() {
-        Name = Prefix + this.getRootName();
         return Name;
     }
 
     @Override
     public String toString() {
-        return Prefix + this.getRootName();
+        return Name;
     }
 
     // getters and setters

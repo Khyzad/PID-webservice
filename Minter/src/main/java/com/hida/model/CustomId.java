@@ -27,11 +27,13 @@ protected static final Logger Logger = LoggerFactory.getLogger(CustomId.class);
     public CustomId(CustomId id) {
         super(id);
         this.TokenMapArray = Arrays.copyOf(id.getTokenMapArray(), id.getTokenMapArray().length);
+        this.Name = id.getPrefix() + getRootName();
     }
 
     public CustomId(String prefix, int[] baseMap, String[] tokenMapArray) {
         super(baseMap, prefix);
         this.TokenMapArray = Arrays.copyOf(tokenMapArray, tokenMapArray.length);
+        this.Name = prefix + getRootName();
     }
 
     /**
@@ -66,7 +68,7 @@ protected static final Logger Logger = LoggerFactory.getLogger(CustomId.class);
      * @return - the name of an Id.
      */
     @Override
-    public String getRootName() {
+    protected final String getRootName() {
         String charId = "";
 
         for (int i = 0; i < this.getBaseMap().length; i++) {
@@ -77,13 +79,12 @@ protected static final Logger Logger = LoggerFactory.getLogger(CustomId.class);
 
     @Override
     public String getName() {
-        Name = Prefix + this.getRootName();
         return Name;
     }
 
     @Override
     public String toString() {
-        return Prefix + this.getRootName();
+        return Name;
     }
 
     /**

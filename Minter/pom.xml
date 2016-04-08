@@ -48,7 +48,7 @@
             <artifactId>spring-orm</artifactId>
             <version>${springframework.version}</version>
         </dependency>
-        
+         
         <!-- JSON -->
         <dependency>
             <groupId>javax.json</groupId>
@@ -64,6 +64,11 @@
             <groupId>org.codehaus.jackson</groupId>
             <artifactId>jackson-core-asl</artifactId>
             <version>1.9.13</version>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish</groupId>
+            <artifactId>javax.json</artifactId>
+            <version>1.0.4</version>
         </dependency>                
         
  
@@ -156,8 +161,12 @@
             <version>${dbunit.version}</version>
             <scope>test</scope>
         </dependency>
-        
-        
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>20160212</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
  
     <build>
