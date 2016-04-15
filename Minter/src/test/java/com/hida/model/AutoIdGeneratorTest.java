@@ -400,7 +400,7 @@ public class AutoIdGeneratorTest implements Comparator<String> {
     private boolean containsCorrectCharacters(String prefix, String name, TokenType tokenType,
             boolean sansVowel) {
         String regex = retrieveRegex(tokenType, sansVowel);
-        return name.matches(String.format("^%s%s$", prefix, regex));
+        return name.matches(String.format("^(%s)%s$", prefix, regex));
     }
 
     /**
@@ -416,19 +416,19 @@ public class AutoIdGeneratorTest implements Comparator<String> {
 
         switch (tokenType) {
             case DIGIT:
-                return "(^[\\d]*$)";
+                return "([\\d]*)";
             case LOWERCASE:
-                return (sansVowel) ? "(^[^aeiouyA-Z\\W\\d]*$)" : "(^[a-z]*$)";
+                return (sansVowel) ? "([^aeiouyA-Z\\W\\d]*)" : "([a-z]*)";
             case UPPERCASE:
-                return (sansVowel) ? "(^[^a-zAEIOUY\\W\\d]*$)" : "(^[A-Z]*$)";
+                return (sansVowel) ? "([^a-zAEIOUY\\W\\d]*)" : "([A-Z]*)";
             case MIXEDCASE:
-                return (sansVowel) ? "(^[^aeiouyAEIOUY\\W\\d]*$)" : "(^[a-zA-Z]*$)";
+                return (sansVowel) ? "([^aeiouyAEIOUY\\W\\d]*)" : "([a-zA-Z]*)";
             case LOWER_EXTENDED:
-                return (sansVowel) ? "(^[^aeiouyA-Z\\W]*$)" : "(^[a-z\\d]*$)";
+                return (sansVowel) ? "([^aeiouyA-Z\\W]*)" : "([a-z\\d]*)";
             case UPPER_EXTENDED:
-                return (sansVowel) ? "(^[^a-zAEIOUY\\W]*$)" : "(^[A-Z\\d]*$)";
+                return (sansVowel) ? "([^a-zAEIOUY\\W]*)" : "([A-Z\\d]*)";
             default:
-                return (sansVowel) ? "(^[^aeiouyAEIOUY\\W]*$)" : "(^[a-zA-z\\d]*$)";
+                return (sansVowel) ? "([^aeiouyAEIOUY\\W]*)" : "(^[a-zA-z\\d]*)";
         }
     }
 

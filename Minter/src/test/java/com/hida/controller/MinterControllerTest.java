@@ -29,6 +29,7 @@ import static org.mockito.Matchers.anyLong;
 import static org.mockito.Mockito.when;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.testng.annotations.DataProvider;
 
 /**
  *
@@ -46,7 +47,6 @@ public class MinterControllerTest {
     ModelMap ModelMap;
 
     private final String PREPEND = "http://digitalarchives.hawaii.gov/70111/";
-    
     private final int AMOUNT = 5;
 
     private static final Logger Logger = LoggerFactory.getLogger(MinterControllerTest.class);
@@ -56,10 +56,38 @@ public class MinterControllerTest {
         MockitoAnnotations.initMocks(this);
     }
 
-    @Test
-    public void testMintPrepend() throws Exception {
-        DefaultSetting setting = getSampleDefaultSetting();
-        setting.setPrepend(PREPEND);
+    @DataProvider(name = "parameters")
+    private Object[][] parameters() {
+        return new Object[][]{
+            {PREPEND, "abc", TokenType.DIGIT, "d", 1, true, true, true},
+            {PREPEND, "abc", TokenType.LOWERCASE, "d", 1, true, true, true},
+            {PREPEND, "abc", TokenType.UPPERCASE, "d", 1, true, true, true},
+            {PREPEND, "abc", TokenType.MIXEDCASE, "d", 1, true, true, true},
+            {PREPEND, "abc", TokenType.LOWER_EXTENDED, "d", 1, true, true, true},
+            {PREPEND, "abc", TokenType.UPPER_EXTENDED, "d", 1, true, true, true},
+            {PREPEND, "abc", TokenType.MIXED_EXTENDED, "d", 1, true, true, true},
+            {PREPEND, "abc", TokenType.DIGIT, "d", 1, true, true, false},
+            {PREPEND, "abc", TokenType.LOWERCASE, "d", 1, true, true, false},
+            {PREPEND, "abc", TokenType.UPPERCASE, "d", 1, true, true, false},
+            {PREPEND, "abc", TokenType.MIXEDCASE, "d", 1, true, true, false},
+            {PREPEND, "abc", TokenType.LOWER_EXTENDED, "d", 1, true, true, false},
+            {PREPEND, "abc", TokenType.UPPER_EXTENDED, "d", 1, true, true, false},
+            {PREPEND, "abc", TokenType.MIXED_EXTENDED, "d", 1, true, true, false},
+            {PREPEND, "abc", TokenType.DIGIT, "d", 1, false, true, false},
+            {PREPEND, "abc", TokenType.DIGIT, "l", 1, false, true, false},
+            {PREPEND, "abc", TokenType.DIGIT, "u", 1, false, true, false},
+            {PREPEND, "abc", TokenType.DIGIT, "m", 1, false, true, false},
+            {PREPEND, "abc", TokenType.DIGIT, "e", 1, false, true, false},
+        };
+    }
+
+    @Test(dataProvider = "parameters")
+    public void testMintPersistedParameters(String prepend, String prefix, TokenType tokenType,
+            String charMap, int rootLength, boolean isAuto, boolean isRandom, boolean sansVowel) 
+            throws Exception {      
+        
+        DefaultSetting setting = new DefaultSetting(prepend, prefix, tokenType, charMap,
+                rootLength, isAuto, isRandom, sansVowel);
 
         when(MinterServiceDao.getCurrentSetting()).thenReturn(setting);
         when(MinterServiceDao.mint(anyInt(), any(DefaultSetting.class))).
@@ -72,17 +100,78 @@ public class MinterControllerTest {
         Logger.debug(message);
         JSONArray testJsonArray = new JSONArray(message);
 
+        MinterServiceDao.getCurrentSetting();
+
         for (int i = 0; i < testJsonArray.length(); i++) {
             JSONObject object = testJsonArray.getJSONObject(i);
             int id = object.getInt("id");
             String name = object.getString("name");
-
             Assert.assertEquals(id, i);
-            Assert.assertEquals(name.startsWith(PREPEND), true);
+            testPid(name, setting);
         }
 
     }
-    
+
+    private void testPid(String name, DefaultSetting setting) {
+        testPidPrepend(name, setting);
+        testPidPrefix(name, setting);
+
+        if (setting.isAuto()) {
+            testPidRootLength(name, setting);
+            testPidTokenType(name, setting);
+        }
+        else {
+            testPidCharMap(name, setting);
+        }
+
+    }
+
+    private void testPidPrepend(String name, DefaultSetting setting) {
+        String prepend = setting.getPrepend();
+
+        Assert.assertTrue(name + " testing prepend", name.startsWith(prepend));
+    }
+
+    private void testPidPrefix(String name, DefaultSetting setting) {
+        String prepend = setting.getPrepend();
+        String prefix = setting.getPrefix();
+
+        Assert.assertTrue(name + " testing prepend", name.startsWith(prepend + prefix));
+    }
+
+    private void testPidTokenType(String name, DefaultSetting setting) {
+        String prepend = setting.getPrepend();
+        String prefix = setting.getPrefix();
+        TokenType tokenType = setting.getTokenType();
+        boolean sansVowel = setting.isSansVowels();
+
+        name = name.replace(prepend, "");
+
+        boolean matchesToken = containsCorrectCharacters(prefix, name, tokenType, sansVowel);
+        Assert.assertEquals(name + " testing tokenType", true, matchesToken);        
+    }
+
+    private void testPidRootLength(String name, DefaultSetting setting) {
+        String prepend = setting.getPrepend();
+        String prefix = setting.getPrefix();
+
+        name = name.replace(prepend + prefix, "");
+        Assert.assertEquals(name + " testing rootLength", name.length(), setting.getRootLength());
+    }
+
+    private void testPidCharMap(String name, DefaultSetting setting) {
+        String prepend = setting.getPrepend();
+        String prefix = setting.getPrefix();
+        String charMap = setting.getCharMap();
+        boolean sansVowel = setting.isSansVowels();
+
+        name = name.replace(prepend + prefix, "");
+
+        boolean matchesToken = containsCorrectCharacters(prefix, name, sansVowel, charMap);
+        Assert.assertEquals(name + " testing charMap", true, matchesToken);
+
+    }
+
     @Test
     public void testBadParameterExceptionBoolean() {
         Assert.fail("unimplemented");
@@ -91,6 +180,107 @@ public class MinterControllerTest {
     @Test
     public void testBadParameterExceptionTokenType() {
         Assert.fail("unimplemented");
+    }
+
+    @Test
+    public void testBadParameterExceptionCharMap() {
+        Assert.fail("unimplemented");
+    }
+
+    @Test
+    public void testBadParameterExceptionAmount() {
+        Assert.fail("unimplemented");
+    }
+
+    /**
+     * missing javadoc
+     *
+     * @param prefix
+     * @param name
+     * @param tokenType
+     * @param sansVowel
+     * @return
+     */
+    private boolean containsCorrectCharacters(String prefix, String name, TokenType tokenType,
+            boolean sansVowel) {
+        String regex = retrieveRegex(tokenType, sansVowel);
+        String region = String.format("^(%s)%s$", prefix, regex);
+        return name.matches(String.format("^(%s)%s$", prefix, regex));
+    }
+    
+    /**
+     * missing javadoc
+     *
+     * @param prefix
+     * @param name
+     * @param tokenType
+     * @param sansVowel
+     * @return
+     */
+    private boolean containsCorrectCharacters(String prefix, String name, boolean sansVowel,
+            String charMap) {
+        String regex = retrieveRegex(charMap, sansVowel);
+        return name.matches(String.format("^(%s)%s$", prefix, regex));
+    }
+
+    /**
+     * Returns an equivalent regular expression that'll map that maps to a
+     * specific TokenType
+     *
+     * @param tokenType Designates what characters are contained in the id's
+     * root
+     * @param sansVowel
+     * @return a regular expression
+     */
+    private String retrieveRegex(TokenType tokenType, boolean sansVowel) {
+
+        switch (tokenType) {
+            case DIGIT:
+                return "([\\d]*)";
+            case LOWERCASE:
+                return (sansVowel) ? "([^aeiouyA-Z\\W\\d]*)" : "([a-z]*)";
+            case UPPERCASE:
+                return (sansVowel) ? "([^a-zAEIOUY\\W\\d]*)" : "([A-Z]*)";
+            case MIXEDCASE:
+                return (sansVowel) ? "([^aeiouyAEIOUY\\W\\d]*)" : "([a-zA-Z]*)";
+            case LOWER_EXTENDED:
+                return (sansVowel) ? "([^aeiouyA-Z\\W]*)" : "([a-z\\d]*)";
+            case UPPER_EXTENDED:
+                return (sansVowel) ? "([^a-zAEIOUY\\W]*)" : "([A-Z\\d]*)";
+            default:
+                return (sansVowel) ? "([^aeiouyAEIOUY\\W]*)" : "(^[a-zA-z\\d]*)";
+        }
+    }        
+    
+    /**
+     * Returns an equivalent regular expression that'll map that maps to a
+     * specific TokenType
+     *
+     * @param charMap Designates what characters are contained in the id's root
+     * @param sansVowel
+     * @return a regular expression
+     */
+    private String retrieveRegex(String charMap, boolean sansVowel) {
+        String regex = "(^";
+        for (int i = 0; i < charMap.length(); i++) {
+            char key = charMap.charAt(i);
+            if (key == 'd') {
+                regex += "[\\d]";
+            }
+            else if (key == 'l') {
+                regex += (sansVowel) ? "[^aeiouyA-Z\\W\\d]" : "[a-z]";
+            }
+            else if (key == 'u') {
+                regex += (sansVowel) ? "[^a-zAEIOUY\\W\\d]" : "[A-Z]";
+            }
+            else if (key == 'm') {
+                regex += (sansVowel) ? "[^aeiouyAEIOUY\\W\\d]" : "[a-zA-Z]";
+            }
+            else if (key == 'e') {
+                regex += (sansVowel) ? "[^aeiouyAEIOUY\\W]" : "[a-zA-z\\d]";
+            }
+        }
+        return regex += "$)";
     }
 
     private DefaultSetting getSampleDefaultSetting() {
@@ -108,24 +298,26 @@ public class MinterControllerTest {
 
     private Set<Pid> getSampleSet(DefaultSetting setting) {
         IdGenerator generator;
-        if(setting.isAuto()){
+        if (setting.isAuto()) {
             generator = new AutoIdGenerator(setting.getPrefix(),
                     setting.isSansVowels(),
                     setting.getTokenType(),
                     setting.getRootLength());
-        }else{
-            generator = new CustomIdGenerator(setting.getPrefix(), 
-                    setting.isSansVowels(), 
-                    setting.getCharMap());
-            
         }
-        
-        Set<Pid> set;        
-        if(setting.isRandom()){
+        else {
+            generator = new CustomIdGenerator(setting.getPrefix(),
+                    setting.isSansVowels(),
+                    setting.getCharMap());
+
+        }
+
+        Set<Pid> set;
+        if (setting.isRandom()) {
             set = generator.randomMint(AMOUNT);
-        }else{
+        }
+        else {
             set = generator.sequentialMint(AMOUNT);
-        }        
+        }
 
         return set;
     }
