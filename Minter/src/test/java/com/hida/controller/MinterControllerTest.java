@@ -2,6 +2,7 @@ package com.hida.controller;
 
 import com.hida.model.AutoId;
 import com.hida.model.AutoIdGenerator;
+import com.hida.model.BadParameterException;
 import com.hida.model.CustomIdGenerator;
 import com.hida.model.DefaultSetting;
 import com.hida.model.IdGenerator;
@@ -77,15 +78,14 @@ public class MinterControllerTest {
             {PREPEND, "abc", TokenType.DIGIT, "l", 1, false, true, false},
             {PREPEND, "abc", TokenType.DIGIT, "u", 1, false, true, false},
             {PREPEND, "abc", TokenType.DIGIT, "m", 1, false, true, false},
-            {PREPEND, "abc", TokenType.DIGIT, "e", 1, false, true, false},
-        };
+            {PREPEND, "abc", TokenType.DIGIT, "e", 1, false, true, false},};
     }
 
     @Test(dataProvider = "parameters")
     public void testMintPersistedParameters(String prepend, String prefix, TokenType tokenType,
-            String charMap, int rootLength, boolean isAuto, boolean isRandom, boolean sansVowel) 
-            throws Exception {      
-        
+            String charMap, int rootLength, boolean isAuto, boolean isRandom, boolean sansVowel)
+            throws Exception {
+
         DefaultSetting setting = new DefaultSetting(prepend, prefix, tokenType, charMap,
                 rootLength, isAuto, isRandom, sansVowel);
 
@@ -109,7 +109,33 @@ public class MinterControllerTest {
             Assert.assertEquals(id, i);
             testPid(name, setting);
         }
+    }
 
+    @Test
+    public void testBadParameterExceptionBoolean() {
+        Assert.fail("unimplemented");
+
+    }
+
+    @Test(expectedExceptions = BadParameterException.class)
+    public void testBadParameterExceptionTokenType() throws Exception {
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("tokenType", "digits");
+
+        DefaultSetting setting = this.getSampleDefaultSetting();
+
+        when(MinterServiceDao.getCurrentSetting()).thenReturn(setting);
+        Controller.printPids(AMOUNT, ModelMap, parameters);
+    }
+
+    @Test
+    public void testBadParameterExceptionCharMap() {
+        Assert.fail("unimplemented");
+    }
+
+    @Test
+    public void testBadParameterExceptionAmount() {
+        Assert.fail("unimplemented");
     }
 
     private void testPid(String name, DefaultSetting setting) {
@@ -148,7 +174,7 @@ public class MinterControllerTest {
         name = name.replace(prepend, "");
 
         boolean matchesToken = containsCorrectCharacters(prefix, name, tokenType, sansVowel);
-        Assert.assertEquals(name + " testing tokenType", true, matchesToken);        
+        Assert.assertEquals(name + " testing tokenType", true, matchesToken);
     }
 
     private void testPidRootLength(String name, DefaultSetting setting) {
@@ -172,26 +198,6 @@ public class MinterControllerTest {
 
     }
 
-    @Test
-    public void testBadParameterExceptionBoolean() {
-        Assert.fail("unimplemented");
-    }
-
-    @Test
-    public void testBadParameterExceptionTokenType() {
-        Assert.fail("unimplemented");
-    }
-
-    @Test
-    public void testBadParameterExceptionCharMap() {
-        Assert.fail("unimplemented");
-    }
-
-    @Test
-    public void testBadParameterExceptionAmount() {
-        Assert.fail("unimplemented");
-    }
-
     /**
      * missing javadoc
      *
@@ -204,10 +210,9 @@ public class MinterControllerTest {
     private boolean containsCorrectCharacters(String prefix, String name, TokenType tokenType,
             boolean sansVowel) {
         String regex = retrieveRegex(tokenType, sansVowel);
-        String region = String.format("^(%s)%s$", prefix, regex);
         return name.matches(String.format("^(%s)%s$", prefix, regex));
     }
-    
+
     /**
      * missing javadoc
      *
@@ -250,8 +255,8 @@ public class MinterControllerTest {
             default:
                 return (sansVowel) ? "([^aeiouyAEIOUY\\W]*)" : "(^[a-zA-z\\d]*)";
         }
-    }        
-    
+    }
+
     /**
      * Returns an equivalent regular expression that'll map that maps to a
      * specific TokenType
