@@ -80,6 +80,15 @@ public class MinterControllerTest {
             {PREPEND, "abc", TokenType.DIGIT, "m", 1, false, true, false},
             {PREPEND, "abc", TokenType.DIGIT, "e", 1, false, true, false},};
     }
+    
+    @DataProvider(name = "bad booleans")
+    private Object[][] badBooleans(){
+        return new Object[][]{
+            {"auto", "t"},
+            {"random", "t"},
+            {"sansVowels", "t"},
+        };
+    }
 
     @Test(dataProvider = "parameters")
     public void testMintPersistedParameters(String prepend, String prefix, TokenType tokenType,
@@ -111,9 +120,15 @@ public class MinterControllerTest {
         }
     }
 
-    @Test
-    public void testBadParameterExceptionBoolean() {
-        Assert.fail("unimplemented");
+    @Test(expectedExceptions = BadParameterException.class, dataProvider = "bad booleans")
+    public void testBadParameterExceptionBoolean(String key, String value) throws Exception {
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put(key, value);        
+        
+        DefaultSetting setting = this.getSampleDefaultSetting();
+
+        when(MinterServiceDao.getCurrentSetting()).thenReturn(setting);
+        Controller.printPids(AMOUNT, ModelMap, parameters);
 
     }
 
