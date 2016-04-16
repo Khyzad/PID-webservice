@@ -197,14 +197,17 @@ public class MinterController {
 
         // ensure that only one thread access the minter at any given time
         RequestLock.lock();
-        Logger.warn("Request to Minter made, LOCKING MINTER");        
+        Logger.warn("Request to Minter made, LOCKING MINTER");
 
         // message variable to be sent to mint.jsp
         String message;
         try {
+            // validate amount
+            validateAmount(requestedAmount);
+            
             // override default settings where applicable
             DefaultSetting tempSetting = overrideDefaultSetting(parameters,
-                    MinterService.getCurrentSetting());                        
+                    MinterService.getCurrentSetting());
 
             // create the set of ids
             Set<Pid> idList = MinterService.mint(requestedAmount, tempSetting);
@@ -442,12 +445,18 @@ public class MinterController {
 
         return jsonString;
     }
-    
-    private String validateCharMap(String charMap) throws BadParameterException{
-        if(!charMap.matches("[dlume]+")){
-            throw new BadParameterException(charMap,"charMap");
+
+    private String validateCharMap(String charMap) throws BadParameterException {
+        if (!charMap.matches("[dlume]+")) {
+            throw new BadParameterException(charMap, "charMap");
         }
         return charMap;
+    }
+
+    private void validateAmount(long amount) throws BadParameterException {
+        if(amount < 0){
+            throw new BadParameterException(amount, "amount");
+        }
     }
 
     /**

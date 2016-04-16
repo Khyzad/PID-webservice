@@ -80,14 +80,13 @@ public class MinterControllerTest {
             {PREPEND, "abc", TokenType.DIGIT, "m", 1, false, true, false},
             {PREPEND, "abc", TokenType.DIGIT, "e", 1, false, true, false},};
     }
-    
+
     @DataProvider(name = "bad booleans")
-    private Object[][] badBooleans(){
+    private Object[][] badBooleans() {
         return new Object[][]{
             {"auto", "t"},
             {"random", "t"},
-            {"sansVowels", "t"},
-        };
+            {"sansVowels", "t"},};
     }
 
     @Test(dataProvider = "parameters")
@@ -123,8 +122,8 @@ public class MinterControllerTest {
     @Test(expectedExceptions = BadParameterException.class, dataProvider = "bad booleans")
     public void testBadParameterExceptionBoolean(String key, String value) throws Exception {
         Map<String, String> parameters = new HashMap<>();
-        parameters.put(key, value);        
-        
+        parameters.put(key, value);
+
         DefaultSetting setting = this.getSampleDefaultSetting();
 
         when(MinterServiceDao.getCurrentSetting()).thenReturn(setting);
@@ -154,9 +153,14 @@ public class MinterControllerTest {
         Controller.printPids(AMOUNT, ModelMap, parameters);
     }
 
-    @Test
-    public void testBadParameterExceptionAmount() {
-        Assert.fail("unimplemented");
+    @Test(expectedExceptions = BadParameterException.class)
+    public void testBadParameterExceptionAmount() throws Exception {
+        Map<String, String> parameters = new HashMap<>();
+
+        DefaultSetting setting = this.getSampleDefaultSetting();
+
+        when(MinterServiceDao.getCurrentSetting()).thenReturn(setting);
+        Controller.printPids(-1, ModelMap, parameters);
     }
 
     private void testPid(String name, DefaultSetting setting) {
