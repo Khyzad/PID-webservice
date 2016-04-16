@@ -143,9 +143,15 @@ public class MinterControllerTest {
         Controller.printPids(AMOUNT, ModelMap, parameters);
     }
 
-    @Test
-    public void testBadParameterExceptionCharMap() {
-        Assert.fail("unimplemented");
+    @Test(expectedExceptions = BadParameterException.class)
+    public void testBadParameterExceptionCharMap() throws Exception {
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("charMap", "dlumea");
+
+        DefaultSetting setting = this.getSampleDefaultSetting();
+
+        when(MinterServiceDao.getCurrentSetting()).thenReturn(setting);
+        Controller.printPids(AMOUNT, ModelMap, parameters);
     }
 
     @Test
