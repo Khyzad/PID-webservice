@@ -469,8 +469,9 @@ public class MinterController {
      * @throws BadParameterException thrown whenever a malformed or invalid
      * parameter is passed
      */
-    private TokenType getValidTokenType(String tokenType) throws BadParameterException {
+    protected TokenType getValidTokenType(String tokenType) throws BadParameterException {
 
+        tokenType = tokenType.toUpperCase();
         switch (tokenType) {
             case "DIGIT":
                 return TokenType.DIGIT;

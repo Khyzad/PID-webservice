@@ -1,6 +1,5 @@
 package com.hida.controller;
 
-import com.hida.model.AutoId;
 import com.hida.model.AutoIdGenerator;
 import com.hida.model.BadParameterException;
 import com.hida.model.CustomIdGenerator;
@@ -8,12 +7,10 @@ import com.hida.model.DefaultSetting;
 import com.hida.model.IdGenerator;
 import com.hida.model.Pid;
 import com.hida.model.TokenType;
-import com.hida.service.MinterService;
 import com.hida.service.MinterServiceImpl;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
 import junit.framework.Assert;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -26,10 +23,10 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyLong;
 import static org.mockito.Mockito.when;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.testng.annotations.AfterTest;
 import org.testng.annotations.DataProvider;
 
 /**
@@ -55,6 +52,11 @@ public class MinterControllerTest {
     @BeforeClass
     public void setUpClass() throws Exception {
         MockitoAnnotations.initMocks(this);
+    }
+    
+    @AfterTest
+    public void setUpTest(){
+        ModelMap.clear();
     }
 
     @DataProvider(name = "parameters")
@@ -89,6 +91,43 @@ public class MinterControllerTest {
             {"sansVowels", "t"},};
     }
 
+    @Test
+    public void testRequestedParameters() throws Exception {
+        //ModelMap.clear();
+        Map<String,String> map = getSampleMap();
+        DefaultSetting originalSetting = getSampleDefaultSetting();
+        DefaultSetting tempSetting = getSampleDefaultSetting();
+        
+        tempSetting.setPrepend(map.get("prepend"));
+        tempSetting.setPrefix(map.get("prefix"));
+        tempSetting.setRootLength(Integer.parseInt(map.get("rootLength")));
+        tempSetting.setCharMap(map.get("charMap"));
+        tempSetting.setTokenType(Controller.getValidTokenType(map.get("tokenType")));
+        tempSetting.setAuto(Boolean.getBoolean(map.get("auto")));
+        tempSetting.setRandom(Boolean.getBoolean(map.get("random")));
+        tempSetting.setSansVowels(Boolean.getBoolean(map.get("sansVowels")));
+        
+        
+        when(MinterServiceDao.getCurrentSetting()).thenReturn(originalSetting);
+        when(MinterServiceDao.mint(anyInt(), any(DefaultSetting.class))).
+                thenReturn(getSampleSet(tempSetting));
+        
+        String jspName = Controller.printPids(AMOUNT, ModelMap, map);
+        Assert.assertEquals("mint", jspName);
+
+        String message = (String) ModelMap.get("message");
+        Logger.debug(message);
+        JSONArray testJsonArray = new JSONArray(message);  
+
+        for (int i = 0; i < AMOUNT; i++) {
+            JSONObject object = testJsonArray.getJSONObject(i);
+            int id = object.getInt("id");
+            String name = object.getString("name");
+            Assert.assertEquals(id, i);
+            testPid(name, tempSetting);
+        }       
+    }
+
     @Test(dataProvider = "parameters")
     public void testMintPersistedParameters(String prepend, String prefix, TokenType tokenType,
             String charMap, int rootLength, boolean isAuto, boolean isRandom, boolean sansVowel)
@@ -106,9 +145,7 @@ public class MinterControllerTest {
 
         String message = (String) ModelMap.get("message");
         Logger.debug(message);
-        JSONArray testJsonArray = new JSONArray(message);
-
-        MinterServiceDao.getCurrentSetting();
+        JSONArray testJsonArray = new JSONArray(message);      
 
         for (int i = 0; i < testJsonArray.length(); i++) {
             JSONObject object = testJsonArray.getJSONObject(i);
@@ -128,7 +165,6 @@ public class MinterControllerTest {
 
         when(MinterServiceDao.getCurrentSetting()).thenReturn(setting);
         Controller.printPids(AMOUNT, ModelMap, parameters);
-
     }
 
     @Test(expectedExceptions = BadParameterException.class)
@@ -216,7 +252,7 @@ public class MinterControllerTest {
         String charMap = setting.getCharMap();
         boolean sansVowel = setting.isSansVowels();
 
-        name = name.replace(prepend + prefix, "");
+        name = name.replace(prepend, "");
 
         boolean matchesToken = containsCorrectCharacters(prefix, name, sansVowel, charMap);
         Assert.assertEquals(name + " testing charMap", true, matchesToken);
@@ -291,7 +327,7 @@ public class MinterControllerTest {
      * @return a regular expression
      */
     private String retrieveRegex(String charMap, boolean sansVowel) {
-        String regex = "(^";
+        String regex = "";
         for (int i = 0; i < charMap.length(); i++) {
             char key = charMap.charAt(i);
             if (key == 'd') {
@@ -310,7 +346,7 @@ public class MinterControllerTest {
                 regex += (sansVowel) ? "[^aeiouyAEIOUY\\W]" : "[a-zA-z\\d]";
             }
         }
-        return regex += "$)";
+        return regex;
     }
 
     private DefaultSetting getSampleDefaultSetting() {
@@ -352,4 +388,18 @@ public class MinterControllerTest {
         return set;
     }
 
+    private Map<String, String> getSampleMap() {
+        Map<String, String> map = new HashMap<>();
+
+        map.put("prepend", PREPEND);
+        map.put("prefix", "xyz");
+        map.put("tokenType", "lowercase");
+        map.put("charMap", "m");
+        map.put("rootLength", "2");
+        map.put("auto", "false");
+        map.put("random", "false");
+        map.put("sansVowel", "false");
+
+        return map;
+    }
 }
