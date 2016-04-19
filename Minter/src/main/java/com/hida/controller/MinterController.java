@@ -2,7 +2,6 @@ package com.hida.controller;
 
 import com.hida.model.BadParameterException;
 import com.hida.model.DefaultSetting;
-
 import com.hida.model.NotEnoughPermutationsException;
 import com.hida.model.Pid;
 import com.hida.model.TokenType;
@@ -45,7 +44,7 @@ public class MinterController {
     private static final Logger Logger = LoggerFactory.getLogger(MinterController.class);
     /**
      * Creates a fair reentrant RequestLock to serialize each request
-     * sequentially instead of concurrently. pids
+     * sequentially instead of concurrently.
      */
     private static final ReentrantLock RequestLock = new ReentrantLock(true);
 
@@ -65,11 +64,10 @@ public class MinterController {
      * @return The name of the page to redirect.
      * @throws BadParameterException Thrown whenever a bad parameter is
      * detected.
-     * @throws ClassNotFoundException Thrown whenever a class does not exist.
      */
     @RequestMapping(value = {"/confirmation"}, method = {RequestMethod.POST})
     public String handleForm(HttpServletRequest request, HttpServletResponse response)
-            throws ClassNotFoundException, BadParameterException {
+            throws BadParameterException {
         try {
             // prevents other clients from accessing the database whenever the form is submitted
             RequestLock.lock();
@@ -150,12 +148,10 @@ public class MinterController {
                         random);
             }
             else {
-
                 charMap = request.getParameter("charmapping");
                 if (charMap == null || charMap.isEmpty()) {
                     throw new BadParameterException();
                 }
-
                 newSetting = new DefaultSetting(prepend,
                         prefix,
                         oldSetting.getTokenType(),
@@ -164,7 +160,6 @@ public class MinterController {
                         vowels,
                         auto,
                         random);
-
             }
 
             MinterService.updateCurrentSetting(newSetting);
@@ -204,7 +199,7 @@ public class MinterController {
         try {
             // validate amount
             validateAmount(requestedAmount);
-            
+
             // override default settings where applicable
             DefaultSetting tempSetting = overrideDefaultSetting(parameters,
                     MinterService.getCurrentSetting());
@@ -214,7 +209,7 @@ public class MinterController {
 
             // convert the set of ids into a json array
             message = convertListToJson(idList, tempSetting.getPrepend());
-            //Logger.info("Message from Minter: "+message);
+            Logger.info("Message from Minter: " + message);
 
             // print list of ids to screen
             Logger.debug(message);
@@ -258,8 +253,7 @@ public class MinterController {
     }
 
     /**
-     * Returns a view that displays the error message of
-     * NotEnoughPermutationsException.
+     * Returns a view that displays the error message of NotEnoughPermutationsException.
      *
      * @param req The HTTP request.
      * @param exception NotEnoughPermutationsException.
@@ -314,14 +308,6 @@ public class MinterController {
         mav.addObject("exception", exception.getClass().getSimpleName());
         mav.addObject("message", exception.getMessage());
         Logger.error("General Error: " + exception.getMessage());
-
-        // display stack trace
-        StackTraceElement[] stacktrace = exception.getStackTrace();
-        String traceList = "";
-        for (StackTraceElement s : stacktrace) {
-            traceList += s.toString() + "\n";
-        }
-        mav.addObject("stacktrace", traceList);
 
         mav.setViewName("error");
         return mav;
@@ -460,7 +446,7 @@ public class MinterController {
     }
 
     private String validatePrefix(String prefix) throws BadParameterException {
-        if(!prefix.matches("[a-zA-z0-9]*")){
+        if (!prefix.matches("[a-zA-z0-9]*")) {
             throw new BadParameterException(prefix, "prefix");
         }
         return prefix;
