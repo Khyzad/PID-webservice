@@ -8,9 +8,13 @@ import com.hida.model.IdGenerator;
 import com.hida.model.Pid;
 import com.hida.model.TokenType;
 import com.hida.service.MinterServiceImpl;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletRequestWrapper;
+import javax.servlet.http.HttpServletResponse;
 import junit.framework.Assert;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -23,9 +27,13 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
+import org.mockito.Mockito;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.mock.web.MockHttpServletResponse;
 import org.testng.annotations.AfterTest;
 import org.testng.annotations.DataProvider;
 
@@ -53,10 +61,19 @@ public class MinterControllerTest {
     public void setUpClass() throws Exception {
         MockitoAnnotations.initMocks(this);
     }
-    
-    @AfterTest
-    public void setUpTest(){
-        ModelMap.clear();
+
+    @DataProvider(name = "request parameters")
+    private Object[][] requestParameters() {
+        return new Object[][]{
+            {PREPEND, "xyz", "auto", "random", "true", "1", "true", null, null, "mmm"},
+            {PREPEND, "xyz", "false", "false", null, "1", "true", "true", null, "mmm"},
+            {PREPEND, "xyz", "false", "false", null, "1", "true", "true", "true", "mmm"},
+            {PREPEND, "xyz", "false", "false", null, "1", null, "true", null, "mmm"},
+            {PREPEND, "xyz", "false", "false", null, "1", null, "true", "true", "mmm"},
+            {PREPEND, "xyz", "false", "false", null, "1", null, null, "true", "mmm"},
+            {PREPEND, "xyz", "false", "false", null, "1", "true", null, null, "mmm"},
+            
+        };
     }
 
     @DataProvider(name = "parameters")
@@ -91,13 +108,38 @@ public class MinterControllerTest {
             {"sansVowels", "t"},};
     }
 
+    @Test(dataProvider = "request parameters")
+    public void testDisplayIndex(String prepend, String idprefix, String mintType,
+            String mintOrder, String vowels, String idLength, String digits,
+            String lowercase, String uppercase, String charMapping) throws Exception {
+        DefaultSetting originalSetting = getSampleDefaultSetting();
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        HttpServletResponse response = Mockito.mock(HttpServletResponse.class);                
+
+        request.setParameter("prepend", prepend);
+        request.setParameter("idprefix", idprefix);
+        request.setParameter("mintType", mintType);
+        request.setParameter("mintOrder", mintOrder);
+        request.setParameter("vowels", vowels);
+        request.setParameter("idlength", idLength);
+        request.setParameter("digits", digits);
+        request.setParameter("lowercase", lowercase);
+        request.setParameter("uppercase", uppercase);
+        request.setParameter("charmapping", charMapping);      
+        
+        when(MinterServiceDao.getCurrentSetting()).thenReturn(originalSetting);
+        doNothing().when(MinterServiceDao).updateCurrentSetting(originalSetting);
+
+        Assert.assertEquals("redirect:", Controller.handleForm(request, response));
+    }
+
     @Test
     public void testRequestedParameters() throws Exception {
         //ModelMap.clear();
-        Map<String,String> map = getSampleMap();
+        Map<String, String> map = getSampleMap();
         DefaultSetting originalSetting = getSampleDefaultSetting();
         DefaultSetting tempSetting = getSampleDefaultSetting();
-        
+
         tempSetting.setPrepend(map.get("prepend"));
         tempSetting.setPrefix(map.get("prefix"));
         tempSetting.setRootLength(Integer.parseInt(map.get("rootLength")));
@@ -106,18 +148,17 @@ public class MinterControllerTest {
         tempSetting.setAuto(Boolean.getBoolean(map.get("auto")));
         tempSetting.setRandom(Boolean.getBoolean(map.get("random")));
         tempSetting.setSansVowels(Boolean.getBoolean(map.get("sansVowels")));
-        
-        
+
         when(MinterServiceDao.getCurrentSetting()).thenReturn(originalSetting);
         when(MinterServiceDao.mint(anyInt(), any(DefaultSetting.class))).
                 thenReturn(getSampleSet(tempSetting));
-        
+
         String jspName = Controller.printPids(AMOUNT, ModelMap, map);
         Assert.assertEquals("mint", jspName);
 
         String message = (String) ModelMap.get("message");
         Logger.debug(message);
-        JSONArray testJsonArray = new JSONArray(message);  
+        JSONArray testJsonArray = new JSONArray(message);
 
         for (int i = 0; i < AMOUNT; i++) {
             JSONObject object = testJsonArray.getJSONObject(i);
@@ -125,7 +166,7 @@ public class MinterControllerTest {
             String name = object.getString("name");
             Assert.assertEquals(id, i);
             testPid(name, tempSetting);
-        }       
+        }
     }
 
     @Test(dataProvider = "parameters")
@@ -145,7 +186,7 @@ public class MinterControllerTest {
 
         String message = (String) ModelMap.get("message");
         Logger.debug(message);
-        JSONArray testJsonArray = new JSONArray(message);      
+        JSONArray testJsonArray = new JSONArray(message);
 
         for (int i = 0; i < testJsonArray.length(); i++) {
             JSONObject object = testJsonArray.getJSONObject(i);
