@@ -17,26 +17,19 @@ import org.springframework.orm.hibernate4.LocalSessionFactoryBean;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 /**
- * missing javadocs
+ * This class is used to configure Hibernate and Spring Beans.
  *
+ * @author lruffin
  */
 @Configuration
 @EnableTransactionManagement
 @ComponentScan({"com.hida.configuration"})
 @PropertySource(value = {"classpath:minter_config.properties"})
 public class HibernateConfiguration {
-
-    /**
-     * missing javadocs
-     */
+    
     @Autowired
     private Environment environment;
-
-    /**
-     * missing javadocs
-     *
-     * @return
-     */
+    
     @Bean
     public LocalSessionFactoryBean sessionFactory() {
         LocalSessionFactoryBean sessionFactory = new LocalSessionFactoryBean();
@@ -45,12 +38,7 @@ public class HibernateConfiguration {
         sessionFactory.setHibernateProperties(hibernateProperties());
         return sessionFactory;
     }
-
-    /**
-     * missing javadocs
-     *
-     * @return
-     */
+    
     @Bean
     public DataSource dataSource() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
@@ -60,27 +48,19 @@ public class HibernateConfiguration {
         dataSource.setPassword(environment.getRequiredProperty("jdbc.password"));
         return dataSource;
     }
-
-    /**
-     * missing javadocs
-     *
-     * @return
-     */
+    
     private Properties hibernateProperties() {
         Properties properties = new Properties();
         properties.put("hibernate.dialect", environment.getRequiredProperty("hibernate.dialect"));
-        properties.put("hibernate.show_sql", environment.getRequiredProperty("hibernate.show_sql"));
-        properties.put("hibernate.format_sql", environment.getRequiredProperty("hibernate.format_sql"));
-        properties.put("hibernate.hbm2ddl.auto", environment.getRequiredProperty("hibernate.hbm2ddl.auto"));
+        properties.put("hibernate.show_sql", 
+                environment.getRequiredProperty("hibernate.show_sql"));
+        properties.put("hibernate.format_sql", 
+                environment.getRequiredProperty("hibernate.format_sql"));
+        properties.put("hibernate.hbm2ddl.auto", 
+                environment.getRequiredProperty("hibernate.hbm2ddl.auto"));
         return properties;
     }
-
-    /**
-     * missing javadocs
-     *
-     * @param s
-     * @return
-     */
+    
     @Bean
     @Autowired
     public HibernateTransactionManager transactionManager(SessionFactory s) {
