@@ -9,8 +9,7 @@ import org.dbunit.operation.DatabaseOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.testng.AbstractTransactionalTestNGSpringContextTests;
-import org.testng.annotations.BeforeMethod;
- 
+import org.testng.annotations.BeforeMethod; 
 import com.hida.configuration.HibernateTestConfiguration;
 import com.hida.configuration.HsqlDataTypeFactory;
 import org.dbunit.database.DatabaseConfig;

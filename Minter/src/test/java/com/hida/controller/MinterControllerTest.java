@@ -8,12 +8,9 @@ import com.hida.model.IdGenerator;
 import com.hida.model.Pid;
 import com.hida.model.TokenType;
 import com.hida.service.MinterServiceImpl;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 import junit.framework.Assert;
 import org.mockito.InjectMocks;
@@ -33,8 +30,6 @@ import static org.mockito.Mockito.when;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.mock.web.MockHttpServletRequest;
-import org.springframework.mock.web.MockHttpServletResponse;
-import org.testng.annotations.AfterTest;
 import org.testng.annotations.DataProvider;
 
 /**
