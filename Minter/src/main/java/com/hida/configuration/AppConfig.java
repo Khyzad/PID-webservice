@@ -8,6 +8,11 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 import org.springframework.web.servlet.view.JstlView;
 
+/**
+ * Acting as a dispatcher.xml, this class resolves requests into view names. 
+ *
+ * @author lruffin
+ */
 @Configuration
 @EnableWebMvc
 @ComponentScan(basePackages = "com.hida")
@@ -21,5 +26,5 @@ public class AppConfig {
         viewResolver.setSuffix(".jsp");
         return viewResolver;
     }
-    
+
 }
