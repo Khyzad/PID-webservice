@@ -239,6 +239,17 @@ public class MinterControllerTest {
         when(MinterServiceDao.getCurrentSetting()).thenReturn(setting);
         Controller.printPids(-1, ModelMap, parameters);
     }
+    
+    @Test(expectedExceptions = BadParameterException.class)
+    public void testBadParameterExceptionPrefix() throws Exception {
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("prefix", " ");
+
+        DefaultSetting setting = this.getSampleDefaultSetting();
+
+        when(MinterServiceDao.getCurrentSetting()).thenReturn(setting);
+        Controller.printPids(AMOUNT, ModelMap, parameters);
+    }
 
     private void testPid(String name, DefaultSetting setting) {
         testPidPrepend(name, setting);

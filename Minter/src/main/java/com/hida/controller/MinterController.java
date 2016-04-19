@@ -345,7 +345,7 @@ public class MinterController {
                 : entity.getPrepend();
 
         String prefix = (parameters.containsKey("prefix"))
-                ? parameters.get("prefix")
+                ? validatePrefix(parameters.get("prefix"))
                 : entity.getPrefix();
 
         int rootLength = (parameters.containsKey("rootLength"))
@@ -454,9 +454,16 @@ public class MinterController {
     }
 
     private void validateAmount(long amount) throws BadParameterException {
-        if(amount < 0){
+        if (amount < 0) {
             throw new BadParameterException(amount, "amount");
         }
+    }
+
+    private String validatePrefix(String prefix) throws BadParameterException {
+        if(!prefix.matches("[a-zA-z0-9]*")){
+            throw new BadParameterException(prefix, "prefix");
+        }
+        return prefix;
     }
 
     /**
