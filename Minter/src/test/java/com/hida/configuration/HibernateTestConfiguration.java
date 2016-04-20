@@ -1,7 +1,7 @@
 package com.hida.configuration;
 
 import java.util.Properties;
-import javax.sql.DataSource; 
+import javax.sql.DataSource;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -14,42 +14,44 @@ import org.springframework.orm.hibernate4.LocalSessionFactoryBean;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 /**
+ * Used to create a test environment for test cases.
  *
  * @author lruffin
  */
 @Configuration
 @EnableTransactionManagement
-@ComponentScan({ "com.hida.dao" })
+@ComponentScan({"com.hida.dao"})
 public class HibernateTestConfiguration {
+
     @Autowired
     private Environment environment;
- 
+
     @Bean
     public LocalSessionFactoryBean sessionFactory() {
         LocalSessionFactoryBean sessionFactory = new LocalSessionFactoryBean();
         sessionFactory.setDataSource(dataSource());
-        sessionFactory.setPackagesToScan(new String[] { "com.hida.model" });
+        sessionFactory.setPackagesToScan(new String[]{"com.hida.model"});
         sessionFactory.setHibernateProperties(hibernateProperties());
         return sessionFactory;
     }
- 
+
     @Bean(name = "dataSource")
     public DataSource dataSource() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
         dataSource.setDriverClassName("org.hsqldb.jdbcDriver");
         dataSource.setUrl("jdbc:hsqldb:mem:test;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE");
         dataSource.setUsername("");
-        dataSource.setPassword("");      
+        dataSource.setPassword("");
         return dataSource;
     }
- 
+
     private Properties hibernateProperties() {
         Properties properties = new Properties();
         properties.put("hibernate.dialect", "org.hibernate.dialect.HSQLDialect");
         properties.put("hibernate.hbm2ddl.auto", "create-drop");
         return properties;
-    }        
- 
+    }
+
     @Bean
     @Autowired
     public HibernateTransactionManager transactionManager(SessionFactory s) {
