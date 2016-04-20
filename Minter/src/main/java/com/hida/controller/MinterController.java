@@ -253,7 +253,8 @@ public class MinterController {
     }
 
     /**
-     * Returns a view that displays the error message of NotEnoughPermutationsException.
+     * Returns a view that displays the error message of
+     * NotEnoughPermutationsException.
      *
      * @param req The HTTP request.
      * @param exception NotEnoughPermutationsException.
@@ -432,6 +433,14 @@ public class MinterController {
         return jsonString;
     }
 
+    /**
+     * Checks to see if a given charMap is valid
+     *
+     * @param charMap A sequence of characters used to configure PIDs
+     * @return Returns the given charMap if nothing wrong was detected
+     * @throws BadParameterException Thrown whenever a bad parameter is
+     * detected.
+     */
     private String validateCharMap(String charMap) throws BadParameterException {
         if (!charMap.matches("[dlume]+")) {
             throw new BadParameterException(charMap, "charMap");
@@ -439,12 +448,28 @@ public class MinterController {
         return charMap;
     }
 
+    /**
+     * Checks to see if the amount is valid
+     *
+     * @param amount The number of PIDs to be created
+     * @throws BadParameterException Thrown whenever a bad parameter is
+     * detected.
+     */
     private void validateAmount(long amount) throws BadParameterException {
         if (amount < 0) {
             throw new BadParameterException(amount, "amount");
         }
     }
 
+    /**
+     * Checks to see if the prefix is valid
+     *
+     * @param prefix A sequence of characters that appear in the beginning of
+     * PIDs
+     * @return Returns the given prefix if nothing wrong was detected
+     * @throws BadParameterException Thrown whenever a bad parameter is
+     * detected.
+     */
     private String validatePrefix(String prefix) throws BadParameterException {
         if (!prefix.matches("[a-zA-z0-9]*")) {
             throw new BadParameterException(prefix, "prefix");
@@ -463,7 +488,6 @@ public class MinterController {
      * parameter is passed
      */
     protected TokenType getValidTokenType(String tokenType) throws BadParameterException {
-
         tokenType = tokenType.toUpperCase();
         switch (tokenType) {
             case "DIGIT":
