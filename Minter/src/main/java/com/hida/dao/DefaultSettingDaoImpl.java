@@ -4,7 +4,7 @@ import com.hida.model.DefaultSetting;
 import org.springframework.stereotype.Repository;
 
 /**
- * missing javadoc
+ * Programmatic implementation DefaultSettingDao
  *
  * @author lruffin
  */
@@ -13,30 +13,29 @@ public class DefaultSettingDaoImpl extends AbstractDao<Integer, DefaultSetting>
         implements DefaultSettingDao {
 
     /**
-     * missing javadoc
+     * Saves a DefaultSetting object to a database
      *
-     * @param setting
+     * @param setting The DefaultSetting object to be saved
      */
     @Override
     public void save(DefaultSetting setting) {
         persist(setting);
-    }   
+    }
 
     /**
-     * missing javadoc
+     * Finds a DefaultSetting object in a database
      *
-     * @param id
-     * @param name
-     * @return
+     * @param id The unique id of the DefaultSetting object
+     * @return The DefaultSetting with the unique id
      */
     private DefaultSetting findById(int id) {
         return getByKey(id);
     }
 
     /**
-     * missing javadoc
+     * Returns the DefaultSetting of the Minter
      *
-     * @return
+     * @return DefaultSetting
      */
     @Override
     public DefaultSetting getDefaultSetting() {
