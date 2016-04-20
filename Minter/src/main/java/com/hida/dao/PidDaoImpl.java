@@ -7,17 +7,17 @@ import org.hibernate.criterion.Restrictions;
 import org.springframework.stereotype.Repository;
 
 /**
- *
+ * Programmatic implementation of PidDao
  * @author lruffin
  */
 @Repository("pidDao")
 public class PidDaoImpl extends AbstractDao<String, Pid> implements PidDao {
     
     /**
-     * missing javadoc
+     * Finds a PID by its unique name 
      *
-     * @param name
-     * @return
+     * @param name 
+     * @return PID
      */
     @Override
     public Pid findByName(String name) {
@@ -25,9 +25,9 @@ public class PidDaoImpl extends AbstractDao<String, Pid> implements PidDao {
     }
     
     /**
-     * missing javadoc
+     * Saves a PID 
      *
-     * @param pid
+     * @param pid 
      */
     @Override
     public void savePid(Pid pid) {
@@ -35,9 +35,9 @@ public class PidDaoImpl extends AbstractDao<String, Pid> implements PidDao {
     }
 
     /**
-     * missing javadoc
+     * Lists all PIDs stored in the database
      *
-     * @return
+     * @return List of all PIDs
      */
     @SuppressWarnings("unchecked")
     @Override
@@ -47,7 +47,7 @@ public class PidDaoImpl extends AbstractDao<String, Pid> implements PidDao {
     }
 
     /**
-     * missing javadoc; currently incomplete
+     * Currently incomplete and should not be used, subject to deletion
      *
      * @param regex
      * @return
