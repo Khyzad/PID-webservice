@@ -9,9 +9,9 @@ import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 import javax.validation.constraints.NotNull;
 
-
 /**
- * missing javadoc
+ * A POJO that contain all the fields and properties that should be recorded by
+ * Hibernate.
  *
  * @author lruffin
  */
@@ -54,13 +54,14 @@ public class Setting {
     }
 
     /**
-     * Constructor; missing javadoc
+     * Constructor that represents the necessary values all settings should contain
      *
-     * @param Prefix
-     * @param TokenType
-     * @param CharMap
-     * @param RootLength
-     * @param SansVowels
+     * @param Prefix A sequence of characters that appear in the beginning of
+     * PIDs
+     * @param TokenType An enum used to configure PIDS
+     * @param CharMap A sequence of characters used to configure PIDs
+     * @param RootLength Designates the length of the id's root
+     * @param SansVowels Dictates whether or not vowels are allowed
      */
     public Setting(String Prefix, TokenType TokenType, String CharMap, int RootLength,
             boolean SansVowels) {

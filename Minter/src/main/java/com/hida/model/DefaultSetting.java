@@ -1,13 +1,14 @@
 package com.hida.model;
 
-import java.util.Arrays;
 import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
 /**
- * missing javadoc
+ * A POJO representing a type of setting that records the values of the
+ * IdGenerators used to create Pids and the current default values of all the
+ * parameters.
  *
  * @author lruffin
  */
@@ -25,16 +26,18 @@ public class DefaultSetting extends Setting {
     private boolean Random;
 
     /**
-     * Constructor; missing javadoc
+     * Constructor used to create a DefaultSetting entity
      *
-     * @param Prepend
-     * @param Prefix
-     * @param TokenType
-     * @param CharMap
-     * @param RootLength
-     * @param SansVowels
-     * @param Auto
-     * @param Random
+     * @param Prepend Primarily used to turn a Pid into a PURL
+     * @param Prefix A sequence of characters that appear in the beginning of
+     * PIDs
+     * @param TokenType An enum used to configure PIDS
+     * @param CharMap A sequence of characters used to configure PIDs
+     * @param RootLength Designates the length of the id's root
+     * @param SansVowels Dictates whether or not vowels are allowed
+     * @param Auto Determines which generator, either Auto or Custom, will be
+     * used
+     * @param Random Determines if the PIDs are created randomly or sequentially
      */
     public DefaultSetting(String Prepend, String Prefix, TokenType TokenType, String CharMap,
             int RootLength, boolean SansVowels, boolean Auto, boolean Random) {
@@ -43,54 +46,10 @@ public class DefaultSetting extends Setting {
         this.Auto = Auto;
         this.Random = Random;
 
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (obj == null) {
-            return false;
-        }
-        if (!(obj instanceof DefaultSetting)) {
-            return false;
-        }
-        final DefaultSetting paramId = (DefaultSetting) obj;
-
-        if (!paramId.getPrepend().equals(this.getPrepend())) {
-            return false;
-        }
-        if (!paramId.getPrefix().equals(this.getPrefix())) {
-            return false;
-        }
-        if (!paramId.getCharMap().equals(this.getCharMap())) {
-            return false;
-        }
-        if (paramId.getTokenType() != this.getTokenType()) {
-            return false;
-        }
-        if (paramId.getRootLength() != this.getRootLength()) {
-            return false;
-        }
-        if (paramId.Auto != this.Auto) {
-            return false;
-        }
-        if (paramId.Random != this.Random) {
-            return false;
-        }
-        return paramId.isSansVowels() == this.isSansVowels();
-
-    }
-
-    @Override
-    public int hashCode() {
-        int hash = 3;
-        hash = 37 * hash + Objects.hashCode(this.Prepend);
-        hash = 37 * hash + (this.Auto ? 1 : 0);
-        hash = 37 * hash + (this.Random ? 1 : 0);
-        return hash;
-    }
+    }     
 
     /**
-     * Default constructor
+     * No-arg constructor used by Hibernate
      */
     public DefaultSetting() {
 
