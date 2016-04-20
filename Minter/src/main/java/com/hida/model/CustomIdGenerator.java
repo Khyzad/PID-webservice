@@ -1,17 +1,13 @@
 package com.hida.model;
 
-
-
 import static com.hida.model.IdGenerator.Rng;
 import static com.hida.model.IdGenerator.Logger;
-import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.TreeSet;
-import javax.persistence.Entity;
-import javax.persistence.Transient;
 
 /**
+ * An Id Generator that creates Pids primarily based on a charMap.
  *
  * @author lruffin
  */
@@ -30,16 +26,18 @@ public class CustomIdGenerator extends IdGenerator {
      * e: any valid character specified by d, l, u, and m.
      * </pre>
      *
-     *
      */
     private String CharMap;
 
     /**
-     * missing javadoc
-     *     
-     * @param prefix
-     * @param sansVowel
-     * @param charMap
+     * Instantiates an Id Generator that creates Pids primarily based on a
+     * charMap. The only valid charMap characters are regex("[dlume]+"). No 
+     * restrictions are placed on the other parameters. 
+     *
+     * @param prefix A sequence of characters that appear in the beginning of
+     * PIDs
+     * @param sansVowel Dictates whether or not vowels are allowed
+     * @param charMap A sequence of characters used to configure Pids
      */
     public CustomIdGenerator(String prefix, boolean sansVowel, String charMap) {
         super(prefix, sansVowel);
@@ -52,7 +50,8 @@ public class CustomIdGenerator extends IdGenerator {
             this.BaseMap.put("u", SANS_VOWEL_TOKEN.toUpperCase());
             this.BaseMap.put("m", SANS_VOWEL_TOKEN + SANS_VOWEL_TOKEN.toUpperCase());
             this.BaseMap.put("e", DIGIT_TOKEN + SANS_VOWEL_TOKEN + SANS_VOWEL_TOKEN.toUpperCase());
-        } else {
+        }
+        else {
             this.BaseMap.put("d", DIGIT_TOKEN);
             this.BaseMap.put("l", VOWEL_TOKEN);
             this.BaseMap.put("u", VOWEL_TOKEN.toUpperCase());
@@ -62,47 +61,10 @@ public class CustomIdGenerator extends IdGenerator {
     }
 
     /**
-     * missing javadoc
+     * Creates Pids without regard to a natural order.
      *
-     * @param amount
-     * @return
-     */
-    @Override
-    public Set<Pid> sequentialMint(long amount) {
-        //Logger.info("in genIdCustomSequential: " + amount);
-
-        // checks to see if its possible to produce or add requested amount of
-        long total = calculatePermutations();
-        if (total < amount) {
-            throw new NotEnoughPermutationsException();
-        }
-        
-        // generate ids
-        String[] tokenMapArray = getBaseCharMapping();
-        Set<Pid> idSet = new TreeSet();
-                
-        int[] previousIdBaseMap = new int[CharMap.length()];
-        CustomId currentId = new CustomId(Prefix, previousIdBaseMap, tokenMapArray);   
-        for (int i = CharMap.length() - 1; i >= 0; i--) {
-            for (int j = CharMap.length() - 1; j >= 0; j--) {
-                
-            }
-        }
-        for (int i = 0; i < amount; i++) {            
-            CustomId nextId = new CustomId(currentId);
-            idSet.add(currentId);
-            Logger.info("Generated Custom Sequential ID: " + currentId);
-            nextId.incrementId();            
-            currentId = new CustomId(nextId); 
-        }
-        return idSet;
-    }
-
-    /**
-     * missing javadoc
-     *
-     * @param amount
-     * @return
+     * @param amount The number of Pids to be created
+     * @return A set of Pids
      */
     @Override
     public Set<Pid> randomMint(long amount) {
@@ -130,9 +92,47 @@ public class CustomIdGenerator extends IdGenerator {
     }
 
     /**
-     * missing javadoc
+     * Creates Pids in ascending order
      *
-     * @return
+     * @param amount The number of PIDs to be created
+     * @return A set of Pids
+     */
+    @Override
+    public Set<Pid> sequentialMint(long amount) {
+        //Logger.info("in genIdCustomSequential: " + amount);
+
+        // checks to see if its possible to produce or add requested amount of
+        long total = calculatePermutations();
+        if (total < amount) {
+            throw new NotEnoughPermutationsException();
+        }
+
+        // generate ids
+        String[] tokenMapArray = getBaseCharMapping();
+        Set<Pid> idSet = new TreeSet();
+
+        int[] previousIdBaseMap = new int[CharMap.length()];
+        CustomId currentId = new CustomId(Prefix, previousIdBaseMap, tokenMapArray);
+        for (int i = CharMap.length() - 1; i >= 0; i--) {
+            for (int j = CharMap.length() - 1; j >= 0; j--) {
+
+            }
+        }
+        for (int i = 0; i < amount; i++) {
+            CustomId nextId = new CustomId(currentId);
+            idSet.add(currentId);
+            Logger.info("Generated Custom Sequential ID: " + currentId);
+            nextId.incrementId();
+            currentId = new CustomId(nextId);
+        }
+        return idSet;
+    }
+
+    /**
+     * This method calculates and returns the total possible number of
+     * permutations using the values given in the constructor.
+     *
+     * @return number of permutations
      */
     @Override
     public long calculatePermutations() {
@@ -140,11 +140,14 @@ public class CustomIdGenerator extends IdGenerator {
         for (int i = 0; i < CharMap.length(); i++) {
             if (CharMap.charAt(i) == 'd') {
                 totalPermutations *= 10;
-            } else if (CharMap.charAt(i) == 'l' || CharMap.charAt(i) == 'u') {
+            }
+            else if (CharMap.charAt(i) == 'l' || CharMap.charAt(i) == 'u') {
                 totalPermutations *= (SansVowel) ? 20 : 26;
-            } else if (CharMap.charAt(i) == 'm') {
+            }
+            else if (CharMap.charAt(i) == 'm') {
                 totalPermutations *= (SansVowel) ? 40 : 52;
-            } else if (CharMap.charAt(i) == 'e') {
+            }
+            else if (CharMap.charAt(i) == 'e') {
                 totalPermutations *= (SansVowel) ? 50 : 62;
             }
         }
@@ -175,6 +178,4 @@ public class CustomIdGenerator extends IdGenerator {
     public void setCharMap(String CharMap) {
         this.CharMap = CharMap;
     }
-
-    
 }

@@ -1,16 +1,14 @@
 package com.hida.model;
 
-
-
 import static com.hida.model.IdGenerator.Rng;
 import static com.hida.model.IdGenerator.Logger;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.TreeSet;
-import javax.persistence.Entity;
-import javax.persistence.Transient;
 
 /**
+ * An Id Generator that creates Pids primarily based on tokenType and
+ * rootLength.
  *
  * @author lruffin
  */
@@ -38,14 +36,16 @@ public class AutoIdGenerator extends IdGenerator {
      * Designates the length of the id's root.
      */
     private int RootLength;
-      
+
     /**
-     * missing javadoc
+     * Default constructor. Aside from TokenType, there are no restrictions placed
+     * on the parameters and can be used however one sees fit. 
      *
-     * @param prefix
-     * @param sansVowel
-     * @param tokenType
-     * @param rootLength
+     * @param prefix A sequence of characters that appear in the beginning of
+     * PIDs
+     * @param sansVowel Dictates whether or not vowels are allowed
+     * @param tokenType An enum used to configure PIDS
+     * @param rootLength Designates the length of the id's root
      */
     public AutoIdGenerator(String prefix, boolean sansVowel, TokenType tokenType, int rootLength) {
         super(prefix, sansVowel);
@@ -64,7 +64,8 @@ public class AutoIdGenerator extends IdGenerator {
                     DIGIT_TOKEN + SANS_VOWEL_TOKEN.toUpperCase());
             this.BaseMap.put(TokenType.MIXED_EXTENDED,
                     DIGIT_TOKEN + SANS_VOWEL_TOKEN + SANS_VOWEL_TOKEN.toUpperCase());
-        } else {
+        }
+        else {
             this.BaseMap.put(TokenType.LOWERCASE, VOWEL_TOKEN);
             this.BaseMap.put(TokenType.UPPERCASE, VOWEL_TOKEN.toUpperCase());
             this.BaseMap.put(TokenType.MIXEDCASE, VOWEL_TOKEN + VOWEL_TOKEN.toUpperCase());
@@ -76,10 +77,10 @@ public class AutoIdGenerator extends IdGenerator {
     }
 
     /**
-     * missing javadoc
+     * Creates Pids without regard to a natural order.
      *
-     * @param amount
-     * @return
+     * @param amount The number of PIDs to be created
+     * @return A set of Pids
      */
     @Override
     public Set<Pid> randomMint(long amount) {
@@ -88,7 +89,7 @@ public class AutoIdGenerator extends IdGenerator {
         if (total < amount) {
             throw new NotEnoughPermutationsException(total, amount);
         }
-        
+
         // generate ids
         String tokenMap = BaseMap.get(TokenType);
         Set<Pid> tempIdList = new LinkedHashSet();
@@ -110,10 +111,10 @@ public class AutoIdGenerator extends IdGenerator {
     }
 
     /**
-     * missing javadoc
+     * Creates Pids in ascending order
      *
-     * @param amount
-     * @return
+     * @param amount The number of PIDs to be created
+     * @return A set of Pids
      */
     @Override
     public Set<Pid> sequentialMint(long amount) {
@@ -129,23 +130,24 @@ public class AutoIdGenerator extends IdGenerator {
         String tokenMap = BaseMap.get(TokenType);
         Set<Pid> idSet = new TreeSet();
 
-        int[] previousIdBaseMap = new int[RootLength];        
+        int[] previousIdBaseMap = new int[RootLength];
         AutoId currentId = new AutoId(Prefix, previousIdBaseMap, tokenMap);
         for (int i = 0; i < amount; i++) {
             AutoId nextId = new AutoId(currentId);
             idSet.add(currentId);
             Logger.info("Generated Auto Sequential ID: " + currentId);
-            nextId.incrementId();            
-            currentId = new AutoId(nextId);            
+            nextId.incrementId();
+            currentId = new AutoId(nextId);
         }
 
         return idSet;
     }
 
     /**
-     * missing javadoc
+     * This method calculates and returns the total possible number of
+     * permutations using the values given in the constructor.
      *
-     * @return
+     * @return number of permutations
      */
     @Override
     public long calculatePermutations() {
@@ -191,5 +193,4 @@ public class AutoIdGenerator extends IdGenerator {
     public void setRootLength(int RootLength) {
         this.RootLength = RootLength;
     }
-    
 }

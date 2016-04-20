@@ -1,7 +1,5 @@
 package com.hida.model;
 
-
-
 import java.security.SecureRandom;
 import java.util.HashMap;
 import java.util.Set;
@@ -9,7 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Minter class creates formatted ids in json using a variety of parameters.
+ * An abstract Id generator that all potential Pid generators should extend. 
  *
  * @author Brittany Cruz
  * @author lruffin
