@@ -1,15 +1,13 @@
 package com.hida.dao;
 
-import com.hida.model.TokenType;
 import com.hida.model.UsedSetting;
 import java.util.List;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.springframework.stereotype.Repository;
 
-
 /**
- * missing javadoc
+ * Programmatic implementation of UsedSettingDao
  *
  * @author lruffin
  */
@@ -17,19 +15,19 @@ import org.springframework.stereotype.Repository;
 public class UsedSettingDaoImpl extends AbstractDao<Integer, UsedSetting> implements UsedSettingDao {
 
     /**
-     * missing javadoc
+     * Saves a UsedSetting object
      *
      * @param setting
      */
     @Override
     public void save(UsedSetting setting) {
         persist(setting);
-    }   
+    }
 
     /**
-     * missing javadoc
+     * Returns a list of all UsedSetting objects in the database
      *
-     * @return
+     * @return List of UsedSetting objects
      */
     @Override
     public List<UsedSetting> findAllUsedSettings() {
@@ -38,21 +36,23 @@ public class UsedSettingDaoImpl extends AbstractDao<Integer, UsedSetting> implem
     }
 
     /**
-     * missing javadoc
+     * Returns a UsedSetting object assigned the given unique id
      *
-     * @param id
-     * @return
+     * @param id Unique id
+     * @return UsedSetting object of the given unique id
      */
     @Override
-    public UsedSetting findUsedSettingById(int id) {        
+    public UsedSetting findUsedSettingById(int id) {
         return getByKey(id);
     }
 
     /**
-     * missing javadoc
+     * Finds a UsedSetting entity with the matching values given by a
+     * UsedSetting object. If an entity could not be found then a null value
+     * is returned
      *
-     * @param setting
-     * @return
+     * @param setting A UsedSetting object that contain sought-after values 
+     * @return A matching UsedSetting entity, null otherwise
      */
     @Override
     public UsedSetting findUsedSetting(UsedSetting setting) {
@@ -75,10 +75,4 @@ public class UsedSettingDaoImpl extends AbstractDao<Integer, UsedSetting> implem
             return findUsedSettingById(id);
         }
     }
-
-   
-        
-
 }
-
-    
