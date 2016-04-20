@@ -13,78 +13,88 @@ import org.slf4j.LoggerFactory;
  */
 @Entity
 public class CustomId extends Pid {
-    
-    
-protected static final Logger Logger = LoggerFactory.getLogger(CustomId.class);
+
+    protected static final Logger Logger = LoggerFactory.getLogger(CustomId.class);
 
     @Transient
     private String[] TokenMapArray;
 
+    /**
+     * No-arg constructor used by Hibernate
+     */
     public CustomId() {
 
     }
 
+    /**
+     * Copy constructor
+     *
+     * @param id An object with values to copy
+     */
     public CustomId(CustomId id) {
         super(id);
         this.TokenMapArray = Arrays.copyOf(id.getTokenMapArray(), id.getTokenMapArray().length);
-        this.Name = id.getPrefix() + getRootName();
-    }
-
-    public CustomId(String prefix, int[] baseMap, String[] tokenMapArray) {
-        super(baseMap, prefix);
-        this.TokenMapArray = Arrays.copyOf(tokenMapArray, tokenMapArray.length);
-        this.Name = prefix + getRootName();
     }
 
     /**
-     * Created and used by CustomMinters
+     * Recommended constructor used to create new Pids
      *
-     * @return
+     * @param prefix A sequence of characters that appear in the beginning of
+     * PIDs
+     * @param baseMap An array of integers that contain the indices described by
+     * tokenMap
+     * @param tokenMapArray An array of a sequence of characters all possible
+     * characters a PID can contain
+     */
+    public CustomId(String prefix, int[] baseMap, String[] tokenMapArray) {
+        super(baseMap, prefix);
+        this.TokenMapArray = Arrays.copyOf(tokenMapArray, tokenMapArray.length);
+    }
+
+    /**
+     * Increments a value of a PID. If the maximum limit is reached the values
+     * will wrap around.
+     *
+     * @return true if the id has been successfully incremented
      */
     @Override
     public boolean incrementId() {
         boolean overflow = true;
-        
-        int lastIndex = BaseMap.length - 1;     
+
+        int lastIndex = BaseMap.length - 1;
         for (int i = lastIndex; overflow && i >= 0; i--) {
-                if(BaseMap[i] == TokenMapArray[i].length() - 1){                         
-                    BaseMap[i] = 0;
-                }else{
-                    
-                    BaseMap[i]++;
-                    overflow = false;
-                }
-        }                
-        
-        return !overflow;
-    }
+            if (BaseMap[i] == TokenMapArray[i].length() - 1) {
+                BaseMap[i] = 0;
+            }
+            else {
 
-    /**
-     * Converts the BaseMap into a String representation of this id's name.
-     *
-     * There is a one-to-one mapping of BaseMap, dependent on a given
-     * DatabaseManager, to every possible name an Id can have.
-     *
-     * @return - the name of an Id.
-     */
-    @Override
-    protected final String getRootName() {
-        String charId = "";
-
-        for (int i = 0; i < this.getBaseMap().length; i++) {
-            charId += TokenMapArray[i].charAt(this.getBaseMap()[i]);
+                BaseMap[i]++;
+                overflow = false;
+            }
         }
-        return charId;
-    }
 
-    @Override
-    public String getName() {
-        return Name;
+        return !overflow;
     }
 
     @Override
     public String toString() {
-        return Name;
+        return getName();
+    }
+
+    /**
+     * Creates the name of the id based on the indices contained in the BaseMap
+     * and the characters in the TokenMap
+     *
+     * @return The Name of the Pid
+     */
+    @Override
+    public String getName() {
+        Name = "";
+
+        for (int i = 0; i < this.getBaseMap().length; i++) {
+            Name += TokenMapArray[i].charAt(this.getBaseMap()[i]);
+        }
+        return this.getPrefix() + Name;
     }
 
     /**

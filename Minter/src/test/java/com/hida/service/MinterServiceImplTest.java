@@ -297,12 +297,6 @@ public class MinterServiceImplTest {
         @Override
         public boolean incrementId() {
             throw new UnsupportedOperationException("Not supported yet.");
-        }
-
-        @Override
-        public String getRootName() {
-            throw new UnsupportedOperationException("Not supported yet.");
-        }
-
+        }       
     }
 }
