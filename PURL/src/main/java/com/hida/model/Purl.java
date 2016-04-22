@@ -33,6 +33,17 @@ public class Purl {
         this.Identifier = PURL;
     }
 
+    public Purl(String Identifier, String URL, String ERC, String Who, String What, String When) {
+        this.Identifier = Identifier;
+        this.URL = URL;
+        this.ERC = ERC;
+        this.Who = Who;
+        this.What = What;
+        this.When = When;
+    }
+    
+    
+
     /**
      * No-arg constructor used by Hibernate
      */
