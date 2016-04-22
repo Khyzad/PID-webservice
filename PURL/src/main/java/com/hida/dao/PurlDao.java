@@ -8,9 +8,9 @@ import com.hida.model.Purl;
  */
 public interface PurlDao {
 
-    public Purl findByPurl(String purl);
+    public Purl findByPurl(String identifier);
 
-    public void save(Purl purl);
+    public void savePurl(Purl purl);
 
-    public void delete(Purl purl);
+    public void deletePurl(Purl purl);
 }
