@@ -6,6 +6,7 @@ import com.hida.model.CustomIdGenerator;
 import com.hida.model.DefaultSetting;
 import com.hida.model.IdGenerator;
 import com.hida.model.Pid;
+import com.hida.model.PidTest;
 import com.hida.model.TokenType;
 import com.hida.service.MinterServiceImpl;
 import java.util.HashMap;
@@ -47,7 +48,8 @@ public class MinterControllerTest {
 
     @Spy
     ModelMap ModelMap;
-
+    
+    private final PidTest PidTest = new PidTest();
     private final String PREPEND = "http://digitalarchives.hawaii.gov/70111/";
     private final int AMOUNT = 5;
 
@@ -361,184 +363,22 @@ public class MinterControllerTest {
      * @param setting
      */
     private void testPid(String name, DefaultSetting setting) {
-        testPidPrepend(name, setting);
-        testPidPrefix(name, setting);
+        PidTest.testPidPrepend(name, setting);
+        
+        // remove the prepend as its irrelevant in future tests
+        String nameWithNoPrepend = name.replace(setting.getPrepend(), "");
+        
+        PidTest.testPidPrefix(nameWithNoPrepend, setting);
 
         if (setting.isAuto()) {
-            testPidRootLength(name, setting);
-            testPidTokenType(name, setting);
+            PidTest.testPidRootLength(nameWithNoPrepend, setting);
+            PidTest.testPidTokenType(nameWithNoPrepend, setting);
         }
         else {
-            testPidCharMap(name, setting);
+            PidTest.testPidCharMap(nameWithNoPrepend, setting);
         }
 
-    }
-
-    /**
-     * Tests the name to see if it matches the provided prepend
-     *
-     * @param name
-     * @param setting
-     */
-    private void testPidPrepend(String name, DefaultSetting setting) {
-        String prepend = setting.getPrepend();
-
-        Assert.assertTrue(name + " testing prepend", name.startsWith(prepend));
-    }
-
-    /**
-     * Tests the name to see if it matches the provided prefix
-     *
-     * @param name
-     * @param setting
-     */
-    private void testPidPrefix(String name, DefaultSetting setting) {
-        String prepend = setting.getPrepend();
-        String prefix = setting.getPrefix();
-
-        Assert.assertTrue(name + " testing prepend", name.startsWith(prepend + prefix));
-    }
-
-    /**
-     * Tests the name to see if it matches the provided token type
-     *
-     * @param name
-     * @param setting
-     */
-    private void testPidTokenType(String name, DefaultSetting setting) {
-        String prepend = setting.getPrepend();
-        String prefix = setting.getPrefix();
-        TokenType tokenType = setting.getTokenType();
-        boolean sansVowel = setting.isSansVowels();
-
-        name = name.replace(prepend, "");
-
-        boolean matchesToken = containsCorrectCharacters(prefix, name, tokenType, sansVowel);
-        Assert.assertEquals(name + " testing tokenType", true, matchesToken);
-    }
-
-    /**
-     * Tests the name to see if it matches the provided root length
-     *
-     * @param name
-     * @param setting
-     */
-    private void testPidRootLength(String name, DefaultSetting setting) {
-        String prepend = setting.getPrepend();
-        String prefix = setting.getPrefix();
-
-        name = name.replace(prepend + prefix, "");
-        Assert.assertEquals(name + " testing rootLength", name.length(), setting.getRootLength());
-    }
-
-    /**
-     * Tests the name to see if it matches the provided char map
-     *
-     * @param name
-     * @param setting
-     */
-    private void testPidCharMap(String name, DefaultSetting setting) {
-        String prepend = setting.getPrepend();
-        String prefix = setting.getPrefix();
-        String charMap = setting.getCharMap();
-        boolean sansVowel = setting.isSansVowels();
-
-        name = name.replace(prepend, "");
-
-        boolean matchesToken = containsCorrectCharacters(prefix, name, sansVowel, charMap);
-        Assert.assertEquals(name + " testing charMap", true, matchesToken);
-
-    }
-
-    /**
-     * missing javadoc
-     *
-     * @param prefix
-     * @param name
-     * @param tokenType
-     * @param sansVowel
-     * @return
-     */
-    private boolean containsCorrectCharacters(String prefix, String name, TokenType tokenType,
-            boolean sansVowel) {
-        String regex = retrieveRegex(tokenType, sansVowel);
-        return name.matches(String.format("^(%s)%s$", prefix, regex));
-    }
-
-    /**
-     * missing javadoc
-     *
-     * @param prefix
-     * @param name
-     * @param tokenType
-     * @param sansVowel
-     * @return
-     */
-    private boolean containsCorrectCharacters(String prefix, String name, boolean sansVowel,
-            String charMap) {
-        String regex = retrieveRegex(charMap, sansVowel);
-        return name.matches(String.format("^(%s)%s$", prefix, regex));
-    }
-
-    /**
-     * Returns an equivalent regular expression that'll map that maps to a
-     * specific TokenType
-     *
-     * @param tokenType Designates what characters are contained in the id's
-     * root
-     * @param sansVowel
-     * @return a regular expression
-     */
-    private String retrieveRegex(TokenType tokenType, boolean sansVowel) {
-
-        switch (tokenType) {
-            case DIGIT:
-                return "([\\d]*)";
-            case LOWERCASE:
-                return (sansVowel) ? "([^aeiouyA-Z\\W\\d]*)" : "([a-z]*)";
-            case UPPERCASE:
-                return (sansVowel) ? "([^a-zAEIOUY\\W\\d]*)" : "([A-Z]*)";
-            case MIXEDCASE:
-                return (sansVowel) ? "([^aeiouyAEIOUY\\W\\d]*)" : "([a-zA-Z]*)";
-            case LOWER_EXTENDED:
-                return (sansVowel) ? "([^aeiouyA-Z\\W]*)" : "([a-z\\d]*)";
-            case UPPER_EXTENDED:
-                return (sansVowel) ? "([^a-zAEIOUY\\W]*)" : "([A-Z\\d]*)";
-            default:
-                return (sansVowel) ? "([^aeiouyAEIOUY\\W]*)" : "(^[a-zA-z\\d]*)";
-        }
-    }
-
-    /**
-     * Returns an equivalent regular expression that'll map that maps to a
-     * specific TokenType
-     *
-     * @param charMap Designates what characters are contained in the id's root
-     * @param sansVowel
-     * @return a regular expression
-     */
-    private String retrieveRegex(String charMap, boolean sansVowel) {
-        String regex = "";
-        for (int i = 0; i < charMap.length(); i++) {
-            char key = charMap.charAt(i);
-            if (key == 'd') {
-                regex += "[\\d]";
-            }
-            else if (key == 'l') {
-                regex += (sansVowel) ? "[^aeiouyA-Z\\W\\d]" : "[a-z]";
-            }
-            else if (key == 'u') {
-                regex += (sansVowel) ? "[^a-zAEIOUY\\W\\d]" : "[A-Z]";
-            }
-            else if (key == 'm') {
-                regex += (sansVowel) ? "[^aeiouyAEIOUY\\W\\d]" : "[a-zA-Z]";
-            }
-            else if (key == 'e') {
-                regex += (sansVowel) ? "[^aeiouyAEIOUY\\W]" : "[a-zA-z\\d]";
-            }
-        }
-        return regex;
-    }
+    }   
 
     /**
      * Returns a sample DefaultSetting object
