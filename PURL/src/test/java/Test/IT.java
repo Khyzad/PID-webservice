@@ -8,7 +8,7 @@ import org.junit.FixMethodOrder;
 import org.junit.Test;
 
 import com.hida.controller.ResolverController;
-import com.hida.service.DBConn;
+import com.hida.service.ResolverServiceImpl;
 import org.junit.Assert;
 import com.hida.model.Purl;
 import org.junit.runners.MethodSorters;
@@ -40,7 +40,7 @@ public class IT {
 	
 	@Test
 	public void test1() throws IOException {
-		DBConn dbconn = new DBConn();
+		ResolverServiceImpl dbconn = new ResolverServiceImpl();
 		Assert.assertEquals(true, dbconn.openConnection());
 	}
 	

@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import org.springframework.web.servlet.ModelAndView;
-import com.hida.service.DBConn;
+import com.hida.service.ResolverServiceImpl;
 import com.hida.model.Purl;
 
 import java.io.IOException;
@@ -43,7 +43,7 @@ public class ResolverController {
         if (Logger.isInfoEnabled()) {
             Logger.info("Retrieve was Called");
         }
-        DBConn dbConn = new DBConn();  //connect to db
+        ResolverServiceImpl dbConn = new ResolverServiceImpl();  //connect to db
         dbConn.openConnection();	//open connection
         Purl purl = dbConn.retrieveModel(purlid);	//retrieve purl object
         dbConn.closeConnection();	//close connection
@@ -75,7 +75,7 @@ public class ResolverController {
         if (Logger.isInfoEnabled()) {
             Logger.info("Edit was Called");
         }
-        DBConn dbConn = new DBConn(); //connect to db
+        ResolverServiceImpl dbConn = new ResolverServiceImpl(); //connect to db
         dbConn.openConnection(); //connect to db
         dbConn.editURL(purlid, url); //edit url
         Purl purl = dbConn.retrieveModel(purlid);	//retrieve edited purl object
@@ -118,7 +118,7 @@ public class ResolverController {
         if (Logger.isInfoEnabled()) {
             Logger.info("Insert was Called");
         }
-        DBConn dbConn = new DBConn();  //connect to db
+        ResolverServiceImpl dbConn = new ResolverServiceImpl();  //connect to db
         dbConn.openConnection();	//connect to db
         if (dbConn.insertPURL(purlid, url, erc, who, what, when)) {
             Purl purl = dbConn.retrieveModel(purlid);
@@ -154,7 +154,7 @@ public class ResolverController {
         if (Logger.isInfoEnabled()) {
             Logger.info("Insert was Called");
         }
-        DBConn dbConn = new DBConn();  //connect to db
+        ResolverServiceImpl dbConn = new ResolverServiceImpl();  //connect to db
         dbConn.openConnection();	//connect to db
         if (dbConn.deletePURL(purlid)) {
             
