@@ -11,7 +11,7 @@
  * @author: leland lopez
  */
 
-package com.hida.DBConn;
+package com.hida.service;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;

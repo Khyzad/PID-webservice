@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import org.springframework.web.servlet.ModelAndView;
-import com.hida.DBConn.DBConn;
+import com.hida.service.DBConn;
 import com.hida.model.Purl;
 
 import java.io.IOException;

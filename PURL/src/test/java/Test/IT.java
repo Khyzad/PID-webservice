@@ -8,7 +8,7 @@ import org.junit.FixMethodOrder;
 import org.junit.Test;
 
 import com.hida.controller.ResolverController;
-import com.hida.DBConn.DBConn;
+import com.hida.service.DBConn;
 import org.junit.Assert;
 import com.hida.model.Purl;
 import org.junit.runners.MethodSorters;
