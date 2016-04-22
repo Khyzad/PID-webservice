@@ -24,8 +24,8 @@ import java.util.Properties;
 
 import org.apache.log4j.Logger;
 
-import com.hida.Controller.PURLController;
-import com.hida.Model.model_Purl;
+import com.hida.controller.PURLController;
+import com.hida.model.model_Purl;
 
 public class DBConn {
 

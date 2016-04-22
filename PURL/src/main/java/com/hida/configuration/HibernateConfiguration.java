@@ -24,7 +24,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @Configuration
 @EnableTransactionManagement
 @ComponentScan({"com.hida.configuration"})
-@PropertySource(value = {"classpath:minter_config.properties"})
+@PropertySource(value = {"classpath:purl_config.properties"})
 public class HibernateConfiguration {
     
     @Autowired
