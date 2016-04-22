@@ -9,6 +9,7 @@ import com.hida.service.ResolverService;
 import java.io.IOException;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 /**
  * A controller class that paths the user to all jsp files in WEB_INF/jsp.
@@ -28,6 +29,19 @@ public class ResolverController {
     
     @Autowired
     private ResolverService ResolverService;
+    
+    /**
+     * Maps to the home page.
+     *
+     * @return view to the home page
+     */
+    @RequestMapping(value = {""}, method = {RequestMethod.GET})
+    public ModelAndView displayIndex() {
+        ModelAndView model = new ModelAndView();       
+        model.setViewName("home");
+
+        return model;
+    }
 
     /**
      * matches url: /PURL/retrieve retrieves corresponding purl row of provided
