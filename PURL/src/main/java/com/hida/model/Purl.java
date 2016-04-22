@@ -1,5 +1,9 @@
 package com.hida.model;
 
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
 /**
  * POJO for PURLs, logical units of transaction that can be resolved into
  * various records and locations.
@@ -7,11 +11,14 @@ package com.hida.model;
  * @author lruffin
  * @author: leland lopez
  */
+@Entity
+@Table(name = "PURL")
 public class Purl {
 
     //variables
-    private String URL;
-    private String PURL;
+    @Id        
+    private String Identifier;
+    private String URL;    
     private String ERC;
     private String Who;
     private String What;
@@ -23,7 +30,7 @@ public class Purl {
      * @param PURL purlid of model_purl
      */
     public Purl(String PURL) {
-        this.PURL = PURL;
+        this.Identifier = PURL;
     }
 
     /**
@@ -37,24 +44,24 @@ public class Purl {
         return URL;
     }
 
-    public void setURL(String uRL) {
-        URL = uRL;
+    public void setURL(String URL) {
+        this.URL = URL;
     }
 
-    public String getPURL() {
-        return PURL;
+    public String getIdentifier() {
+        return Identifier;
     }
 
-    public void setPURL(String pURL) {
-        PURL = pURL;
+    public void setIdentifier(String Identifier) {
+        this.Identifier = Identifier;
     }
 
     public String getERC() {
         return ERC;
     }
 
-    public void setERC(String eRC) {
-        ERC = eRC;
+    public void setERC(String ERC) {
+        this.ERC = ERC;
     }
 
     public String getWho() {
@@ -88,7 +95,7 @@ public class Purl {
     public String toJSON() {
         String json = "";
         json += "{";
-        json += "\"PURL\":\"" + PURL + "\",";
+        json += "\"PURL\":\"" + Identifier + "\",";
         json += "\"URL\":\"" + URL + "\",";
         json += "\"ERC\":\"" + ERC + "\",";
         json += "\"Who\":\"" + Who + "\",";
