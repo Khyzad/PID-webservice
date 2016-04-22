@@ -1,12 +1,12 @@
-package Controller;
+package com.hida.Controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
-import DBConn.DBConn;
-import Model.model_Purl;
+import com.hida.DBConn.DBConn;
+import com.hida.Model.model_Purl;
 
 import java.io.IOException;
 

@@ -7,10 +7,10 @@ import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 
-import Controller.PURLController;
-import DBConn.DBConn;
+import com.hida.Controller.PURLController;
+import com.hida.DBConn.DBConn;
 import org.junit.Assert;
-import Model.model_Purl;
+import com.hida.Model.model_Purl;
 import org.junit.runners.MethodSorters;
 
 

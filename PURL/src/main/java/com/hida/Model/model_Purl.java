@@ -4,7 +4,7 @@
  * @author: leland lopez
  */
 
-package Model;
+package com.hida.Model;
 
 public class model_Purl {
 	

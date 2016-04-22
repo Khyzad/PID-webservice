@@ -11,7 +11,7 @@
  * @author: leland lopez
  */
 
-package DBConn;
+package com.hida.DBConn;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -24,8 +24,8 @@ import java.util.Properties;
 
 import org.apache.log4j.Logger;
 
-import Controller.PURLController;
-import Model.model_Purl;
+import com.hida.Controller.PURLController;
+import com.hida.Model.model_Purl;
 
 public class DBConn {
 
