@@ -10,7 +10,9 @@ import java.sql.Statement;
 import java.util.Properties;
 import org.apache.log4j.Logger;
 import com.hida.controller.ResolverController;
+import com.hida.dao.PurlDao;
 import com.hida.model.Purl;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,10 +28,13 @@ import org.springframework.transaction.annotation.Transactional;
  * @author lruffin
  * @author: leland lopez
  */
-@Service("minterService")
+@Service("resolverService")
 @Transactional
 public class ResolverServiceImpl implements ResolverService {
 
+    @Autowired
+    private PurlDao PurlDao;
+    
     final static Logger logger = Logger.getLogger(ResolverController.class);
     //variables
     private String serverURL;
@@ -99,36 +104,9 @@ public class ResolverServiceImpl implements ResolverService {
      */
     @Override
     public String retrieveURL(String PURLID) {
-
-        ResultSet rs = null;
-        String url = null;
-
-        try {
-            if (conn != null) {	//if conn was made
-                try {
-                    Statement st = null;
-                    st = conn.createStatement();
-                    rs = st.executeQuery("SELECT \"strURL\" FROM \"PURL\" WHERE \"strPurl\" = '" + PURLID.toString() + "'");		//setup query and run
-                    if (rs.next()) {	//if result was found
-                        url = rs.getString(1);	//get result
-                    }
-                    else {
-                        logger.info("Purl: " + PURLID + " provided does not exist");	//log that PURLID doesn't exist
-                    }
-
-                }
-                catch (Exception ee) {
-                    logger.error("Threw a BadException in DBConn::retrieveURL, full stack trace follows:", ee);
-                }
-                finally {
-
-                }
-            }
-        }
-        catch (Exception ee) {
-            ee.printStackTrace();
-
-        }
+        Purl entity = PurlDao.findByPurl(PURLID);
+        String url = entity.getURL();
+        
         return url;
 
     }
@@ -146,47 +124,10 @@ public class ResolverServiceImpl implements ResolverService {
      */
     @Override
     public boolean insertPURL(String PURLID, String URL, String ERC, String Who, String What, String When) {
-        ResultSet rs = null;
-        int numrows; //indicates how much rows have the same purlid
-
-        try {
-            if (conn != null) {
-                try {
-                    Statement st = null;
-                    st = conn.createStatement();
-                    String sql = "SELECT COUNT(*) FROM \"PURL\" WHERE \"strPurl\" = '" + PURLID.toString() + "'";
-                    rs = st.executeQuery(sql);
-                    if (rs.next()) {
-                        numrows = Integer.parseInt(rs.getString(1));
-                    }
-                    else {
-                        return false; //if it doesn't have the count in it, then something went wrong.
-                    }
-                    if (numrows == 0) {
-                        sql = "INSERT INTO \"PURL\" (\"strPurl\", \"strURL\", \"strERC\", \"strWho\", \"strWhat\", \"strWhen\") Values ('" + PURLID + "','" + URL + "','" + ERC + "','" + Who + "','" + What + "','" + When + "')";	//setup query
-                        st.executeUpdate(sql); 	//execute query
-                        return true;	//return true
-                    }
-                    else {
-                        return false;	//return false if PURLID specified was not unique
-                    }
-
-                }
-                catch (Exception ee) {
-                    logger.error("Threw a BadException in DBConn::insertPURL, full stack trace follows:", ee);
-                    return false;
-                }
-            }
-            else {
-                logger.error("Conn wasn't initialized error occured in DBConn::insertPURL");
-                return false;
-            }
-        }
-        catch (Exception ee) {
-            logger.error("Threw a BadException in DBConn::insertPURL, full stack trace follows:", ee);
-            return false;
-
-        }
+        Purl purl = new Purl(PURLID, URL, ERC, Who, What, When);
+        PurlDao.savePurl(purl);
+        
+        return true;
     }
 
     /**
@@ -199,31 +140,10 @@ public class ResolverServiceImpl implements ResolverService {
      */
     @Override
     public boolean editURL(String PURLID, String URL) {
-
-        try {
-            if (conn != null) {	//if connection was made
-                try {
-                    Statement st = null;
-                    st = conn.createStatement();
-                    st.executeUpdate("UPDATE \"PURL\" SET \"strURL\" = '" + URL + "' WHERE \"strPurl\" = '" + PURLID + "'");	//setup query
-                    return true;
-
-                }
-                catch (Exception ee) {
-                    ee.printStackTrace();
-                    return false;
-                }
-            }
-            else {
-                System.out.println("Conn was null");
-                return false;
-            }
-        }
-        catch (Exception ee) {
-            logger.error("Threw a BadException in DBConn::editURL, full stack trace follows:", ee);
-            return false;
-
-        }
+        Purl entity = PurlDao.findByPurl(PURLID);
+        entity.setURL(URL);
+        
+        return true;
     }
 
     /**
@@ -235,31 +155,10 @@ public class ResolverServiceImpl implements ResolverService {
      */
     @Override
     public boolean deletePURL(String PURLID) {
-
-        try {
-            if (conn != null) {
-                try {
-                    Statement st = null;
-                    st = conn.createStatement();
-                    String sql = "DELETE FROM \"PURL\" WHERE \"strPurl\" = '" + PURLID.toString() + "'";
-                    st.executeUpdate(sql);
-                    return true;
-                }
-                catch (Exception ee) {
-                    logger.error("Threw a BadException in DBConn::deletePurl, full stack trace follows:", ee);
-                    return false;
-                }
-            }
-            else {
-                logger.error("Conn wasn't initialized error occured in DBConn::deletePURL");
-                return false;
-            }
-        }
-        catch (Exception ee) {
-            logger.error("Threw a BadException in DBConn::deletePURL, full stack trace follows:", ee);
-            return false;
-
-        }
+        Purl entity = PurlDao.findByPurl(PURLID);
+        PurlDao.deletePurl(entity);
+        
+        return true;
     }
 
     /**
@@ -270,42 +169,10 @@ public class ResolverServiceImpl implements ResolverService {
      */
     @Override
     public Purl retrieveModel(String PURLID) {
-
-        ResultSet rs = null;
-
-        Purl PURL = new Purl(PURLID);
-
-        try {
-            if (conn != null) {	// if there is a conection
-                try {
-                    Statement st = null;
-                    st = conn.createStatement();
-                    rs = st.executeQuery("SELECT * FROM \"PURL\" WHERE \"strPurl\" = '" + PURLID.toString() + "'");		//prepares a query string
-                    if (rs.next()) {		//extracts variables
-                        PURL.setURL(rs.getString(2));
-                        PURL.setERC(rs.getString(3));
-                        PURL.setWho(rs.getString(4));
-                        PURL.setWhat(rs.getString(5));
-                        PURL.setWhen(rs.getString(6));
-                    }
-                    else {
-                        return null;	//if result was empty return null, meaning PURLID was not in table
-                    }
-
-                }
-                catch (Exception ee) {
-                    logger.error("Threw a BadException in DBConn::retrieveModel, full stack trace follows:", ee);
-                    return null;
-                }
-            }
-        }
-        catch (Exception ee) {
-            logger.error("Threw a BadException in DBConn::retrieveModel, full stack trace follows:", ee);
-            return null;
-
-        }
-
-        return PURL;		//return the PURL model
+        Purl entity = PurlDao.findByPurl(PURLID);
+        
+        return entity;
+        
     }
 
     /**
