@@ -1,5 +1,6 @@
 package com.hida.model;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
@@ -12,16 +13,27 @@ import javax.persistence.Table;
  * @author: leland lopez
  */
 @Entity
-@Table(name = "PURL")
+@Table(name = "PURL_TABLE")
 public class Purl {
 
     //variables
-    @Id        
+    @Id 
+    @Column(name = "NAME")
     private String Identifier;
+    
+    @Column(name = "URL")
     private String URL;    
+    
+    @Column(name = "ERC")
     private String ERC;
+    
+    @Column(name = "WHO")
     private String Who;
+    
+    @Column(name = "WHAT")
     private String What;
+    
+    @Column(name = "TIMESTAMP")
     private String When;
 
     /**

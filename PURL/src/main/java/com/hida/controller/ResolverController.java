@@ -7,8 +7,10 @@ import org.springframework.web.servlet.ModelAndView;
 import com.hida.model.Purl;
 import com.hida.service.ResolverService;
 import java.io.IOException;
+import javax.servlet.http.HttpServletRequest;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 /**
@@ -175,5 +177,32 @@ public class ResolverController {
             Logger.info("insert returned: " + null);
             return mv;
         }
+    }
+    
+    /**
+     * Throws any exception that may be caught within the program
+     *
+     * @param req the HTTP request
+     * @param exception the caught exception
+     * @return The view of the error message
+     */
+    @ExceptionHandler(Exception.class)
+    public ModelAndView handleGeneralError(HttpServletRequest req, Exception exception) {
+        ModelAndView mav = new ModelAndView();
+        mav.addObject("status", 500);
+        mav.addObject("exception", exception.getClass().getSimpleName());
+        mav.addObject("message", exception.getMessage());
+        Logger.error("General Error: " + exception.getMessage());
+        
+        StackTraceElement[] trace = exception.getStackTrace();
+        String error = "";
+        for(StackTraceElement element : trace){
+            error += element.toString() + "\n";
+        }
+        
+        mav.addObject("stacktrace", error);
+
+        mav.setViewName("error");
+        return mav;
     }
 }
