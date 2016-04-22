@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import org.springframework.web.servlet.ModelAndView;
 import com.hida.DBConn.DBConn;
-import com.hida.model.model_Purl;
+import com.hida.model.Purl;
 
 import java.io.IOException;
 
@@ -25,7 +25,8 @@ public class ResolverController {
     /* 
      * Logger; logfile to be stored in resource folder    
      */
-    private static final org.slf4j.Logger Logger = LoggerFactory.getLogger(ResolverController.class);
+    private static final org.slf4j.Logger Logger = 
+            LoggerFactory.getLogger(ResolverController.class);
 
     /**
      * matches url: /PURL/retrieve retrieves corresponding purl row of provided
@@ -44,7 +45,7 @@ public class ResolverController {
         }
         DBConn dbConn = new DBConn();  //connect to db
         dbConn.openConnection();	//open connection
-        model_Purl purl = dbConn.retrieveModel(purlid);	//retrieve purl object
+        Purl purl = dbConn.retrieveModel(purlid);	//retrieve purl object
         dbConn.closeConnection();	//close connection
         if (purl != null) {
             //show retrieve view, attach purl object.  converted to json at view.
@@ -77,7 +78,7 @@ public class ResolverController {
         DBConn dbConn = new DBConn(); //connect to db
         dbConn.openConnection(); //connect to db
         dbConn.editURL(purlid, url); //edit url
-        model_Purl purl = dbConn.retrieveModel(purlid);	//retrieve edited purl object
+        Purl purl = dbConn.retrieveModel(purlid);	//retrieve edited purl object
         dbConn.closeConnection(); //close connection
         if (purl != null) {
             //show edit view, attach purl object.  converted to json at view.
@@ -120,7 +121,7 @@ public class ResolverController {
         DBConn dbConn = new DBConn();  //connect to db
         dbConn.openConnection();	//connect to db
         if (dbConn.insertPURL(purlid, url, erc, who, what, when)) {
-            model_Purl purl = dbConn.retrieveModel(purlid);
+            Purl purl = dbConn.retrieveModel(purlid);
                         
             //show edit view, attach purl object.  converted to json at view.
             ModelAndView mv = new ModelAndView("insert", "purl", purl);

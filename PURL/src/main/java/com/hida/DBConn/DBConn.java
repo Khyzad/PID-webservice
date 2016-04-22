@@ -25,7 +25,7 @@ import java.util.Properties;
 import org.apache.log4j.Logger;
 
 import com.hida.controller.ResolverController;
-import com.hida.model.model_Purl;
+import com.hida.model.Purl;
 
 public class DBConn {
 
@@ -239,14 +239,14 @@ public class DBConn {
 	/**
 	 * retrieves model of purl_id object
 	 * returns the respective purl db row.
-	 * @param PURLID purlid of desired row that will become model_Purl
-	 * @return model_Purl
+	 * @param PURLID purlid of desired row that will become Purl
+	 * @return Purl
 	 */
-	public model_Purl retrieveModel(String PURLID) {
+	public Purl retrieveModel(String PURLID) {
 		
 	    ResultSet rs = null;
 	    
-		model_Purl PURL = new model_Purl(PURLID);
+		Purl PURL = new Purl(PURLID);
 		
 		try {
             if(conn != null) {	// if there is a conection

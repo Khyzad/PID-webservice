@@ -10,7 +10,7 @@ import org.junit.Test;
 import com.hida.controller.ResolverController;
 import com.hida.DBConn.DBConn;
 import org.junit.Assert;
-import com.hida.model.model_Purl;
+import com.hida.model.Purl;
 import org.junit.runners.MethodSorters;
 
 
@@ -48,8 +48,7 @@ public class IT {
 	public void test2() throws IOException {
 		String test_string ="{\"PURL\":\""+ test_purlid +"\",\"URL\":\"first_URL\",\"ERC\":\"first_ERC\",\"Who\":\"first_WHO\",\"What\":\"first_What\",\"When\":\"first_When\"}";
 		ResolverController PC = new ResolverController();
-		Assert.assertEquals(
-				((model_Purl) PC.insert(test_purlid, "first_URL", "first_ERC", "first_WHO", "first_What", "first_When").getModel().get("purl")).toJSON(),
+		Assert.assertEquals(((Purl) PC.insert(test_purlid, "first_URL", "first_ERC", "first_WHO", "first_What", "first_When").getModel().get("purl")).toJSON(),
 				test_string);
 	}
 	
@@ -57,8 +56,7 @@ public class IT {
 	public void test3() throws IOException {
 		String test_string ="{\"PURL\":\""+test_purlid +"\",\"URL\":\"first_URL\",\"ERC\":\"first_ERC\",\"Who\":\"first_WHO\",\"What\":\"first_What\",\"When\":\"first_When\"}";
 		ResolverController PC = new ResolverController();
-		Assert.assertEquals(
-				((model_Purl) PC.retrieve(test_purlid).getModel().get("purl")).toJSON(),
+		Assert.assertEquals(((Purl) PC.retrieve(test_purlid).getModel().get("purl")).toJSON(),
 				test_string);
 	}
 	
@@ -72,8 +70,7 @@ public class IT {
 	public void test5() throws IOException {
 		String test_string ="{\"PURL\":\""+ test_purlid +"\",\"URL\":\"first_URL_Edit\",\"ERC\":\"first_ERC\",\"Who\":\"first_WHO\",\"What\":\"first_What\",\"When\":\"first_When\"}";
 		ResolverController PC = new ResolverController();
-		Assert.assertEquals(
-				((model_Purl) PC.edit(test_purlid, "first_URL_Edit").getModel().get("purl")).toJSON(),
+		Assert.assertEquals(((Purl) PC.edit(test_purlid, "first_URL_Edit").getModel().get("purl")).toJSON(),
 				test_string);
 	}
 	

@@ -1,11 +1,13 @@
 package com.hida.model;
 
 /**
- * model_Purl Model for Purl object.
+ * POJO for PURLs, logical units of transaction that can be resolved into
+ * various records and locations.
  *
+ * @author lruffin
  * @author: leland lopez
  */
-public class model_Purl {
+public class Purl {
 
     //variables
     private String URL;
@@ -16,19 +18,19 @@ public class model_Purl {
     private String When;
 
     /**
-     * model_Purl Constructor
+     * Purl Constructor
      *
      * @param PURL purlid of model_purl
      */
-    public model_Purl(String PURL) {
+    public Purl(String PURL) {
         this.PURL = PURL;
     }
-    
+
     /**
      * No-arg constructor used by Hibernate
      */
-    public model_Purl(){
-        
+    public Purl() {
+
     }
 
     public String getURL() {
