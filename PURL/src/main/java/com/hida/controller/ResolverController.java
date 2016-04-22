@@ -20,12 +20,12 @@ import org.slf4j.LoggerFactory;
  */
 @Controller
 @RequestMapping("/")
-public class PURLController {
+public class ResolverController {
 
     /* 
      * Logger; logfile to be stored in resource folder    
      */
-    private static final org.slf4j.Logger Logger = LoggerFactory.getLogger(PURLController.class);
+    private static final org.slf4j.Logger Logger = LoggerFactory.getLogger(ResolverController.class);
 
     /**
      * matches url: /PURL/retrieve retrieves corresponding purl row of provided

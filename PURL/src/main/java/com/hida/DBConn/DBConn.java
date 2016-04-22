@@ -24,12 +24,12 @@ import java.util.Properties;
 
 import org.apache.log4j.Logger;
 
-import com.hida.controller.PURLController;
+import com.hida.controller.ResolverController;
 import com.hida.model.model_Purl;
 
 public class DBConn {
 
-	final static Logger logger = Logger.getLogger(PURLController.class);
+	final static Logger logger = Logger.getLogger(ResolverController.class);
 	//variables
 	private String serverURL;
 	private String username;
