@@ -11,6 +11,8 @@ import java.util.Properties;
 import org.apache.log4j.Logger;
 import com.hida.controller.ResolverController;
 import com.hida.model.Purl;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * DBconn
@@ -24,6 +26,8 @@ import com.hida.model.Purl;
  * @author lruffin
  * @author: leland lopez
  */
+@Service("minterService")
+@Transactional
 public class ResolverServiceImpl implements ResolverService {
 
     final static Logger logger = Logger.getLogger(ResolverController.class);
