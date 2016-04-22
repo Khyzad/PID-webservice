@@ -3,14 +3,12 @@ package com.hida.controller;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-
 import org.springframework.web.servlet.ModelAndView;
-import com.hida.service.ResolverServiceImpl;
 import com.hida.model.Purl;
-
+import com.hida.service.ResolverService;
 import java.io.IOException;
-
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * A controller class that paths the user to all jsp files in WEB_INF/jsp.
@@ -27,6 +25,9 @@ public class ResolverController {
      */
     private static final org.slf4j.Logger Logger = 
             LoggerFactory.getLogger(ResolverController.class);
+    
+    @Autowired
+    private ResolverService ResolverService;
 
     /**
      * matches url: /PURL/retrieve retrieves corresponding purl row of provided
@@ -43,10 +44,9 @@ public class ResolverController {
         if (Logger.isInfoEnabled()) {
             Logger.info("Retrieve was Called");
         }
-        ResolverServiceImpl dbConn = new ResolverServiceImpl();  //connect to db
-        dbConn.openConnection();	//open connection
-        Purl purl = dbConn.retrieveModel(purlid);	//retrieve purl object
-        dbConn.closeConnection();	//close connection
+        
+        Purl purl = ResolverService.retrieveModel(purlid);	//retrieve purl object
+        
         if (purl != null) {
             //show retrieve view, attach purl object.  converted to json at view.
             ModelAndView mv = new ModelAndView("retrieve", "purl", purl);
@@ -75,11 +75,9 @@ public class ResolverController {
         if (Logger.isInfoEnabled()) {
             Logger.info("Edit was Called");
         }
-        ResolverServiceImpl dbConn = new ResolverServiceImpl(); //connect to db
-        dbConn.openConnection(); //connect to db
-        dbConn.editURL(purlid, url); //edit url
-        Purl purl = dbConn.retrieveModel(purlid);	//retrieve edited purl object
-        dbConn.closeConnection(); //close connection
+        ResolverService.editURL(purlid, url);
+        Purl purl = ResolverService.retrieveModel(purlid);
+                
         if (purl != null) {
             //show edit view, attach purl object.  converted to json at view.
             ModelAndView mv = new ModelAndView("edit", "purl", purl);
@@ -118,21 +116,16 @@ public class ResolverController {
         if (Logger.isInfoEnabled()) {
             Logger.info("Insert was Called");
         }
-        ResolverServiceImpl dbConn = new ResolverServiceImpl();  //connect to db
-        dbConn.openConnection();	//connect to db
-        if (dbConn.insertPURL(purlid, url, erc, who, what, when)) {
-            Purl purl = dbConn.retrieveModel(purlid);
+        
+        if (ResolverService.insertPURL(purlid, url, erc, who, what, when)) {
+            Purl purl = ResolverService.retrieveModel(purlid);
                         
             //show edit view, attach purl object.  converted to json at view.
             ModelAndView mv = new ModelAndView("insert", "purl", purl);
-            dbConn.closeConnection();	//close connection
             Logger.info("insert returned: " + purl.toJSON());
             return mv;
         }
         else {
-            //close connection
-            dbConn.closeConnection();
-
             //show edit view, attach purl object.  converted to json at view.
             ModelAndView mv = new ModelAndView("null");
             Logger.info("insert returned: " + null);
@@ -154,21 +147,15 @@ public class ResolverController {
         if (Logger.isInfoEnabled()) {
             Logger.info("Insert was Called");
         }
-        ResolverServiceImpl dbConn = new ResolverServiceImpl();  //connect to db
-        dbConn.openConnection();	//connect to db
-        if (dbConn.deletePURL(purlid)) {
-            
+
+        if (ResolverService.deletePURL(purlid)) {           
             //show edit view, attach purl object.  converted to json at view.
             ModelAndView mv = new ModelAndView("deleted");
 
-            dbConn.closeConnection();	//close connection
             Logger.info("{\"result\":\"success\"}");
             return mv;
         }
         else {
-            //close connection
-            dbConn.closeConnection();
-
             //show edit view, attach purl object.  converted to json at view.
             ModelAndView mv = new ModelAndView("null");
             Logger.info("insert returned: " + null);
