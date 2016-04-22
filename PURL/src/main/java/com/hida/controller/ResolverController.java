@@ -132,10 +132,9 @@ public class ResolverController {
         if (Logger.isInfoEnabled()) {
             Logger.info("Insert was Called");
         }
+        Purl purl = new Purl(purlid, url, erc, who, what, when);
         
-        if (ResolverService.insertPURL(purlid, url, erc, who, what, when)) {
-            Purl purl = ResolverService.retrieveModel(purlid);
-                        
+        if (ResolverService.insertPURL(purl)) {                       
             //show edit view, attach purl object.  converted to json at view.
             ModelAndView mv = new ModelAndView("insert", "purl", purl);
             Logger.info("insert returned: " + purl.toJSON());

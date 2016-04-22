@@ -48,18 +48,11 @@ public class ResolverServiceImpl implements ResolverService {
 
     /**
      * inserts PURL into database returns true if successful, false if not
-     *
-     * @param PURLID purlid to be inserted
-     * @param URL url to be inserted
-     * @param ERC erc to be inserted
-     * @param Who who to be inserted
-     * @param What what to be inserted
-     * @param When when to be inserted
+     *     
      * @return boolean
      */
     @Override
-    public boolean insertPURL(String PURLID, String URL, String ERC, String Who, String What, String When) {
-        Purl purl = new Purl(PURLID, URL, ERC, Who, What, When);
+    public boolean insertPURL(Purl purl) {        
         PurlDao.savePurl(purl);
         
         return true;

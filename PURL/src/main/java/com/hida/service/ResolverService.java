@@ -13,6 +13,5 @@ public interface ResolverService {
     public boolean editURL(String PURLID, String URL);
     public boolean deletePURL(String PURLID);
     public Purl retrieveModel(String PURLID);
-    public boolean insertPURL(String PURLID, String URL, String 
-            ERC, String Who, String What, String When);
+    public boolean insertPURL(Purl purl);
 }
