@@ -363,19 +363,19 @@ public class MinterControllerTest {
      * @param setting
      */
     private void testPid(String name, DefaultSetting setting) {
-        PidTest.testPidPrepend(name, setting);
+        PidTest.testPrepend(name, setting);
         
         // remove the prepend as its irrelevant in future tests
         String nameWithNoPrepend = name.replace(setting.getPrepend(), "");
         
-        PidTest.testPidPrefix(nameWithNoPrepend, setting);
+        PidTest.testPrefix(nameWithNoPrepend, setting);
 
         if (setting.isAuto()) {
-            PidTest.testPidRootLength(nameWithNoPrepend, setting);
-            PidTest.testPidTokenType(nameWithNoPrepend, setting);
+            PidTest.testRootLength(nameWithNoPrepend, setting);
+            PidTest.testTokenType(nameWithNoPrepend, setting);
         }
         else {
-            PidTest.testPidCharMap(nameWithNoPrepend, setting);
+            PidTest.testCharMap(nameWithNoPrepend, setting);
         }
 
     }   

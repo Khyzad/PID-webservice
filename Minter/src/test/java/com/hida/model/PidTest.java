@@ -1,5 +1,6 @@
 package com.hida.model;
 
+import java.util.Comparator;
 import junit.framework.Assert;
 
 /**
@@ -15,10 +16,10 @@ public class PidTest {
      * @param name Unique identifier of a Pid
      * @param setting The desired setting used to create a Pid
      */
-    public void testPidPrepend(String name, DefaultSetting setting) {
+    public void testPrepend(String name, DefaultSetting setting) {
         String prepend = setting.getPrepend();
 
-        Assert.assertTrue(name + " testing prepend", name.startsWith(prepend));
+        Assert.assertTrue(name + ", testing prepend: " + prepend, name.startsWith(prepend));
     }
 
     /**
@@ -27,10 +28,10 @@ public class PidTest {
      * @param name Unique identifier of a Pid
      * @param setting The desired setting used to create a Pid
      */
-    public void testPidPrefix(String name, Setting setting) {
+    public void testPrefix(String name, Setting setting) {
         String prefix = setting.getPrefix();
 
-        Assert.assertTrue(name + " testing prefix", name.startsWith(prefix));
+        Assert.assertTrue(name + ", testing prefix: " + prefix, name.startsWith(prefix));
     }
 
     /**
@@ -39,13 +40,13 @@ public class PidTest {
      * @param name Unique identifier of a Pid
      * @param setting The desired setting used to create a Pid
      */
-    public void testPidTokenType(String name, Setting setting) {
+    public void testTokenType(String name, Setting setting) {
         String prefix = setting.getPrefix();
         TokenType tokenType = setting.getTokenType();
         boolean sansVowel = setting.isSansVowels();
 
         boolean matchesToken = containsCorrectCharacters(prefix, name, tokenType, sansVowel);
-        Assert.assertEquals(name + " testing tokenType", true, matchesToken);
+        Assert.assertEquals(name + ", testing tokenType: " + tokenType, true, matchesToken);
     }
 
     /**
@@ -54,11 +55,14 @@ public class PidTest {
      * @param name Unique identifier of a Pid
      * @param setting The desired setting used to create a Pid
      */
-    public void testPidRootLength(String name, Setting setting) {
+    public void testRootLength(String name, Setting setting) {
         String prefix = setting.getPrefix();
 
         name = name.replace(prefix, "");
-        Assert.assertEquals(name + " testing rootLength", name.length(), setting.getRootLength());
+        int rootLength = name.length();
+        int expRootLength = setting.getRootLength();
+        Assert.assertEquals(name + ", testing rootLength: " + rootLength,
+                rootLength, expRootLength);
     }
 
     /**
@@ -67,14 +71,26 @@ public class PidTest {
      * @param name Unique identifier of a Pid
      * @param setting The desired setting used to create a Pid
      */
-    public void testPidCharMap(String name, Setting setting) {
+    public void testCharMap(String name, Setting setting) {
         String prefix = setting.getPrefix();
         String charMap = setting.getCharMap();
         boolean sansVowel = setting.isSansVowels();
 
         boolean matchesToken = containsCorrectCharacters(prefix, name, sansVowel, charMap);
-        Assert.assertEquals(name + " testing charMap", true, matchesToken);
-    }   
+        Assert.assertEquals(name + ", testing charMap: " + charMap, true, matchesToken);
+    }
+
+    /**
+     * Tests the order of two names. The previous name must have a lesser value
+     * than the next name to pass the test.
+     *
+     * @param previous The previous name
+     * @param next The next name
+     */
+    public void testOrder(String previous, String next) {
+        PidComparator comparator = new PidComparator();
+        Assert.assertEquals(-1, comparator.compare(previous, next));
+    }
 
     /**
      * Checks to see if the Pid matches the given parameters
@@ -168,4 +184,53 @@ public class PidTest {
         return regex;
     }
 
+    /**
+     * Comparator object used to compare the value of a Pid's name
+     */
+    private static class PidComparator implements Comparator<String> {
+
+        /**
+         * Used to compare to ids. If the first id has a smaller value than the
+         * second id, -1 is returned. If they are equal, 0 is returned.
+         * Otherwise 1 is returned. In terms of value, each character has a
+         * unique value associated with them. Numbers are valued less than
+         * lowercase letters, which are valued less than upper case letters.
+         *
+         * The least and greatest valued number is 0 and 9 respectively. The
+         * least and greatest valued lowercase letter is a and z respectively.
+         * The least and greatest valued uppercase letter is A and Z
+         * respectively.
+         *
+         * @param id1 the first id
+         * @param id2 the second id
+         * @return result of the comparison.
+         */
+        @Override
+        public int compare(String id1, String id2) {
+            if (id1.length() < id2.length()) {
+                return -1;
+            }
+            else if (id1.length() > id2.length()) {
+                return 1;
+            }
+            else {
+                for (int i = 0; i < id1.length(); i++) {
+                    char c1 = id1.charAt(i);
+                    char c2 = id2.charAt(i);
+                    if (Character.isDigit(c1) && Character.isLetter(c2)
+                            || Character.isLowerCase(c1) && Character.isUpperCase(c2)
+                            || c1 < c2) {
+                        return -1;
+                    }
+                    else if ((Character.isLetter(c1) && Character.isDigit(c2))
+                            || Character.isUpperCase(c1) && Character.isLowerCase(c2)
+                            || c1 > c2) {
+                        return 1;
+                    }
+                }
+                return 0;
+            }
+        }
+
+    }
 }

@@ -1,6 +1,5 @@
 package com.hida.model;
 
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Set;
 import org.slf4j.Logger;
@@ -10,17 +9,19 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 /**
+ * This class tests the functionality of CustomIdGeneratorTest
  *
  * @author lruffin
  */
-public class CustomIdGeneratorTest implements Comparator<String> {   
+public class CustomIdGeneratorTest {
 
     protected static final Logger Logger = LoggerFactory.getLogger(CustomIdGeneratorTest.class);
+    private final PidTest PidTest = new PidTest();
 
     /**
-     * missing javadoc
+     * Data set with varying charMap values
      *
-     * @return
+     * @return A data set
      */
     @DataProvider(name = "sansVowel")
     public Object[][] sansVowelParameters() {
@@ -42,9 +43,9 @@ public class CustomIdGeneratorTest implements Comparator<String> {
     }
 
     /**
-     * missing javadoc
+     * Data set with varying prefix values
      *
-     * @return
+     * @return A data set
      */
     @DataProvider(name = "prefix")
     public Object[][] prefixParameters() {
@@ -60,9 +61,9 @@ public class CustomIdGeneratorTest implements Comparator<String> {
     }
 
     /**
-     * missing javadoc
+     * Data set with varying root length values
      *
-     * @return
+     * @return A data set
      */
     @DataProvider(name = "rootLength")
     public Object[][] rootLengthParameters() {
@@ -77,36 +78,38 @@ public class CustomIdGeneratorTest implements Comparator<String> {
     }
 
     /**
-     * missing javadoc
+     * Tests CustomIdGenerator for the presence of vowels through the
+     * sequentialMint method.
      *
-     * @param prefix
-     * @param sansVowel
-     * @param charMap
-     * @param amount
+     * @param prefix A sequence of characters that appear in the beginning of
+     * PIDs
+     * @param sansVowel Dictates whether or not vowels are allowed
+     * @param charMap A sequence of characters used to configure PIDs
+     * @param amount The number of PIDs to be created
      */
     @Test(dataProvider = "sansVowel")
     public void testSequentialMintSansVowels(String prefix, boolean sansVowel,
             String charMap, int amount) {
         Logger.trace("inside testSequentialMintSansVowels");
 
-        Set<Pid> sequentialSet = testSequentialMint(prefix, sansVowel, charMap, amount);
+        // store parameters in a setting object
+        Setting setting = new Setting(prefix, null, charMap, 0, sansVowel);
 
-        // test sequential mint
+        // create a generator object
+        CustomIdGenerator minter = new CustomIdGenerator(prefix, sansVowel, charMap);
+        Set<Pid> sequentialSet = minter.sequentialMint(amount);
+
         String prev = null;
         Iterator<Pid> iter = sequentialSet.iterator();
         while (iter.hasNext()) {
             // fail if the id does not match the token 
             String current = iter.next().toString();
-            if (!containsCorrectCharacters(prefix, current, sansVowel, charMap)) {
-                Assert.fail(String.format("Id \"%s\" does not match %s, sansVowels = %b",
-                        current, charMap, sansVowel));
+            PidTest.testCharMap(current, setting);
+
+            if (prev != null) {
+                PidTest.testOrder(prev, current);
             }
 
-            // fail the test if ids aren't ordered
-            if (prev != null && compare(prev, current) > -1) {
-                Assert.fail(String.format("The ids are not sequential: prev=%s\tcurrent=%s",
-                        prev, current));
-            }
             prev = current;
         }
 
@@ -114,63 +117,66 @@ public class CustomIdGeneratorTest implements Comparator<String> {
     }
 
     /**
-     * missing javadoc
+     * Tests CustomIdGenerator for the presence of vowels through the randomMint
+     * method.
      *
-     * @param prefix
-     * @param sansVowel
-     * @param charMap
-     * @param amount
+     * @param prefix A sequence of characters that appear in the beginning of
+     * PIDs
+     * @param sansVowel Dictates whether or not vowels are allowed
+     * @param charMap A sequence of characters used to configure PIDs
+     * @param amount The number of PIDs to be created
      */
     @Test(dataProvider = "sansVowel")
     public void testRandomMintSansVowels(String prefix, boolean sansVowel,
             String charMap, int amount) {
         Logger.debug("inside testRandomMintSansVowels");
 
-        Set<Pid> randomSet = testRandomMint(prefix, sansVowel, charMap, amount);
+        // store parameters in a setting object
+        Setting setting = new Setting(prefix, null, charMap, 0, sansVowel);
 
-        // test random mint
+        // create a generator object
+        CustomIdGenerator minter = new CustomIdGenerator(prefix, sansVowel, charMap);
+        Set<Pid> randomSet = minter.randomMint(amount);
+
         for (Pid id : randomSet) {
             // fail if the id does not match the token 
-            if (!containsCorrectCharacters(prefix, id.toString(), sansVowel, charMap)) {
-                Assert.fail(String.format("Id \"%s\" does not match %s, sansVowels = %b",
-                        id.toString(), charMap, sansVowel));
-            }
+            PidTest.testCharMap(id.getName(), setting);
         }
         // test to see if the amount matches the size of the generated set        
         Assert.assertEquals(randomSet.size(), amount);
     }
 
     /**
-     * missing javadoc
+     * Tests to see if the sequentialMint method will print the desired prefix
      *
-     * @param prefix
-     * @param sansVowel
-     * @param charMap
-     * @param amount
+     * @param prefix A sequence of characters that appear in the beginning of
+     * PIDs
+     * @param sansVowel Dictates whether or not vowels are allowed
+     * @param charMap A sequence of characters used to configure PIDs
+     * @param amount The number of PIDs to be created
      */
     @Test(dataProvider = "prefix")
     public void testSequentialMintPrefix(String prefix, boolean sansVowel, String charMap,
             int amount) {
         Logger.debug("inside testSequentialMintPrefix");
 
-        Set<Pid> sequentialSet
-                = testSequentialMint(prefix, sansVowel, charMap, amount);
+        // store parameters in a setting object
+        Setting setting = new Setting(prefix, null, charMap, 0, sansVowel);
 
-        // test sequential mint
+        // create a generator object
+        CustomIdGenerator minter = new CustomIdGenerator(prefix, sansVowel, charMap);
+        Set<Pid> sequentialSet = minter.sequentialMint(amount);
+
         String prev = null;
         Iterator<Pid> iter = sequentialSet.iterator();
         while (iter.hasNext()) {
             String current = iter.next().toString();
-            if (!current.startsWith(prefix)) {
-                Assert.fail(String.format("Id \"%s\" does not start with \"$s\"", 
-                        current, prefix));
+            PidTest.testPrefix(current, setting);
+
+            if (prev != null) {
+                PidTest.testOrder(prev, current);
             }
 
-            // fail the test if ids aren't ordered
-            if (prev != null && compare(prev, current) > -1) {
-                Assert.fail(String.format("The ids are not sequential: prev=%s\tcurrent=%s",
-                        prev, current));
-            }
             prev = current;
         }
 
@@ -179,24 +185,28 @@ public class CustomIdGeneratorTest implements Comparator<String> {
     }
 
     /**
-     * missing javadoc
+     * Tests to see if the randomMint method will print the desired prefix
      *
-     * @param prefix
-     * @param sansVowel
-     * @param charMap
-     * @param amount
+     * @param prefix A sequence of characters that appear in the beginning of
+     * PIDs
+     * @param sansVowel Dictates whether or not vowels are allowed
+     * @param charMap A sequence of characters used to configure PIDs
+     * @param amount The number of PIDs to be created
      */
     @Test(dataProvider = "prefix")
     public void testRandomMintPrefix(String prefix, boolean sansVowel,
             String charMap, int amount) {
         Logger.debug("inside testRandomMintPrefix");
-        Set<Pid> randomSet = testRandomMint(prefix, sansVowel, charMap, amount);
 
-        // test random mint
+        // store parameters in a setting object
+        Setting setting = new Setting(prefix, null, charMap, 0, sansVowel);
+
+        // create a generator object
+        CustomIdGenerator minter = new CustomIdGenerator(prefix, sansVowel, charMap);
+        Set<Pid> randomSet = minter.randomMint(amount);
+
         for (Pid id : randomSet) {
-            if (!id.toString().startsWith(prefix)) {
-                Assert.fail(String.format("Id \"%s\" does not start with \"$s\"", id, prefix));
-            }
+            PidTest.testPrefix(id.getName(), setting);
         }
 
         // test to see if the amount matches the size of the generated set
@@ -204,40 +214,37 @@ public class CustomIdGeneratorTest implements Comparator<String> {
     }
 
     /**
-     * missing javadoc
+     * Tests sequentialMint to see if it will produce the correct length of Pids
      *
-     * @param prefix
-     * @param sansVowel
-     * @param charMap
-     * @param amount
+     * @param prefix A sequence of characters that appear in the beginning of
+     * PIDs
+     * @param sansVowel Dictates whether or not vowels are allowed
+     * @param charMap A sequence of characters used to configure PIDs
+     * @param amount The number of PIDs to be created
      */
     @Test(dataProvider = "rootLength")
     public void testSequentialLength(String prefix, boolean sansVowel, String charMap,
             int amount) {
         Logger.debug("inside testSequentialLength");
-
+        
+        // store parameters in a setting object
+        Setting setting = new Setting(prefix, null, charMap, charMap.length(), sansVowel);
+        
+        // create a generator object
         CustomIdGenerator minter = new CustomIdGenerator(prefix, sansVowel, charMap);
-        long total = minter.calculatePermutations();
-        if (amount > total) {
-            amount = (int) total;
-        }
         Set<Pid> sequentialSet = minter.sequentialMint(amount);
 
-        // test sequential mint
         String prev = null;
-        int nameLength = prefix.length() + charMap.length();
         Iterator<Pid> iter = sequentialSet.iterator();
         while (iter.hasNext()) {
             // fail if the length does not match
             String current = iter.next().toString();
-            Assert.assertEquals(current.length(), nameLength,
-                    String.format("Id \"%s\" length is not %d", current, nameLength));
+            PidTest.testPrefix(current, setting);
 
-            // fail the test if ids aren't ordered
-            if (prev != null && compare(prev, current) > -1) {
-                Assert.fail(String.format("The ids are not sequential: prev=%s\tcurrent=%s",
-                        prev, current));
+            if (prev != null) {
+                PidTest.testOrder(prev, current);
             }
+
             prev = current;
         }
 
@@ -246,37 +253,35 @@ public class CustomIdGeneratorTest implements Comparator<String> {
     }
 
     /**
-     * missing javadoc
+     * Tests randomMint to see if it will produce the correct length of Pids
      *
-     * @param prefix
-     * @param sansVowel
-     * @param charMap
-     * @param amount
+     * @param prefix A sequence of characters that appear in the beginning of
+     * PIDs
+     * @param sansVowel Dictates whether or not vowels are allowed
+     * @param charMap A sequence of characters used to configure PIDs
+     * @param amount The number of PIDs to be created
      */
     @Test(dataProvider = "rootLength")
     public void testRandomLength(String prefix, boolean sansVowel, String charMap, int amount) {
         Logger.debug("inside testRandomLength");
-
+        
+        // store parameters in a setting object
+        Setting setting = new Setting(prefix, null, charMap, charMap.length(), sansVowel);
+        
+        // create a generator object
         CustomIdGenerator minter = new CustomIdGenerator(prefix, sansVowel, charMap);
-        long total = minter.calculatePermutations();
-        if (amount > total) {
-            amount = (int) total;
-        }
         Set<Pid> randomSet = minter.randomMint(amount);
 
-        // test random mint
-        int nameLength = prefix.length() + charMap.length();
         for (Pid id : randomSet) {
-            Assert.assertEquals(id.toString().length(), nameLength,
-                    String.format("Id \"%s\" length is not %d", id, nameLength));
+            PidTest.testPrefix(id.getName(), setting);
         }
-
         // test to see if the amount matches the size of the generated set
         Assert.assertEquals(randomSet.size(), amount);
-    }   
+    }
 
     /**
-     * missing javadoc
+     * Tests to see if sequentialMint will through NotEnoughPermutation
+     * exception when the amount exceeds the total permutations
      */
     @Test(expectedExceptions = NotEnoughPermutationsException.class)
     public void testSequentialNotEnoughPermutationException() {
@@ -289,7 +294,8 @@ public class CustomIdGeneratorTest implements Comparator<String> {
     }
 
     /**
-     * missing javadoc
+     * Tests to see if randomMint will through NotEnoughPermutation exception
+     * when the amount exceeds the total permutations
      */
     @Test(expectedExceptions = NotEnoughPermutationsException.class)
     public void testRandomNotEnoughPermutationException() {
@@ -302,7 +308,8 @@ public class CustomIdGeneratorTest implements Comparator<String> {
     }
 
     /**
-     * missing javadoc
+     * Tests to see if randomMint will through NotEnoughPermutation exception
+     * when the amount is negative
      */
     @Test
     public void testRandomMintNegativeAmount() {
@@ -315,7 +322,8 @@ public class CustomIdGeneratorTest implements Comparator<String> {
     }
 
     /**
-     * missing javadoc
+     * Tests to see if sequentialMint will through NotEnoughPermutation
+     * exception when the amount is negative
      */
     @Test
     public void testSequentialMintNegativeAmount() {
@@ -329,7 +337,7 @@ public class CustomIdGeneratorTest implements Comparator<String> {
     }
 
     /**
-     * missing javadoc
+     * Tests to see if the the randomMint method returns an empty set
      */
     @Test
     public void testRandomMintZeroAmount() {
@@ -342,7 +350,7 @@ public class CustomIdGeneratorTest implements Comparator<String> {
     }
 
     /**
-     * missing javadoc
+     * Tests to see if the the sequentialMint method returns an empty set
      */
     @Test
     public void testSequentialMintZeroAmount() {
@@ -353,122 +361,4 @@ public class CustomIdGeneratorTest implements Comparator<String> {
         Set<Pid> sequentialSet = minter.sequentialMint(0);
         Assert.assertEquals(sequentialSet.isEmpty(), true);
     }
-
-    /**
-     * missing javadoc
-     *
-     * @param prefix
-     * @param sansVowel
-     * @param tokenType
-     * @param rootLength
-     * @return
-     */
-    private Set<Pid> testSequentialMint(String prefix, boolean sansVowel, String charMap,
-            int amount) {
-        IdGenerator generator = new CustomIdGenerator(prefix, sansVowel, charMap);
-        return generator.sequentialMint(amount);
-    }
-
-    /**
-     * missing javadoc
-     *
-     * @param prefix
-     * @param sansVowel
-     * @param tokenType
-     * @param rootLength
-     * @return
-     */
-    private Set<Pid> testRandomMint(String prefix, boolean sansVowel, String charMap, int amount) {
-        IdGenerator generator = new CustomIdGenerator(prefix, sansVowel, charMap);
-        return generator.randomMint(amount);
-    }
-
-    /**
-     * missing javadoc
-     *
-     * @param prefix
-     * @param name
-     * @param tokenType
-     * @param sansVowel
-     * @return
-     */
-    private boolean containsCorrectCharacters(String prefix, String name, boolean sansVowel,
-            String charMap) {
-        String regex = retrieveRegex(charMap, sansVowel);
-        return name.matches(String.format("^%s%s$", prefix, regex));
-    }
-
-    /**
-     * Returns an equivalent regular expression that'll map that maps to a
-     * specific TokenType
-     *
-     * @param charMap Designates what characters are contained in the id's root
-     * @param sansVowel
-     * @return a regular expression
-     */
-    private String retrieveRegex(String charMap, boolean sansVowel) {
-        String regex = "(^";
-        for (int i = 0; i < charMap.length(); i++) {
-            char key = charMap.charAt(i);
-            if (key == 'd') {
-                regex += "[\\d]";
-            }
-            else if (key == 'l') {
-                regex += (sansVowel) ? "[^aeiouyA-Z\\W\\d]" : "[a-z]";
-            }
-            else if (key == 'u') {
-                regex += (sansVowel) ? "[^a-zAEIOUY\\W\\d]" : "[A-Z]";
-            }
-            else if (key == 'm') {
-                regex += (sansVowel) ? "[^aeiouyAEIOUY\\W\\d]" : "[a-zA-Z]";
-            }
-            else if (key == 'e') {
-                regex += (sansVowel) ? "[^aeiouyAEIOUY\\W]" : "[a-zA-z\\d]";
-            }
-        }
-        return regex += "$)";
-    }
-
-    /**
-     * Used to compare to ids. If the first id has a smaller value than the
-     * second id, -1 is returned. If they are equal, 0 is returned. Otherwise 1
-     * is returned. In terms of value, each character has a unique value
-     * associated with them. Numbers are valued less than lowercase letters,
-     * which are valued less than upper case letters.
-     *
-     * The least and greatest valued number is 0 and 9 respectively. The least
-     * and greatest valued lowercase letter is a and z respectively. The least
-     * and greatest valued uppercase letter is A and Z respectively.
-     *
-     * @param id1 the first id
-     * @param id2 the second id
-     * @return result of the comparison.
-     */
-    @Override
-    public int compare(String id1, String id2) {
-        if (id1.length() < id2.length()) {
-            return -1;
-        }
-        else if (id1.length() > id2.length()) {
-            return 1;
-        }
-        else {
-            for (int i = 0; i < id1.length(); i++) {
-                char c1 = id1.charAt(i);
-                char c2 = id2.charAt(i);
-                if (Character.isDigit(c1) && Character.isLetter(c2)
-                        || Character.isLowerCase(c1) && Character.isUpperCase(c2)
-                        || c1 < c2) {
-                    return -1;
-                }
-                else if ((Character.isLetter(c1) && Character.isDigit(c2))
-                        || Character.isUpperCase(c1) && Character.isLowerCase(c2)
-                        || c1 > c2) {
-                    return 1;
-                }
-            }
-            return 0;
-        }
-    }
-
 }
