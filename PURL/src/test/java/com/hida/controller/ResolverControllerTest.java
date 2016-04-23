@@ -8,6 +8,7 @@ import org.mockito.InjectMocks;
 import static org.mockito.Matchers.any;
 import org.mockito.Mock;
 import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.mockito.MockitoAnnotations;
@@ -37,9 +38,10 @@ public class ResolverControllerTest {
 
     /**
      * Test the retrieve REST call
+     * @throws Exception
      */
     @Test
-    public void testRetrieve() throws Exception {
+    public void testRetrieve() throws Exception{
         Purl entity = getSamplePurl();
         when(Service.retrieveModel(any(String.class))).thenReturn(entity);
 
@@ -56,9 +58,27 @@ public class ResolverControllerTest {
         testJsonObject(jsonObject, entity);
     }
 
+    /**
+     * Test the edit REST call
+     * @throws Exception
+     */
     @Test
-    public void testEdit() {
-        Assert.fail("unimplemented");
+    public void testEdit() throws Exception{
+        // create purl entites to reflect the change that happens after calling edit
+        Purl entity = getSamplePurl();       
+                
+        // pretend the entity was edited and return new entity
+        when(Service.editURL(any(String.class), any(String.class))).thenReturn(true);
+        when(Service.retrieveModel(any(String.class))).thenReturn(entity);
+        
+        // test to see that the correct view is returned
+        ModelAndView mav = Controller.retrieve("");
+        Assert.assertEquals("retrieve", mav.getViewName());
+        
+        // test to see that Json is formated properly
+        Map<String, Object> map = mav.getModel();
+        String jsonObject = (String) map.get("purl");
+        testJsonObject(jsonObject, entity);
     }
 
     @Test
