@@ -7,7 +7,19 @@ import org.springframework.web.servlet.ModelAndView;
 import com.hida.model.Purl;
 import com.hida.service.ResolverService;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.Writer;
+import java.math.BigDecimal;
+import java.util.Set;
+import javax.json.Json;
+import javax.json.JsonArray;
+import javax.json.JsonArrayBuilder;
+import javax.json.JsonBuilderFactory;
+import javax.json.JsonObject;
+import javax.json.JsonObjectBuilder;
+import javax.json.JsonWriter;
 import javax.servlet.http.HttpServletRequest;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -26,12 +38,12 @@ public class ResolverController {
     /* 
      * Logger; logfile to be stored in resource folder    
      */
-    private static final org.slf4j.Logger Logger = 
-            LoggerFactory.getLogger(ResolverController.class);
-    
+    private static final org.slf4j.Logger Logger
+            = LoggerFactory.getLogger(ResolverController.class);
+
     @Autowired
     private ResolverService ResolverService;
-    
+
     /**
      * Maps to the home page.
      *
@@ -39,7 +51,7 @@ public class ResolverController {
      */
     @RequestMapping(value = {""}, method = {RequestMethod.GET})
     public ModelAndView displayIndex() {
-        ModelAndView model = new ModelAndView();       
+        ModelAndView model = new ModelAndView();
         model.setViewName("home");
 
         return model;
@@ -60,12 +72,12 @@ public class ResolverController {
         if (Logger.isInfoEnabled()) {
             Logger.info("Retrieve was Called");
         }
-        
+
         Purl purl = ResolverService.retrieveModel(purlid);	//retrieve purl object
-        
+
         if (purl != null) {
             //show retrieve view, attach purl object.  converted to json at view.
-            ModelAndView mv = new ModelAndView("retrieve", "purl", purl);
+            ModelAndView mv = new ModelAndView("retrieve", "purl", this.convertListToJson(purl));
             Logger.info("Retrieve returned: " + purl.toJSON());
             return mv;
         }
@@ -93,10 +105,10 @@ public class ResolverController {
         }
         ResolverService.editURL(purlid, url);
         Purl purl = ResolverService.retrieveModel(purlid);
-                
+
         if (purl != null) {
             //show edit view, attach purl object.  converted to json at view.
-            ModelAndView mv = new ModelAndView("edit", "purl", purl);
+            ModelAndView mv = new ModelAndView("edit", "purl", this.convertListToJson(purl));
             Logger.info("Edit returned: " + purl.toJSON());
             return mv;
         }
@@ -133,11 +145,11 @@ public class ResolverController {
             Logger.info("Insert was Called");
         }
         Purl purl = new Purl(purlid, url, erc, who, what, when);
-        
-        if (ResolverService.insertPURL(purl)) {                       
+
+        if (ResolverService.insertPURL(purl)) {
             //show edit view, attach purl object.  converted to json at view.
-            ModelAndView mv = new ModelAndView("insert", "purl", purl);
-            Logger.info("insert returned: " + purl.toJSON());
+            ModelAndView mv = new ModelAndView("insert", "purl", this.convertListToJson(purl));
+            Logger.info("insert returned: " + this.convertListToJson(purl));
             return mv;
         }
         else {
@@ -163,7 +175,7 @@ public class ResolverController {
             Logger.info("Insert was Called");
         }
 
-        if (ResolverService.deletePURL(purlid)) {           
+        if (ResolverService.deletePURL(purlid)) {
             //show edit view, attach purl object.  converted to json at view.
             ModelAndView mv = new ModelAndView("deleted");
 
@@ -177,7 +189,7 @@ public class ResolverController {
             return mv;
         }
     }
-    
+
     /**
      * Throws any exception that may be caught within the program
      *
@@ -192,16 +204,50 @@ public class ResolverController {
         mav.addObject("exception", exception.getClass().getSimpleName());
         mav.addObject("message", exception.getMessage());
         Logger.error("General Error: " + exception.getMessage());
-        
+
         StackTraceElement[] trace = exception.getStackTrace();
         String error = "";
-        for(StackTraceElement element : trace){
+        for (StackTraceElement element : trace) {
             error += element.toString() + "\n";
         }
-        
+
         mav.addObject("stacktrace", error);
 
         mav.setViewName("error");
         return mav;
+    }
+
+    /**
+     * Creates a Json object based off a set of ids given in the parameter
+     *
+     * @param set A set of ids to display into JSON
+     * @param prepend A value to attach to the beginning of every id. Typically
+     * used to determine the format of the id. For example, ARK or DOI.
+     * @return A reference to a String that contains Json set of ids
+     * @throws IOException thrown whenever a file could not be found
+     */
+    private String convertListToJson(Purl purl) throws IOException {
+
+        // Jackson objects to format JSON strings
+        String jsonString;
+        ObjectMapper mapper = new ObjectMapper();
+        Object formattedJson;
+
+        // create json object
+        JsonObject jsonObject = Json.createObjectBuilder()
+                .add("pid", purl.getIdentifier())
+                .add("url", purl.getURL())
+                .add("erc", purl.getERC())
+                .add("who", purl.getWho())
+                .add("what", purl.getWhat())
+                .add("date", purl.getDate())
+                .build();
+
+        // format json array
+        formattedJson = mapper.readValue(jsonObject.toString(), Object.class);
+        jsonString = mapper.writerWithDefaultPrettyPrinter().
+                writeValueAsString(formattedJson);
+
+        return jsonString;
     }
 }
