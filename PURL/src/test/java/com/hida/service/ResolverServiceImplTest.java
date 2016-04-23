@@ -11,7 +11,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.mockito.MockitoAnnotations;
 import org.testng.annotations.Test;
-import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 
 /**
