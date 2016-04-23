@@ -91,9 +91,10 @@ public class ResolverServiceImplTest {
      */
     @Test
     public void testInsertPURL() {
-        Purl purl = new Purl();
-        
+        Purl purl = new Purl();                        
         doNothing().when(Dao).savePurl(purl);
+        
+        Service.insertPURL(purl);
         verify(Dao, atLeastOnce()).savePurl(any(Purl.class));
     }
 
