@@ -6,6 +6,7 @@ import org.mockito.InjectMocks;
 import static org.mockito.Matchers.any;
 import org.mockito.Mock;
 import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.mockito.MockitoAnnotations;
@@ -59,13 +60,20 @@ public class ResolverServiceImplTest {
         when(Dao.findByPurl(any(String.class))).thenReturn(entity);
         
         Service.editURL("", "");
-        verify(Dao, atLeastOnce()).findByPurl(any(String.class));
-                
+        verify(Dao, atLeastOnce()).findByPurl(any(String.class));                
     }
 
+    /**
+     * Tests to see if an entity can be deleted
+     */
     @Test
     public void testDeletePURL() {
-        Assert.fail("unimplemented");
+        Purl entity = new Purl();
+        when(Dao.findByPurl(any(String.class))).thenReturn(entity);
+        doNothing().when(Dao).deletePurl(entity);
+        
+        Service.deletePURL("");
+        verify(Dao, atLeastOnce()).deletePurl(any(Purl.class));
     }
 
     @Test
