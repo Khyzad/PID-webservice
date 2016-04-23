@@ -87,9 +87,15 @@ public class ResolverServiceImplTest {
         verify(Dao, atLeastOnce()).findByPurl(any(String.class));
     }
 
+    /**
+     * Tests to see if a Purl object can be persisted
+     */
     @Test
     public void testInsertPURL() {
-        Assert.fail("unimplemented");
+        Purl purl = new Purl();
+        
+        doNothing().when(Dao).savePurl(purl);
+        verify(Dao, atLeastOnce()).savePurl(any(Purl.class));
     }
 
 }
