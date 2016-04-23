@@ -45,9 +45,16 @@ public class PurlDaoImplTest extends EntityDaoImplTest {
         Assert.assertNull(entity3);        
     }
 
+    /**
+     * Tests to see if a purl object can be saved
+     */
     @Test
     public void testSavePurl() {
-        Assert.fail("unimplemented");
+        Purl purl = new Purl("pid","url","erc","who","what","date");
+        Dao.savePurl(purl);
+        
+        Purl entity = Dao.findByPurl("pid");
+        Assert.assertNotNull(entity);
     }
 
     @Test
