@@ -76,9 +76,15 @@ public class ResolverServiceImplTest {
         verify(Dao, atLeastOnce()).deletePurl(any(Purl.class));
     }
 
+    /**
+     * Tests to see if a purl entity is retrievable
+     */
     @Test
     public void testRetrieveModel() {
-        Assert.fail("unimplemented");
+        Purl entity = new Purl();
+        when(Dao.findByPurl(any(String.class))).thenReturn(entity);
+        
+        verify(Dao, atLeastOnce()).findByPurl(any(String.class));
     }
 
     @Test
