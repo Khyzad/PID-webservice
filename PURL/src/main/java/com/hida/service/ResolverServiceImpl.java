@@ -2,20 +2,20 @@ package com.hida.service;
 
 import org.apache.log4j.Logger;
 import com.hida.controller.ResolverController;
-import com.hida.dao.PurlDao;
-import com.hida.model.Purl;
+import com.hida.dao.CitationDao;
+import com.hida.model.Citation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
  * ResolverServiceImpl
- *
- * holds functions that allow communication, and communicate with database
- * methods 1.ResolverServiceImpl - sets up conn, specify, serverURL, username,
- * password of database 2.Openconnection 3.closeConnection 4.retrieveURL -
- * retrieve url requested 5.insertPURL - insert purl, along with its url, who,
- * what, when, erc 6.editURL - edits url of a specified purl
+
+ holds functions that allow communication, and communicate with database
+ methods 1.ResolverServiceImpl - sets up conn, specify, serverURL, username,
+ password of database 2.Openconnection 3.closeConnection 4.retrieveUrl -
+ retrieve url requested 5.insertCitation - insert purl, along with its url, who,
+ what, when, erc 6.editUrl - edits url of a specified purl
  *
  * @author lruffin
  * @author: leland lopez
@@ -25,7 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class ResolverServiceImpl implements ResolverService {
 
     @Autowired
-    private PurlDao PurlDao;
+    private CitationDao PurlDao;
     
     final static Logger logger = Logger.getLogger(ResolverController.class);
 
@@ -34,25 +34,24 @@ public class ResolverServiceImpl implements ResolverService {
      * retrieves url of provided purlid returns url string if successfull, null
      * if not
      *
-     * @param PURLID purlid of desired row
+     * @param purl purlid of desired row
      * @return String
      */
     @Override
-    public String retrieveURL(String PURLID) {
-        Purl entity = PurlDao.findByPurl(PURLID);
-        String url = entity.getURL();
+    public String retrieveUrl(String purl) {
+        Citation entity = PurlDao.findByPurl(purl);
+        String url = entity.getUrl();
         
         return url;
-
     }
 
     /**
      * inserts PURL into database returns true if successful, false if not
      *     
-     * @param purl Purl to insert into database
+     * @param purl Citation to insert into database
      */
     @Override
-    public void insertPURL(Purl purl) {        
+    public void insertCitation(Citation purl) {        
         PurlDao.savePurl(purl);                
     }
 
@@ -60,36 +59,36 @@ public class ResolverServiceImpl implements ResolverService {
      * edits url of db row with corresponding purlid. returns true if
      * successful, false if not
      *
-     * @param PURLID purlid of desired edited row
-     * @param URL url that desired row url will be changed to     
+     * @param purl purlid of desired edited row
+     * @param url url that desired row url will be changed to     
      */
     @Override
-    public void editURL(String PURLID, String URL) {
-        Purl entity = PurlDao.findByPurl(PURLID);
-        entity.setURL(URL);        
+    public void editUrl(String purl, String url) {
+        Citation entity = PurlDao.findByPurl(purl);
+        entity.setUrl(url);        
     }
 
     /**
      * deletes db row with corresponding purlid returns true if successful,
      * false if not
      *
-     * @param PURLID purlid of desired deleted row   
+     * @param purl purlid of desired deleted row   
      */
     @Override
-    public void deletePURL(String PURLID) {
-        Purl entity = PurlDao.findByPurl(PURLID);
+    public void deleteCitation(String purl) {
+        Citation entity = PurlDao.findByPurl(purl);
         PurlDao.deletePurl(entity);                
     }
 
     /**
      * retrieves model of purl_id object returns the respective purl db row.
      *
-     * @param PURLID purlid of desired row that will become Purl
-     * @return Purl
+     * @param purl purlid of desired row that will become Citation
+     * @return Citation
      */
     @Override
-    public Purl retrieveModel(String PURLID) {
-        Purl entity = PurlDao.findByPurl(PURLID);
+    public Citation retrieveCitation(String purl) {
+        Citation entity = PurlDao.findByPurl(purl);
         
         return entity;        
     }   

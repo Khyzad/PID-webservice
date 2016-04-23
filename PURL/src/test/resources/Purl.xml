@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <dataset>
-    <purl_table PID="abc123" URL="http://www.google.com" ERC="a" WHAT="hida" DATE="4/22"/>
-    <purl_table PID="xyz" URL="C:\\Users\\John\\Desktop" ERC="a" WHAT="hida" DATE="4/22"/>    
+    <citation_table 
+        PURL="abc123" URL="http://www.google.com" ERC="a" WHO="x" WHAT="hida" DATE="4/22"/>
+    <citation_table 
+        PURL="xyz" URL="C:\\Users\\John\\Desktop" ERC="a" WHO="y" WHAT="hida" DATE="4/22"/>    
 </dataset>

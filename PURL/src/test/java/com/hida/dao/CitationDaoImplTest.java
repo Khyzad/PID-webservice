@@ -1,6 +1,6 @@
 package com.hida.dao;
 
-import com.hida.model.Purl;
+import com.hida.model.Citation;
 import org.dbunit.dataset.IDataSet;
 import org.dbunit.dataset.xml.FlatXmlDataSet;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,15 +8,15 @@ import org.testng.annotations.Test;
 import org.testng.Assert;
 
 /**
- * Tests the functionality of PurlDaoTest and ensures that it properly interacts
+ * Tests the functionality of CitationDaoTest and ensures that it properly interacts
  * with Hibernate.
  *
  * @author lruffin
  */
-public class PurlDaoImplTest extends EntityDaoImplTest {
+public class CitationDaoImplTest extends EntityDaoImplTest {
     
     @Autowired
-    private PurlDao Dao;
+    private CitationDao Dao;
 
     /**
      * Retrieves data from an xml file sheet to mock Pids.
@@ -27,18 +27,18 @@ public class PurlDaoImplTest extends EntityDaoImplTest {
     @Override
     protected IDataSet getDataSet() throws Exception {
         IDataSet dataSet = new FlatXmlDataSet(this.getClass().getClassLoader().
-                getResourceAsStream("Purl.xml"));
+                getResourceAsStream("Citation.xml"));
         return dataSet;
     }
 
     /**
-     * Tests to see if a purl entity is retrievable
+     * Tests to see if a Citation entity is retrievable
      */
     @Test
     public void testFindByPurl() {
-        Purl entity1 = Dao.findByPurl("abc123");
-        Purl entity2 = Dao.findByPurl("xyz");
-        Purl entity3 = Dao.findByPurl("null");
+        Citation entity1 = Dao.findByPurl("abc123");
+        Citation entity2 = Dao.findByPurl("xyz");
+        Citation entity3 = Dao.findByPurl("null");
         
         Assert.assertNotNull(entity1);
         Assert.assertNotNull(entity2);
@@ -46,27 +46,27 @@ public class PurlDaoImplTest extends EntityDaoImplTest {
     }
 
     /**
-     * Tests to see if a purl object can be saved
+     * Tests to see if a Citation object can be saved
      */
     @Test
     public void testSavePurl() {
-        Purl purl = new Purl("pid","url","erc","who","what","date");
+        Citation purl = new Citation("pid","url","erc","who","what","date");
         Dao.savePurl(purl);
         
-        Purl entity = Dao.findByPurl("pid");
+        Citation entity = Dao.findByPurl("pid");
         Assert.assertNotNull(entity);
     }
 
     /**
-     * Tests to see if a purl entity can be removed
+     * Tests to see if a Citation entity can be removed
      */
     @Test
     public void testDeletePurl() {
-        Purl entity = Dao.findByPurl("abc123");
+        Citation entity = Dao.findByPurl("abc123");
         
         Dao.deletePurl(entity);
         
-        Purl nullEntity = Dao.findByPurl("abc123");
+        Citation nullEntity = Dao.findByPurl("abc123");
         Assert.assertNull(nullEntity);       
     }
 

@@ -1,6 +1,6 @@
 package com.hida.controller;
 
-import com.hida.model.Purl;
+import com.hida.model.Citation;
 import com.hida.service.ResolverService;
 import java.util.Map;
 import org.json.JSONObject;
@@ -43,15 +43,15 @@ public class ResolverControllerTest {
      */
     @Test
     public void testRetrieve() throws Exception {
-        Purl entity = getSamplePurl();
-        when(Service.retrieveModel(any(String.class))).thenReturn(entity);
+        Citation entity = getSampleCitation();
+        when(Service.retrieveCitation(any(String.class))).thenReturn(entity);
 
         // test to see that the correct view is returned
         ModelAndView mav = Controller.retrieve("");
         Assert.assertEquals("result", mav.getViewName());
 
-        // test to see that Service at least makes a call to get a Purl object
-        verify(Service, atLeastOnce()).retrieveModel(any(String.class));
+        // test to see that Service at least makes a call to get a Citation object
+        verify(Service, atLeastOnce()).retrieveCitation(any(String.class));
 
         // test to see that Json is formated properly
         Map<String, Object> map = mav.getModel();
@@ -66,12 +66,12 @@ public class ResolverControllerTest {
      */
     @Test
     public void testEdit() throws Exception {
-        // create purl entity to reflect the change that happens after calling edit
-        Purl entity = getSamplePurl();
+        // create citation entity to reflect the change that happens after calling edit
+        Citation entity = getSampleCitation();
 
         // pretend the entity was edited and return new entity
-        doNothing().when(Service).editURL(any(String.class), any(String.class));
-        when(Service.retrieveModel(any(String.class))).thenReturn(entity);
+        doNothing().when(Service).editUrl(any(String.class), any(String.class));
+        when(Service.retrieveCitation(any(String.class))).thenReturn(entity);
 
         // test to see that the correct view is returned
         ModelAndView mav = Controller.edit("", "");
@@ -90,16 +90,16 @@ public class ResolverControllerTest {
      */
     @Test
     public void testInsert() throws Exception {
-        // create purl entites to reflect the change that happens after calling edit
-        Purl entity = getSamplePurl();
+        // create citation entites to reflect the change that happens after calling edit
+        Citation entity = getSampleCitation();
 
         // pretend the entity was inserted 
-        doNothing().when(Service).insertPURL(any(Purl.class));
+        doNothing().when(Service).insertCitation(any(Citation.class));
 
         // call insert
-        ModelAndView mav = Controller.insert(entity.getIdentifier(),
-                entity.getURL(),
-                entity.getERC(),
+        ModelAndView mav = Controller.insert(entity.getPurl(),
+                entity.getUrl(),
+                entity.getErc(),
                 entity.getWho(),
                 entity.getWhat(),
                 entity.getDate());
@@ -121,7 +121,7 @@ public class ResolverControllerTest {
     @Test
     public void testDelete() throws Exception {
         // pretend the entity was deleted
-        doNothing().when(Service).deletePURL(any(String.class));
+        doNothing().when(Service).deleteCitation(any(String.class));
 
         // call delete
         ModelAndView mav = Controller.delete("");
@@ -139,11 +139,11 @@ public class ResolverControllerTest {
     /**
      * Tests the given jsonObject to ensure that it matches the given entity
      *
-     * @param jsonObject Json object to test
+     * @param jsonString Json object to test
      * @param entity Entity to check against
      */
-    private void testJsonObject(String jsonObject, Purl entity) {
-        JSONObject testObject = new JSONObject(jsonObject);
+    private void testJsonObject(String jsonString, Citation entity) {
+        JSONObject testObject = new JSONObject(jsonString);
 
         String pid = testObject.getString("pid");
         String url = testObject.getString("url");
@@ -152,28 +152,27 @@ public class ResolverControllerTest {
         String what = testObject.getString("what");
         String time = testObject.getString("date");
 
-        Assert.assertEquals(entity.getIdentifier(), pid);
-        Assert.assertEquals(entity.getURL(), url);
-        Assert.assertEquals(entity.getERC(), erc);
+        Assert.assertEquals(entity.getPurl(), pid);
+        Assert.assertEquals(entity.getUrl(), url);
+        Assert.assertEquals(entity.getErc(), erc);
         Assert.assertEquals(entity.getWho(), who);
         Assert.assertEquals(entity.getWhat(), what);
         Assert.assertEquals(entity.getDate(), time);
-
     }
 
     /**
-     * Gets a sample Purl object for testing
+     * Gets a sample Citation object for testing
      *
-     * @return sample Purl object
+     * @return sample Citation object
      */
-    private Purl getSamplePurl() {
-        Purl purl = new Purl("samplePid",
+    private Citation getSampleCitation() {
+        Citation citation = new Citation("samplePid",
                 "sampleURL",
                 "sampleERC",
                 "sampleWho",
                 "sampleWhat",
                 "sampleTime");
 
-        return purl;
+        return citation;
     }
 }

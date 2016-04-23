@@ -1,6 +1,6 @@
 package com.hida.service;
 
-import com.hida.model.Purl;
+import com.hida.model.Citation;
 
 /**
  * This class is used to define the possible operations that Hibernate can
@@ -9,9 +9,14 @@ import com.hida.model.Purl;
  * @author lruffin
  */
 public interface ResolverService {
-    public String retrieveURL(String purlId);
-    public void editURL(String PURLID, String URL);
-    public void deletePURL(String PURLID);
-    public Purl retrieveModel(String PURLID);
-    public void insertPURL(Purl purl);
+
+    public String retrieveUrl(String purl);
+
+    public void editUrl(String purl, String url);
+
+    public void deleteCitation(String purl);
+
+    public Citation retrieveCitation(String purl);
+
+    public void insertCitation(Citation citation);
 }

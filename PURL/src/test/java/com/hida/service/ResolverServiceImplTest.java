@@ -1,7 +1,7 @@
 package com.hida.service;
 
-import com.hida.dao.PurlDao;
-import com.hida.model.Purl;
+import com.hida.dao.CitationDao;
+import com.hida.model.Citation;
 import org.mockito.InjectMocks;
 import static org.mockito.Matchers.any;
 import org.mockito.Mock;
@@ -21,11 +21,11 @@ import org.testng.annotations.BeforeClass;
 public class ResolverServiceImplTest {
 
     @Mock
-    private PurlDao Dao;
+    private CitationDao Dao;
 
     @InjectMocks
     private ResolverServiceImpl Service;
-    
+
     /**
      * Sets up Mockito
      *
@@ -33,69 +33,69 @@ public class ResolverServiceImplTest {
      */
     @BeforeClass
     public void setUpClass() throws Exception {
-        MockitoAnnotations.initMocks(this);        
+        MockitoAnnotations.initMocks(this);
     }
 
     /**
-     * Tests to see if the URL of a given entity is properly retrieved
+     * Tests to see if the URL of a given Citation entity is properly retrieved
      */
     @Test
-    public void testRetrieveURL() {
-        Purl entity = new Purl();
-        entity.setURL("");
+    public void testRetrieveUrl() {
+        Citation entity = new Citation();
+        entity.setUrl("");
         when(Dao.findByPurl(any(String.class))).thenReturn(entity);
-        
-        Service.retrieveURL("");
-        
+
+        Service.retrieveUrl("");
+
         verify(Dao, atLeastOnce()).findByPurl(any(String.class));
     }
 
     /**
-     * Tests to see if an entity can be edited
+     * Tests to see if a Citation entity can be edited
      */
     @Test
-    public void testEditURL() {        
-        Purl entity = new Purl();
+    public void testEditUrl() {
+        Citation entity = new Citation();
         when(Dao.findByPurl(any(String.class))).thenReturn(entity);
-        
-        Service.editURL("", "");
-        verify(Dao, atLeastOnce()).findByPurl(any(String.class));                
+
+        Service.editUrl("", "");
+        verify(Dao, atLeastOnce()).findByPurl(any(String.class));
     }
 
     /**
-     * Tests to see if an entity can be deleted
+     * Tests to see if a Citation entity can be deleted
      */
     @Test
-    public void testDeletePURL() {
-        Purl entity = new Purl();
+    public void testDeleteCitation() {
+        Citation entity = new Citation();
         when(Dao.findByPurl(any(String.class))).thenReturn(entity);
         doNothing().when(Dao).deletePurl(entity);
-        
-        Service.deletePURL("");
-        verify(Dao, atLeastOnce()).deletePurl(any(Purl.class));
+
+        Service.deleteCitation("");
+        verify(Dao, atLeastOnce()).deletePurl(any(Citation.class));
     }
 
     /**
-     * Tests to see if a purl entity is retrievable
+     * Tests to see if a Citation entity is retrievable
      */
     @Test
     public void testRetrieveModel() {
-        Purl entity = new Purl();
+        Citation entity = new Citation();
         when(Dao.findByPurl(any(String.class))).thenReturn(entity);
-        
+
         verify(Dao, atLeastOnce()).findByPurl(any(String.class));
     }
 
     /**
-     * Tests to see if a Purl object can be persisted
+     * Tests to see if a Citation object can be persisted
      */
     @Test
-    public void testInsertPURL() {
-        Purl purl = new Purl();                        
+    public void testInsertCitation() {
+        Citation purl = new Citation();
         doNothing().when(Dao).savePurl(purl);
-        
-        Service.insertPURL(purl);
-        verify(Dao, atLeastOnce()).savePurl(any(Purl.class));
+
+        Service.insertCitation(purl);
+        verify(Dao, atLeastOnce()).savePurl(any(Citation.class));
     }
 
 }

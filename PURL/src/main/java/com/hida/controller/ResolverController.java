@@ -4,7 +4,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
-import com.hida.model.Purl;
+import com.hida.model.Citation;
 import com.hida.service.ResolverService;
 import java.io.IOException;
 import javax.json.Json;
@@ -49,25 +49,25 @@ public class ResolverController {
     }
 
     /**
-     * matches url: /PURL/retrieve retrieves corresponding purl row of provided
-     * purlid returns model - purl and view : retrieve if successful returns
+     * matches url: /PURL/retrieve retrieves corresponding citation row of provided
+     * citation returns model - purl and view : retrieve if successful returns
      * model - null if not
      *
-     * @param purlid purlid of desired retrieved row
+     * @param purl purl of desired retrieved row
      * @return ModelAndView Holds resulting Model and view information
      * @throws IOException Thrown by Jackson library
      */
     @RequestMapping("/retrieve")
-    public ModelAndView retrieve(@RequestParam(value = "purlid", required = true) String purlid)
+    public ModelAndView retrieve(@RequestParam(value = "purl", required = true) String purl)
             throws IOException {
         if (Logger.isInfoEnabled()) {
             Logger.info("Retrieve was Called");
         }
-        // retrieve purl jsonString
-        Purl purl = ResolverService.retrieveModel(purlid);
+        // retrieve citation jsonString
+        Citation citation = ResolverService.retrieveCitation(purl);
 
-        // show retrieve view, attach purl jsonString.  converted to json at view.
-        String jsonString = this.convertPurlToJson(purl);
+        // show retrieve view, attach citation jsonString.  converted to json at view.
+        String jsonString = this.convertCitationToJson(citation);
         ModelAndView mv = new ModelAndView("result", "message", jsonString);
 
         Logger.info("Retrieve returned: " + null);
@@ -75,26 +75,26 @@ public class ResolverController {
     }
 
     /**
-     * matches url: /PURL/edit edit purlid row url, with provided url returns
-     * model : purl and view : edit if successful returns model : null if not
+     * matches url: /PURL/edit edit Citation row url, with provided url returns
+     * model : Citation and view : edit if successful returns model : null if not
      *
-     * @param purlid purlid of desired edited row
-     * @param url The url that the desired purl will have
+     * @param purl purl of desired edited row
+     * @param url The url that the desired Citation will have
      * @return ModelAndView Holds resulting Model and view information
      * @throws IOException Thrown by Jackson library
      */
     @RequestMapping("/edit")
-    public ModelAndView edit(@RequestParam(value = "purlid", required = true) String purlid,
+    public ModelAndView edit(@RequestParam(value = "purlid", required = true) String purl,
             @RequestParam(value = "url", required = true) String url) throws IOException {
         if (Logger.isInfoEnabled()) {
             Logger.info("Edit was Called");
         }
         // edit the purl and then retrieve its entire contents
-        ResolverService.editURL(purlid, url);
-        Purl purl = ResolverService.retrieveModel(purlid);
+        ResolverService.editUrl(purl, url);
+        Citation citation = ResolverService.retrieveCitation(purl);
 
         // show edit view, attach purl jsonString.  converted to json at view.
-        String jsonString = this.convertPurlToJson(purl);
+        String jsonString = this.convertCitationToJson(citation);
         ModelAndView mv = new ModelAndView("result", "message", jsonString);
 
         Logger.info("Edit returned: " + jsonString);
@@ -103,11 +103,11 @@ public class ResolverController {
     }
 
     /**
-     * matches url: /PURL/insert inserts purlid, url, erc, who, what, when to
-     * new row of table returns model : purl and view : insert if successful
+     * matches url: /PURL/insert inserts Citation url, erc, who, what, when to
+     * new row of table returns model : Citation and view : insert if successful
      * returns model : null if not
      *
-     * @param purlid purlid to be inserted
+     * @param purl Citation to be inserted
      * @param url url to be inserted
      * @param erc erc to be inserted
      * @param who who to be inserted
@@ -117,7 +117,7 @@ public class ResolverController {
      * @throws IOException Thrown by Jackson library
      */
     @RequestMapping("/insert")
-    public ModelAndView insert(@RequestParam(value = "purlid", required = true) String purlid,
+    public ModelAndView insert(@RequestParam(value = "purlid", required = true) String purl,
             @RequestParam(value = "url", required = true) String url,
             @RequestParam(value = "erc", required = true) String erc,
             @RequestParam(value = "who", required = true) String who,
@@ -128,13 +128,13 @@ public class ResolverController {
             Logger.info("Insert was Called");
         }
         // create purl jsonString to store information
-        Purl purl = new Purl(purlid, url, erc, who, what, when);
+        Citation citation = new Citation(purl, url, erc, who, what, when);
 
         // insert purl
-        ResolverService.insertPURL(purl);
+        ResolverService.insertCitation(citation);
 
         //show edit view, attach purl jsonString.  converted to json at view.
-        String jsonString = this.convertPurlToJson(purl);
+        String jsonString = this.convertCitationToJson(citation);
         ModelAndView mv = new ModelAndView("result", "message", jsonString);
 
         Logger.info("insert returned: " + null);
@@ -143,15 +143,15 @@ public class ResolverController {
     }
 
     /**
-     * matches url: /PURL/delete deletes row of table with corresponding purlid
+     * matches url: /PURL/delete deletes row of table with corresponding purl
      * returns view : deleted if successful returns model : null if not
      *
-     * @param purlid purlid of desired deleted row
+     * @param purl purl of desired deleted row
      * @return ModelAndView Holds resulting Model and view information
      * @throws IOException Thrown by Jackson library
      */
     @RequestMapping("/delete")
-    public ModelAndView delete(@RequestParam(value = "purlid", required = true) String purlid)
+    public ModelAndView delete(@RequestParam(value = "purl", required = true) String purl)
             throws IOException {
         if (Logger.isInfoEnabled()) {
             Logger.info("Insert was Called");
@@ -159,10 +159,10 @@ public class ResolverController {
         // create json jsonString that designates success
         final String resultJson = "{\"result\":\"deleted\"}";
 
-        // delete purl
-        ResolverService.deletePURL(purlid);
+        // delete Citation
+        ResolverService.deleteCitation(purl);
 
-        //show edit view, attach purl jsonString.  converted to json at view.
+        //show edit view, attach Citation jsonString.  converted to json at view.
         ModelAndView mv = new ModelAndView("result", "message", resultJson);
         Logger.info("insert returned: " + resultJson);
 
@@ -198,13 +198,13 @@ public class ResolverController {
     }
 
     /**
-     * Creates a Json jsonString based off a set of purl given in the parameter
+     * Creates a Json jsonString based off of a citation given in the parameter
      *
-     * @param purl Entity to convert the jsonString into
+     * @param citation Entity to convert the jsonString into
      * @return A reference to a String that contains Json set of ids
      * @throws IOException Thrown by Jackson's IO framework
      */
-    private String convertPurlToJson(Purl purl) throws IOException {
+    private String convertCitationToJson(Citation citation) throws IOException {
 
         // Jackson objects to format JSON strings
         String jsonString;
@@ -213,15 +213,15 @@ public class ResolverController {
 
         // create json jsonString
         JsonObject jsonObject = Json.createObjectBuilder()
-                .add("pid", purl.getIdentifier())
-                .add("url", purl.getURL())
-                .add("erc", purl.getERC())
-                .add("who", purl.getWho())
-                .add("what", purl.getWhat())
-                .add("date", purl.getDate())
+                .add("pid", citation.getPurl())
+                .add("url", citation.getUrl())
+                .add("erc", citation.getErc())
+                .add("who", citation.getWho())
+                .add("what", citation.getWhat())
+                .add("date", citation.getDate())
                 .build();
 
-        // format json array
+        // format json object
         formattedJson = mapper.readValue(jsonObject.toString(), Object.class);
         jsonString = mapper.writerWithDefaultPrettyPrinter().
                 writeValueAsString(formattedJson);
