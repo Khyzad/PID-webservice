@@ -57,9 +57,17 @@ public class PurlDaoImplTest extends EntityDaoImplTest {
         Assert.assertNotNull(entity);
     }
 
+    /**
+     * Tests to see if a purl entity can be removed
+     */
     @Test
     public void testDeletePurl() {
-        Assert.fail("unimplemented");
+        Purl entity = Dao.findByPurl("abc123");
+        
+        Dao.deletePurl(entity);
+        
+        Purl nullEntity = Dao.findByPurl("abc123");
+        Assert.assertNull(nullEntity);       
     }
 
 }
