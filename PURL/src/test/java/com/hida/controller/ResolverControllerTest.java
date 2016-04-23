@@ -47,7 +47,7 @@ public class ResolverControllerTest {
 
         // test to see that the correct view is returned
         ModelAndView mav = Controller.retrieve("");
-        Assert.assertEquals("retrieve", mav.getViewName());
+        Assert.assertEquals("message", mav.getViewName());
 
         // test to see that Service at least makes a call to get a Purl object
         verify(Service, atLeastOnce()).retrieveModel(any(String.class));
@@ -74,7 +74,7 @@ public class ResolverControllerTest {
 
         // test to see that the correct view is returned
         ModelAndView mav = Controller.edit("", "");
-        Assert.assertEquals("edit", mav.getViewName());
+        Assert.assertEquals("message", mav.getViewName());
 
         // test to see that Json is formated properly
         Map<String, Object> map = mav.getModel();
@@ -104,7 +104,7 @@ public class ResolverControllerTest {
                 entity.getDate());
 
         // test to see that the correct view is returned
-        Assert.assertEquals("insert", mav.getViewName());
+        Assert.assertEquals("message", mav.getViewName());
 
         // test to see that Json is formated properly
         Map<String, Object> map = mav.getModel();

@@ -68,7 +68,8 @@ public class ResolverController {
 
         if (purl != null) {
             //show retrieve view, attach purl object.  converted to json at view.
-            ModelAndView mv = new ModelAndView("retrieve", "purl", this.convertListToJson(purl));            
+            String object = this.convertToJsonObject(purl);
+            ModelAndView mv = new ModelAndView("message", "purl", object);
             Logger.info("Retrieve returned: " + purl.toJSON());
             return mv;
         }
@@ -99,7 +100,8 @@ public class ResolverController {
 
         if (purl != null) {
             //show edit view, attach purl object.  converted to json at view.
-            ModelAndView mv = new ModelAndView("edit", "purl", this.convertListToJson(purl));
+            String object = this.convertToJsonObject(purl);
+            ModelAndView mv = new ModelAndView("message", "purl", object);
             Logger.info("Edit returned: " + purl.toJSON());
             return mv;
         }
@@ -139,8 +141,9 @@ public class ResolverController {
 
         if (ResolverService.insertPURL(purl)) {
             //show edit view, attach purl object.  converted to json at view.
-            ModelAndView mv = new ModelAndView("insert", "purl", this.convertListToJson(purl));
-            Logger.info("insert returned: " + this.convertListToJson(purl));
+            String object = this.convertToJsonObject(purl);
+            ModelAndView mv = new ModelAndView("message", "purl", object);
+            Logger.info("insert returned: " + this.convertToJsonObject(purl));
             return mv;
         }
         else {
@@ -168,9 +171,8 @@ public class ResolverController {
 
         if (ResolverService.deletePURL(purlid)) {
             //show edit view, attach purl object.  converted to json at view.
-            ModelAndView mv = 
-                    new ModelAndView("deleted","deleteSuccess", "{\"result\":\"deleted\"}");
-            
+            ModelAndView mv
+                    = new ModelAndView("deleted", "deleteSuccess", "{\"result\":\"deleted\"}");
 
             Logger.info("{\"result\":\"success\"}");
             return mv;
@@ -211,15 +213,13 @@ public class ResolverController {
     }
 
     /**
-     * Creates a Json object based off a set of ids given in the parameter
+     * Creates a Json object based off a set of purl given in the parameter
      *
-     * @param set A set of ids to display into JSON
-     * @param prepend A value to attach to the beginning of every id. Typically
-     * used to determine the format of the id. For example, ARK or DOI.
+     * @param purl Entity to convert the object into
      * @return A reference to a String that contains Json set of ids
-     * @throws IOException thrown whenever a file could not be found
+     * @throws IOException Thrown by Jackson's IO framework
      */
-    private String convertListToJson(Purl purl) throws IOException {
+    private String convertToJsonObject(Purl purl) throws IOException {
 
         // Jackson objects to format JSON strings
         String jsonString;
