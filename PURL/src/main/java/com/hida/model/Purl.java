@@ -18,8 +18,8 @@ public class Purl {
 
     //variables
     @Id 
-    @Column(name = "NAME")
-    private String Identifier;
+    @Column(name = "PID")
+    private String Pid;
     
     @Column(name = "URL")
     private String URL;    
@@ -33,8 +33,8 @@ public class Purl {
     @Column(name = "WHAT")
     private String What;
     
-    @Column(name = "TIMESTAMP")
-    private String When;
+    @Column(name = "DATE")
+    private String Date;
 
     /**
      * Purl Constructor
@@ -42,16 +42,16 @@ public class Purl {
      * @param PURL purlid of model_purl
      */
     public Purl(String PURL) {
-        this.Identifier = PURL;
+        this.Pid = PURL;
     }
 
     public Purl(String Identifier, String URL, String ERC, String Who, String What, String When) {
-        this.Identifier = Identifier;
+        this.Pid = Identifier;
         this.URL = URL;
         this.ERC = ERC;
         this.Who = Who;
         this.What = What;
-        this.When = When;
+        this.Date = When;
     }
     
     
@@ -72,11 +72,11 @@ public class Purl {
     }
 
     public String getIdentifier() {
-        return Identifier;
+        return Pid;
     }
 
     public void setIdentifier(String Identifier) {
-        this.Identifier = Identifier;
+        this.Pid = Identifier;
     }
 
     public String getERC() {
@@ -103,12 +103,12 @@ public class Purl {
         What = what;
     }
 
-    public String getWhen() {
-        return When;
+    public String getDate() {
+        return Date;
     }
 
-    public void setWhen(String when) {
-        When = when;
+    public void setDate(String when) {
+        Date = when;
     }
 
     /**
@@ -118,12 +118,12 @@ public class Purl {
     public String toJSON() {
         String json = "";
         json += "{";
-        json += "\"PURL\":\"" + Identifier + "\",";
+        json += "\"PURL\":\"" + Pid + "\",";
         json += "\"URL\":\"" + URL + "\",";
         json += "\"ERC\":\"" + ERC + "\",";
         json += "\"Who\":\"" + Who + "\",";
         json += "\"What\":\"" + What + "\",";
-        json += "\"When\":\"" + When + "\"";
+        json += "\"When\":\"" + Date + "\"";
         json += "}";
         return json;
     }
