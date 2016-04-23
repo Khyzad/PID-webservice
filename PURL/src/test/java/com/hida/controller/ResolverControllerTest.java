@@ -93,9 +93,9 @@ public class ResolverControllerTest {
         // create purl entites to reflect the change that happens after calling edit
         Purl entity = getSamplePurl();
 
-        // pretend the entity was edited and return new entity
+        // pretend the entity was instered 
         when(Service.insertPURL(any(Purl.class))).thenReturn(true);
-        
+
         // call insert
         ModelAndView mav = Controller.insert(entity.getIdentifier(),
                 entity.getURL(),
@@ -103,7 +103,7 @@ public class ResolverControllerTest {
                 entity.getWho(),
                 entity.getWhat(),
                 entity.getDate());
-        
+
         // test to see that the correct view is returned
         Assert.assertEquals("insert", mav.getViewName());
 
@@ -113,15 +113,28 @@ public class ResolverControllerTest {
         testJsonObject(jsonObject, entity);
     }
 
+    /**
+     * Tests the delete REST call
+     *
+     * @throws Exception
+     */
     @Test
-    public void testDelete() {
-        Assert.fail("unimplemented");
-    }
+    public void testDelete() throws Exception {
+        // pretend the entity was deleted
+        when(Service.deletePURL(any(String.class))).thenReturn(true);
 
-    @Test
-    public void testHandleGeneralError() {
-        Assert.fail("unimplemented");
-    }
+        // call delete
+        ModelAndView mav = Controller.delete("");
+
+        // test to see that the correct view is returned
+        Assert.assertEquals("deleted", mav.getViewName());
+
+        // test to see that Json is formated properly
+        Map<String, Object> map = mav.getModel();
+        String result = (String) map.get("deleteSuccess");
+
+        Assert.assertEquals("{\"result\":\"deleted\"}", result);
+    }   
 
     /**
      * Tests the given jsonObject to ensure that it matches the given entity

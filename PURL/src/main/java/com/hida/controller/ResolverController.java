@@ -177,7 +177,9 @@ public class ResolverController {
 
         if (ResolverService.deletePURL(purlid)) {
             //show edit view, attach purl object.  converted to json at view.
-            ModelAndView mv = new ModelAndView("deleted");
+            ModelAndView mv = 
+                    new ModelAndView("deleted","deleteSuccess", "{\"result\":\"deleted\"}");
+            
 
             Logger.info("{\"result\":\"success\"}");
             return mv;
