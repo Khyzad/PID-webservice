@@ -1,9 +1,14 @@
 package com.hida.service;
 
 import com.hida.dao.PurlDao;
+import com.hida.model.Purl;
 import org.mockito.InjectMocks;
+import static org.mockito.Matchers.any;
+import org.mockito.Mock;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import org.mockito.MockitoAnnotations;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.testng.annotations.Test;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
@@ -15,11 +20,11 @@ import org.testng.annotations.BeforeClass;
  */
 public class ResolverServiceImplTest {
 
-    @Autowired
+    @Mock
     private PurlDao Dao;
 
     @InjectMocks
-    private ResolverService Service;
+    private ResolverServiceImpl Service;
     
     /**
      * Sets up Mockito
@@ -33,7 +38,13 @@ public class ResolverServiceImplTest {
 
     @Test
     public void testRetrieveURL() {
-        Assert.fail("unimplemented");
+        Purl entity = new Purl();
+        entity.setURL("");
+        when(Dao.findByPurl(any(String.class))).thenReturn(entity);
+        
+        Service.retrieveURL("");
+        
+        verify(Dao, atLeastOnce()).findByPurl(any(String.class));
     }
 
     @Test
