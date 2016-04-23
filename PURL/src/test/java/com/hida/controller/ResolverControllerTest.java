@@ -47,14 +47,14 @@ public class ResolverControllerTest {
 
         // test to see that the correct view is returned
         ModelAndView mav = Controller.retrieve("");
-        Assert.assertEquals("message", mav.getViewName());
+        Assert.assertEquals("result", mav.getViewName());
 
         // test to see that Service at least makes a call to get a Purl object
         verify(Service, atLeastOnce()).retrieveModel(any(String.class));
 
         // test to see that Json is formated properly
         Map<String, Object> map = mav.getModel();
-        String jsonObject = (String) map.get("purl");
+        String jsonObject = (String) map.get("message");
         testJsonObject(jsonObject, entity);
     }
 
@@ -74,11 +74,11 @@ public class ResolverControllerTest {
 
         // test to see that the correct view is returned
         ModelAndView mav = Controller.edit("", "");
-        Assert.assertEquals("message", mav.getViewName());
+        Assert.assertEquals("result", mav.getViewName());
 
         // test to see that Json is formated properly
         Map<String, Object> map = mav.getModel();
-        String jsonObject = (String) map.get("purl");
+        String jsonObject = (String) map.get("message");
         testJsonObject(jsonObject, entity);
     }
 
@@ -104,11 +104,11 @@ public class ResolverControllerTest {
                 entity.getDate());
 
         // test to see that the correct view is returned
-        Assert.assertEquals("message", mav.getViewName());
+        Assert.assertEquals("result", mav.getViewName());
 
         // test to see that Json is formated properly
         Map<String, Object> map = mav.getModel();
-        String jsonObject = (String) map.get("purl");
+        String jsonObject = (String) map.get("message");
         testJsonObject(jsonObject, entity);
     }
 

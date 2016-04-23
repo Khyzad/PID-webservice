@@ -66,15 +66,16 @@ public class ResolverController {
 
         Purl purl = ResolverService.retrieveModel(purlid);	//retrieve purl object
 
+        ModelAndView mv = new ModelAndView("result");
         if (purl != null) {
             //show retrieve view, attach purl object.  converted to json at view.
             String object = this.convertToJsonObject(purl);
-            ModelAndView mv = new ModelAndView("message", "purl", object);
+            mv.addObject("message", object);
             Logger.info("Retrieve returned: " + purl.toJSON());
             return mv;
         }
         else {
-            ModelAndView mv = new ModelAndView("null");
+            mv.addObject("message", null);
             Logger.info("insert returned: " + null);
             return mv;
         }
@@ -98,15 +99,16 @@ public class ResolverController {
         ResolverService.editURL(purlid, url);
         Purl purl = ResolverService.retrieveModel(purlid);
 
+        ModelAndView mv = new ModelAndView("result");
         if (purl != null) {
             //show edit view, attach purl object.  converted to json at view.
             String object = this.convertToJsonObject(purl);
-            ModelAndView mv = new ModelAndView("message", "purl", object);
+            mv.addObject("message", object);
             Logger.info("Edit returned: " + purl.toJSON());
             return mv;
         }
         else {
-            ModelAndView mv = new ModelAndView("null");
+            mv.addObject("message", null);
             Logger.info("Edit returned: " + null);
             return mv;
         }
@@ -138,17 +140,19 @@ public class ResolverController {
             Logger.info("Insert was Called");
         }
         Purl purl = new Purl(purlid, url, erc, who, what, when);
-
+        ModelAndView mv = new ModelAndView("result");
+        
         if (ResolverService.insertPURL(purl)) {
             //show edit view, attach purl object.  converted to json at view.
             String object = this.convertToJsonObject(purl);
-            ModelAndView mv = new ModelAndView("message", "purl", object);
+            //ModelAndView mv = new ModelAndView("message", "purl", object);
+            mv.addObject("message", object);
             Logger.info("insert returned: " + this.convertToJsonObject(purl));
             return mv;
         }
         else {
             //show edit view, attach purl object.  converted to json at view.
-            ModelAndView mv = new ModelAndView("null");
+            mv.addObject("message", null);
             Logger.info("insert returned: " + null);
             return mv;
         }
