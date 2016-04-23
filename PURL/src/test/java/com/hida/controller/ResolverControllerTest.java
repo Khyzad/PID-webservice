@@ -38,10 +38,11 @@ public class ResolverControllerTest {
 
     /**
      * Test the retrieve REST call
+     *
      * @throws Exception
      */
     @Test
-    public void testRetrieve() throws Exception{
+    public void testRetrieve() throws Exception {
         Purl entity = getSamplePurl();
         when(Service.retrieveModel(any(String.class))).thenReturn(entity);
 
@@ -60,30 +61,56 @@ public class ResolverControllerTest {
 
     /**
      * Test the edit REST call
+     *
      * @throws Exception
      */
     @Test
-    public void testEdit() throws Exception{
-        // create purl entites to reflect the change that happens after calling edit
-        Purl entity = getSamplePurl();       
-                
+    public void testEdit() throws Exception {
+        // create purl entity to reflect the change that happens after calling edit
+        Purl entity = getSamplePurl();
+
         // pretend the entity was edited and return new entity
         when(Service.editURL(any(String.class), any(String.class))).thenReturn(true);
         when(Service.retrieveModel(any(String.class))).thenReturn(entity);
-        
+
         // test to see that the correct view is returned
-        ModelAndView mav = Controller.retrieve("");
-        Assert.assertEquals("retrieve", mav.getViewName());
-        
+        ModelAndView mav = Controller.edit("", "");
+        Assert.assertEquals("edit", mav.getViewName());
+
         // test to see that Json is formated properly
         Map<String, Object> map = mav.getModel();
         String jsonObject = (String) map.get("purl");
         testJsonObject(jsonObject, entity);
     }
 
+    /**
+     * Tests the insert REST call
+     *
+     * @throws Exception
+     */
     @Test
-    public void testInsert() {
-        Assert.fail("unimplemented");
+    public void testInsert() throws Exception {
+        // create purl entites to reflect the change that happens after calling edit
+        Purl entity = getSamplePurl();
+
+        // pretend the entity was edited and return new entity
+        when(Service.insertPURL(any(Purl.class))).thenReturn(true);
+        
+        // call insert
+        ModelAndView mav = Controller.insert(entity.getIdentifier(),
+                entity.getURL(),
+                entity.getERC(),
+                entity.getWho(),
+                entity.getWhat(),
+                entity.getDate());
+        
+        // test to see that the correct view is returned
+        Assert.assertEquals("insert", mav.getViewName());
+
+        // test to see that Json is formated properly
+        Map<String, Object> map = mav.getModel();
+        String jsonObject = (String) map.get("purl");
+        testJsonObject(jsonObject, entity);
     }
 
     @Test
