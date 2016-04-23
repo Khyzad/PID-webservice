@@ -77,7 +77,7 @@ public class ResolverController {
 
         if (purl != null) {
             //show retrieve view, attach purl object.  converted to json at view.
-            ModelAndView mv = new ModelAndView("retrieve", "purl", this.convertListToJson(purl));
+            ModelAndView mv = new ModelAndView("retrieve", "purl", this.convertListToJson(purl));            
             Logger.info("Retrieve returned: " + purl.toJSON());
             return mv;
         }
