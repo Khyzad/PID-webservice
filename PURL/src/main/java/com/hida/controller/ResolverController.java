@@ -54,8 +54,8 @@ public class ResolverController {
      * model - null if not
      *
      * @param purlid purlid of desired retrieved row
-     * @return ModelAndView
-     * @throws IOException throws if connection could not be made
+     * @return ModelAndView Holds resulting Model and view information
+     * @throws IOException Thrown by Jackson library
      */
     @RequestMapping("/retrieve")
     public ModelAndView retrieve(@RequestParam(value = "purlid", required = true) String purlid)
@@ -63,22 +63,15 @@ public class ResolverController {
         if (Logger.isInfoEnabled()) {
             Logger.info("Retrieve was Called");
         }
+        // retrieve purl jsonString
+        Purl purl = ResolverService.retrieveModel(purlid);
 
-        Purl purl = ResolverService.retrieveModel(purlid);	//retrieve purl object
+        // show retrieve view, attach purl jsonString.  converted to json at view.
+        String jsonString = this.convertPurlToJson(purl);
+        ModelAndView mv = new ModelAndView("result", "message", jsonString);
 
-        ModelAndView mv = new ModelAndView("result");
-        if (purl != null) {
-            //show retrieve view, attach purl object.  converted to json at view.
-            String object = this.convertToJsonObject(purl);
-            mv.addObject("message", object);
-            Logger.info("Retrieve returned: " + purl.toJSON());
-            return mv;
-        }
-        else {
-            mv.addObject("message", null);
-            Logger.info("insert returned: " + null);
-            return mv;
-        }
+        Logger.info("Retrieve returned: " + null);
+        return mv;
     }
 
     /**
@@ -86,9 +79,9 @@ public class ResolverController {
      * model : purl and view : edit if successful returns model : null if not
      *
      * @param purlid purlid of desired edited row
-     * @param url url that desired row url will be changed to
-     * @return ModelAndView
-     * @throws IOException throws if connection could not be made
+     * @param url The url that the desired purl will have
+     * @return ModelAndView Holds resulting Model and view information
+     * @throws IOException Thrown by Jackson library
      */
     @RequestMapping("/edit")
     public ModelAndView edit(@RequestParam(value = "purlid", required = true) String purlid,
@@ -96,22 +89,17 @@ public class ResolverController {
         if (Logger.isInfoEnabled()) {
             Logger.info("Edit was Called");
         }
+        // edit the purl and then retrieve its entire contents
         ResolverService.editURL(purlid, url);
         Purl purl = ResolverService.retrieveModel(purlid);
 
-        ModelAndView mv = new ModelAndView("result");
-        if (purl != null) {
-            //show edit view, attach purl object.  converted to json at view.
-            String object = this.convertToJsonObject(purl);
-            mv.addObject("message", object);
-            Logger.info("Edit returned: " + purl.toJSON());
-            return mv;
-        }
-        else {
-            mv.addObject("message", null);
-            Logger.info("Edit returned: " + null);
-            return mv;
-        }
+        // show edit view, attach purl jsonString.  converted to json at view.
+        String jsonString = this.convertPurlToJson(purl);
+        ModelAndView mv = new ModelAndView("result", "message", jsonString);
+
+        Logger.info("Edit returned: " + jsonString);
+        return mv;
+
     }
 
     /**
@@ -125,8 +113,8 @@ public class ResolverController {
      * @param who who to be inserted
      * @param what what to be inserted
      * @param when when to be insertd
-     * @return ModelAndView
-     * @throws IOException throws if db conn not successful
+     * @return ModelAndView Holds resulting Model and view information
+     * @throws IOException Thrown by Jackson library
      */
     @RequestMapping("/insert")
     public ModelAndView insert(@RequestParam(value = "purlid", required = true) String purlid,
@@ -139,23 +127,19 @@ public class ResolverController {
         if (Logger.isInfoEnabled()) {
             Logger.info("Insert was Called");
         }
+        // create purl jsonString to store information
         Purl purl = new Purl(purlid, url, erc, who, what, when);
-        ModelAndView mv = new ModelAndView("result");
-        
-        if (ResolverService.insertPURL(purl)) {
-            //show edit view, attach purl object.  converted to json at view.
-            String object = this.convertToJsonObject(purl);
-            //ModelAndView mv = new ModelAndView("message", "purl", object);
-            mv.addObject("message", object);
-            Logger.info("insert returned: " + this.convertToJsonObject(purl));
-            return mv;
-        }
-        else {
-            //show edit view, attach purl object.  converted to json at view.
-            mv.addObject("message", null);
-            Logger.info("insert returned: " + null);
-            return mv;
-        }
+
+        // insert purl
+        ResolverService.insertPURL(purl);
+
+        //show edit view, attach purl jsonString.  converted to json at view.
+        String jsonString = this.convertPurlToJson(purl);
+        ModelAndView mv = new ModelAndView("result", "message", jsonString);
+
+        Logger.info("insert returned: " + null);
+        return mv;
+
     }
 
     /**
@@ -163,8 +147,8 @@ public class ResolverController {
      * returns view : deleted if successful returns model : null if not
      *
      * @param purlid purlid of desired deleted row
-     * @return ModelAndView
-     * @throws IOException throws if dbConn is not successful
+     * @return ModelAndView Holds resulting Model and view information
+     * @throws IOException Thrown by Jackson library
      */
     @RequestMapping("/delete")
     public ModelAndView delete(@RequestParam(value = "purlid", required = true) String purlid)
@@ -172,21 +156,18 @@ public class ResolverController {
         if (Logger.isInfoEnabled()) {
             Logger.info("Insert was Called");
         }
+        // create json jsonString that designates success
+        final String resultJson = "{\"result\":\"deleted\"}";
 
-        if (ResolverService.deletePURL(purlid)) {
-            //show edit view, attach purl object.  converted to json at view.
-            ModelAndView mv
-                    = new ModelAndView("deleted", "deleteSuccess", "{\"result\":\"deleted\"}");
+        // delete purl
+        ResolverService.deletePURL(purlid);
 
-            Logger.info("{\"result\":\"success\"}");
-            return mv;
-        }
-        else {
-            //show edit view, attach purl object.  converted to json at view.
-            ModelAndView mv = new ModelAndView("null");
-            Logger.info("insert returned: " + null);
-            return mv;
-        }
+        //show edit view, attach purl jsonString.  converted to json at view.
+        ModelAndView mv = new ModelAndView("result", "message", resultJson);
+        Logger.info("insert returned: " + resultJson);
+
+        mv.addObject("message", resultJson);
+        return mv;
     }
 
     /**
@@ -217,20 +198,20 @@ public class ResolverController {
     }
 
     /**
-     * Creates a Json object based off a set of purl given in the parameter
+     * Creates a Json jsonString based off a set of purl given in the parameter
      *
-     * @param purl Entity to convert the object into
+     * @param purl Entity to convert the jsonString into
      * @return A reference to a String that contains Json set of ids
      * @throws IOException Thrown by Jackson's IO framework
      */
-    private String convertToJsonObject(Purl purl) throws IOException {
+    private String convertPurlToJson(Purl purl) throws IOException {
 
         // Jackson objects to format JSON strings
         String jsonString;
         ObjectMapper mapper = new ObjectMapper();
         Object formattedJson;
 
-        // create json object
+        // create json jsonString
         JsonObject jsonObject = Json.createObjectBuilder()
                 .add("pid", purl.getIdentifier())
                 .add("url", purl.getURL())

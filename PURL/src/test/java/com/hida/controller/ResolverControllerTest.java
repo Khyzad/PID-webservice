@@ -8,6 +8,7 @@ import org.mockito.InjectMocks;
 import static org.mockito.Matchers.any;
 import org.mockito.Mock;
 import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.mockito.MockitoAnnotations;
@@ -69,7 +70,7 @@ public class ResolverControllerTest {
         Purl entity = getSamplePurl();
 
         // pretend the entity was edited and return new entity
-        when(Service.editURL(any(String.class), any(String.class))).thenReturn(true);
+        doNothing().when(Service).editURL(any(String.class), any(String.class));
         when(Service.retrieveModel(any(String.class))).thenReturn(entity);
 
         // test to see that the correct view is returned
@@ -92,8 +93,8 @@ public class ResolverControllerTest {
         // create purl entites to reflect the change that happens after calling edit
         Purl entity = getSamplePurl();
 
-        // pretend the entity was instered 
-        when(Service.insertPURL(any(Purl.class))).thenReturn(true);
+        // pretend the entity was inserted 
+        doNothing().when(Service).insertPURL(any(Purl.class));
 
         // call insert
         ModelAndView mav = Controller.insert(entity.getIdentifier(),
@@ -120,17 +121,17 @@ public class ResolverControllerTest {
     @Test
     public void testDelete() throws Exception {
         // pretend the entity was deleted
-        when(Service.deletePURL(any(String.class))).thenReturn(true);
+        doNothing().when(Service).deletePURL(any(String.class));
 
         // call delete
         ModelAndView mav = Controller.delete("");
 
         // test to see that the correct view is returned
-        Assert.assertEquals("deleted", mav.getViewName());
+        Assert.assertEquals("result", mav.getViewName());
 
         // test to see that Json is formated properly
         Map<String, Object> map = mav.getModel();
-        String result = (String) map.get("deleteSuccess");
+        String result = (String) map.get("message");
 
         Assert.assertEquals("{\"result\":\"deleted\"}", result);
     }   

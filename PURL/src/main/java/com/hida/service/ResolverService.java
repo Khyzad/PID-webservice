@@ -10,8 +10,8 @@ import com.hida.model.Purl;
  */
 public interface ResolverService {
     public String retrieveURL(String purlId);
-    public boolean editURL(String PURLID, String URL);
-    public boolean deletePURL(String PURLID);
+    public void editURL(String PURLID, String URL);
+    public void deletePURL(String PURLID);
     public Purl retrieveModel(String PURLID);
-    public boolean insertPURL(Purl purl);
+    public void insertPURL(Purl purl);
 }
