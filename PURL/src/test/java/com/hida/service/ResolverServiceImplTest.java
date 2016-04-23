@@ -36,6 +36,9 @@ public class ResolverServiceImplTest {
         MockitoAnnotations.initMocks(this);        
     }
 
+    /**
+     * Tests to see if the URL of a given entity is properly retrieved
+     */
     @Test
     public void testRetrieveURL() {
         Purl entity = new Purl();
@@ -47,23 +50,31 @@ public class ResolverServiceImplTest {
         verify(Dao, atLeastOnce()).findByPurl(any(String.class));
     }
 
+    /**
+     * Tests to see if an entity can be edited
+     */
     @Test
-    public void editURL() {
+    public void testEditURL() {        
+        Purl entity = new Purl();
+        when(Dao.findByPurl(any(String.class))).thenReturn(entity);
+        
+        Service.editURL("", "");
+        verify(Dao, atLeastOnce()).findByPurl(any(String.class));
+                
+    }
+
+    @Test
+    public void testDeletePURL() {
         Assert.fail("unimplemented");
     }
 
     @Test
-    public void deletePURL() {
+    public void testRetrieveModel() {
         Assert.fail("unimplemented");
     }
 
     @Test
-    public void retrieveModel() {
-        Assert.fail("unimplemented");
-    }
-
-    @Test
-    public void insertPURL() {
+    public void testInsertPURL() {
         Assert.fail("unimplemented");
     }
 
