@@ -1,6 +1,7 @@
 package com.hida.dao;
 
 import org.dbunit.dataset.IDataSet;
+import org.dbunit.dataset.xml.FlatXmlDataSet;
 import org.testng.annotations.Test;
 import org.testng.Assert;
 
@@ -12,7 +13,9 @@ public class PurlDaoImplTest extends EntityDaoImplTest{
 
     @Override
     protected IDataSet getDataSet() throws Exception {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        IDataSet dataSet = new FlatXmlDataSet(this.getClass().getClassLoader().
+                getResourceAsStream("Purl.xml"));
+        return dataSet;        
     }
     
     @Test
