@@ -50,13 +50,10 @@ public class ResolverServiceImpl implements ResolverService {
      * inserts PURL into database returns true if successful, false if not
      *     
      * @param purl Purl to insert into database
-     * @return boolean
      */
     @Override
-    public boolean insertPURL(Purl purl) {        
-        PurlDao.savePurl(purl);
-        
-        return true;
+    public void insertPURL(Purl purl) {        
+        PurlDao.savePurl(purl);                
     }
 
     /**
@@ -64,30 +61,24 @@ public class ResolverServiceImpl implements ResolverService {
      * successful, false if not
      *
      * @param PURLID purlid of desired edited row
-     * @param URL url that desired row url will be changed to
-     * @return boolean
+     * @param URL url that desired row url will be changed to     
      */
     @Override
-    public boolean editURL(String PURLID, String URL) {
+    public void editURL(String PURLID, String URL) {
         Purl entity = PurlDao.findByPurl(PURLID);
-        entity.setURL(URL);
-        
-        return true;
+        entity.setURL(URL);        
     }
 
     /**
      * deletes db row with corresponding purlid returns true if successful,
      * false if not
      *
-     * @param PURLID purlid of desired delted row
-     * @return boolean
+     * @param PURLID purlid of desired deleted row   
      */
     @Override
-    public boolean deletePURL(String PURLID) {
+    public void deletePURL(String PURLID) {
         Purl entity = PurlDao.findByPurl(PURLID);
-        PurlDao.deletePurl(entity);
-        
-        return true;
+        PurlDao.deletePurl(entity);                
     }
 
     /**
@@ -100,7 +91,6 @@ public class ResolverServiceImpl implements ResolverService {
     public Purl retrieveModel(String PURLID) {
         Purl entity = PurlDao.findByPurl(PURLID);
         
-        return entity;
-        
+        return entity;        
     }   
 }
