@@ -12,4 +12,5 @@ doc/
 .settings
 
 # Netbeans
-nb-configuration.xml
+**/nb-configuration.xml
+**/nbactions.xml
