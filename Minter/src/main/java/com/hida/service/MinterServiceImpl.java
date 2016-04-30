@@ -262,7 +262,8 @@ public class MinterServiceImpl implements MinterService {
                 CurrentDefaultSetting.isSansVowels(),
                 0);
 
-        return UsedSettingDao.findUsedSetting(setting);
+        
+        return UsedSettingRepo.findUsedSetting(setting);
     }
 
     /**
@@ -284,7 +285,7 @@ public class MinterServiceImpl implements MinterService {
                     CurrentDefaultSetting.isSansVowels(),
                     amount);
 
-            UsedSettingDao.save(entity);
+            UsedSettingRepo.save(entity);
         }
         else {
             long previousAmount = entity.getAmount();
