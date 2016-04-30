@@ -10,6 +10,6 @@ import org.springframework.data.repository.CrudRepository;
  */
 public interface DefaultSettingRepository extends CrudRepository<DefaultSetting, Integer>{
 
-    @Query("select s from DEFAULT_SETTING where s.Id = 1")
+    @Query("select s from DefaultSetting s where s.Id = 1")
     public DefaultSetting findCurrentDefaultSetting();
 }

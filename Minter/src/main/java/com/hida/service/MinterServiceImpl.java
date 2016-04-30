@@ -240,15 +240,13 @@ public class MinterServiceImpl implements MinterService {
      * @return Returns a UsedSetting entity if found, null otherwise
      */
     private UsedSetting findUsedSetting() {
-        Logger.info("in findUsedSetting");
-        UsedSetting setting = new UsedSetting(CurrentDefaultSetting.getPrefix(),
+        Logger.info("in findUsedSetting");        
+
+        return UsedSettingRepo.findUsedSetting(CurrentDefaultSetting.getPrefix(),
                 CurrentDefaultSetting.getTokenType(),
                 CurrentDefaultSetting.getCharMap(),
                 CurrentDefaultSetting.getRootLength(),
-                CurrentDefaultSetting.isSansVowels(),
-                0);
-
-        return UsedSettingRepo.findUsedSetting(setting);
+                CurrentDefaultSetting.isSansVowels());
     }
 
     /**
