@@ -237,8 +237,8 @@ public class MinterServiceImpl implements MinterService {
     private void addIdList(Set<Pid> list, long amountCreated) {
         Logger.info("in addIdlIst");
 
-        for (Pid pid : list) {
-            PidDao.savePid(pid);
+        for (Pid pid : list) {            
+            PidRepo.save(pid);
         }
 
         Logger.info("DatabaseUpdated with new pids");
@@ -301,7 +301,7 @@ public class MinterServiceImpl implements MinterService {
      */
     private boolean isValidId(Pid pid) {
         Logger.info("in isValidId");
-        Pid entity = this.PidDao.findByName(pid.getName());
+        Pid entity = this.PidRepo.findOne(pid.getName());        
         return entity == null;
     }
 
