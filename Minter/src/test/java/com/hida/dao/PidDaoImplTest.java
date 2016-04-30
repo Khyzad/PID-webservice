@@ -18,9 +18,6 @@ import org.testng.annotations.Test;
  * @author lruffin
  */
 public class PidDaoImplTest extends EntityDaoImplTest {
-
-    @Autowired
-    private PidDao PidDao;
     
     @Autowired
     private PidRepository PidRepo;

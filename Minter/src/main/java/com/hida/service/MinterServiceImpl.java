@@ -1,11 +1,8 @@
 package com.hida.service;
 
-import com.hida.dao.DefaultSettingDao;
 import com.hida.dao.DefaultSettingRepository;
-import com.hida.dao.PidDao;
 import com.hida.dao.PidRepository;
 import com.hida.model.TokenType;
-import com.hida.dao.UsedSettingDao;
 import com.hida.dao.UsedSettingRepository;
 import com.hida.model.AutoIdGenerator;
 import com.hida.model.CustomIdGenerator;
@@ -38,24 +35,13 @@ public class MinterServiceImpl implements MinterService {
     private static final Logger Logger = LoggerFactory.getLogger(MinterServiceImpl.class);
 
     @Autowired
-    private PidDao PidDao;
-
-    @Autowired
-    private UsedSettingDao UsedSettingDao;
-
-    @Autowired
-    private DefaultSettingDao DefaultSettingDao;
-    
-    @Autowired
     private PidRepository PidRepo;
-    
+
     @Autowired
     private UsedSettingRepository UsedSettingRepo;
-    
+
     @Autowired
     private DefaultSettingRepository DefaultSettingRepo;
-    
-    
 
     /**
      * Declares a Generator object to manage
@@ -237,7 +223,7 @@ public class MinterServiceImpl implements MinterService {
     private void addIdList(Set<Pid> list, long amountCreated) {
         Logger.info("in addIdlIst");
 
-        for (Pid pid : list) {            
+        for (Pid pid : list) {
             PidRepo.save(pid);
         }
 
@@ -262,7 +248,6 @@ public class MinterServiceImpl implements MinterService {
                 CurrentDefaultSetting.isSansVowels(),
                 0);
 
-        
         return UsedSettingRepo.findUsedSetting(setting);
     }
 
@@ -302,7 +287,7 @@ public class MinterServiceImpl implements MinterService {
      */
     private boolean isValidId(Pid pid) {
         Logger.info("in isValidId");
-        Pid entity = this.PidRepo.findOne(pid.getName());        
+        Pid entity = this.PidRepo.findOne(pid.getName());
         return entity == null;
     }
 
@@ -311,12 +296,12 @@ public class MinterServiceImpl implements MinterService {
      * DefaultSetting.
      *
      * @param newSetting A DefaultSetting object that contains newly requested
-     * values     
+     * values
      */
     @Override
     public void updateCurrentSetting(DefaultSetting newSetting) {
         Logger.info("in updateCurrentSetting");
-        
+
         CurrentDefaultSetting = DefaultSettingRepo.findCurrentDefaultSetting();
         CurrentDefaultSetting.setPrepend(newSetting.getPrepend());
         CurrentDefaultSetting.setPrefix(newSetting.getPrefix());
@@ -344,7 +329,7 @@ public class MinterServiceImpl implements MinterService {
                     true, // is auto
                     true); // is random
 
-            DefaultSettingRepo.save(CurrentDefaultSetting);            
+            DefaultSettingRepo.save(CurrentDefaultSetting);
         }
         return CurrentDefaultSetting;
     }

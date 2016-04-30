@@ -1,11 +1,8 @@
 package com.hida.service;
 
 import com.hida.configuration.RepositoryConfiguration;
-import com.hida.dao.DefaultSettingDao;
 import com.hida.dao.DefaultSettingRepository;
-import com.hida.dao.PidDao;
 import com.hida.dao.PidRepository;
-import com.hida.dao.UsedSettingDao;
 import com.hida.dao.UsedSettingRepository;
 import com.hida.model.DefaultSetting;
 import com.hida.model.NotEnoughPermutationsException;
@@ -36,16 +33,7 @@ import org.testng.annotations.Test;
  */
 @SpringApplicationConfiguration(classes = {RepositoryConfiguration.class})
 public class MinterServiceImplTest {
-
-    @Mock
-    DefaultSettingDao DefaultSettingDao;
-
-    @Mock
-    PidDao PidDao;
-
-    @Mock
-    UsedSettingDao UsedSettingDao;
-    
+ 
     @Mock 
     private DefaultSettingRepository DefaultSettingRepo;
     

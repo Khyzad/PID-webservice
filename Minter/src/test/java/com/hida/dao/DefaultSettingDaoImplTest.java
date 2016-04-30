@@ -14,10 +14,7 @@ import org.testng.annotations.Test;
  * @author lruffin
  */
 public class DefaultSettingDaoImplTest extends EntityDaoImplTest {
-
-    @Autowired
-    private DefaultSettingDao DefaultSettingDao;
-    
+       
     @Autowired
     private DefaultSettingRepository DefaultSettingRepo;
 
