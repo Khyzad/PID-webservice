@@ -315,8 +315,8 @@ public class MinterServiceImpl implements MinterService {
     @Override
     public void updateCurrentSetting(DefaultSetting newSetting) {
         Logger.info("in updateCurrentSetting");
-
-        CurrentDefaultSetting = DefaultSettingDao.getDefaultSetting();
+        
+        CurrentDefaultSetting = DefaultSettingRepo.findCurrentDefaultSetting();
         CurrentDefaultSetting.setPrepend(newSetting.getPrepend());
         CurrentDefaultSetting.setPrefix(newSetting.getPrefix());
         CurrentDefaultSetting.setCharMap(newSetting.getCharMap());
@@ -330,7 +330,7 @@ public class MinterServiceImpl implements MinterService {
     /* typical getters and setters */
     @Override
     public DefaultSetting getCurrentSetting() {
-        CurrentDefaultSetting = DefaultSettingDao.getDefaultSetting();
+        CurrentDefaultSetting = DefaultSettingRepo.findCurrentDefaultSetting();
         if (CurrentDefaultSetting == null) {
 
             // create initial default values to be stored in the database
@@ -343,7 +343,7 @@ public class MinterServiceImpl implements MinterService {
                     true, // is auto
                     true); // is random
 
-            DefaultSettingDao.save(CurrentDefaultSetting);
+            DefaultSettingRepo.save(CurrentDefaultSetting);            
         }
         return CurrentDefaultSetting;
     }
