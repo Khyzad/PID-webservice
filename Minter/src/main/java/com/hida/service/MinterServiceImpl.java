@@ -1,9 +1,12 @@
 package com.hida.service;
 
 import com.hida.dao.DefaultSettingDao;
+import com.hida.dao.DefaultSettingRepository;
 import com.hida.dao.PidDao;
+import com.hida.dao.PidRepository;
 import com.hida.model.TokenType;
 import com.hida.dao.UsedSettingDao;
+import com.hida.dao.UsedSettingRepository;
 import com.hida.model.AutoIdGenerator;
 import com.hida.model.CustomIdGenerator;
 import com.hida.model.DefaultSetting;
@@ -42,6 +45,17 @@ public class MinterServiceImpl implements MinterService {
 
     @Autowired
     private DefaultSettingDao DefaultSettingDao;
+    
+    @Autowired
+    private PidRepository PidRepo;
+    
+    @Autowired
+    private UsedSettingRepository UsedSettingRepo;
+    
+    @Autowired
+    private DefaultSettingRepository DefaultSettingRepo;
+    
+    
 
     /**
      * Declares a Generator object to manage
