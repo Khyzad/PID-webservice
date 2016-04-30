@@ -1,8 +1,6 @@
 # Maven
 target/
 
-
-
 # PURL specific 
 doc/
 
@@ -14,3 +12,9 @@ doc/
 # Netbeans
 **/nb-configuration.xml
 **/nbactions.xml
+
+# Database
+*.lck
+*.script
+Minter/*.properties
+Minter/*.log
