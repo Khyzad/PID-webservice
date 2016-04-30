@@ -1,8 +1,11 @@
 package com.hida.service;
 
 import com.hida.dao.DefaultSettingDao;
+import com.hida.dao.DefaultSettingRepository;
 import com.hida.dao.PidDao;
+import com.hida.dao.PidRepository;
 import com.hida.dao.UsedSettingDao;
+import com.hida.dao.UsedSettingRepository;
 import com.hida.model.DefaultSetting;
 import com.hida.model.NotEnoughPermutationsException;
 import com.hida.model.Pid;
@@ -40,6 +43,15 @@ public class MinterServiceImplTest {
 
     @Mock
     UsedSettingDao UsedSettingDao;
+    
+    @Mock 
+    private DefaultSettingRepository DefaultSettingRepo;
+    
+    @Mock 
+    private PidRepository PidRepo;
+    
+    @Mock
+    private UsedSettingRepository UsedSettingRepo;
 
     @InjectMocks
     MinterServiceImpl MinterServiceImpl;
@@ -92,12 +104,12 @@ public class MinterServiceImplTest {
         defaultSetting.setRandom(isRandom);
 
         // assume that any Pids created aren't already persisted and pretend to persist them
-        when(PidDao.findByName(any(String.class))).thenReturn(null);
-        doNothing().when(PidDao).savePid(any(Pid.class));
+        when(PidRepo.findOne(any(String.class))).thenReturn(null);
+        doNothing().when(PidRepo).save(any(Pid.class));
 
         // assume the UsedSetting isn't persisted and pretend to persist it
-        when(UsedSettingDao.findUsedSetting(any(UsedSetting.class))).thenReturn(null);
-        doNothing().when(UsedSettingDao).save(any(UsedSetting.class));
+        when(UsedSettingRepo.findUsedSetting(any(UsedSetting.class))).thenReturn(null);
+        doNothing().when(UsedSettingRepo).save(any(UsedSetting.class));
 
         // check to see if all the Pids were created
         Set<Pid> testSet = MinterServiceImpl.mint(10, defaultSetting);
@@ -125,12 +137,12 @@ public class MinterServiceImplTest {
         UsedSetting usedSetting = getSampleUsedSetting();
 
         // assume that any Pids created aren't already persisted and pretend to persist them
-        when(PidDao.findByName(any(String.class))).thenReturn(null);
-        doNothing().when(PidDao).savePid(any(Pid.class));
+        when(PidRepo.findOne(any(String.class))).thenReturn(null);
+        doNothing().when(PidRepo).save(any(Pid.class));
 
         // assume the UsedSetting isn't persisted and pretend to persist it
-        when(UsedSettingDao.findUsedSetting(any(UsedSetting.class))).thenReturn(usedSetting);
-        doNothing().when(UsedSettingDao).save(any(UsedSetting.class));
+        when(UsedSettingRepo.findUsedSetting(any(UsedSetting.class))).thenReturn(usedSetting);
+        doNothing().when(UsedSettingRepo).save(any(UsedSetting.class));
 
         // check to see if all the Pids were created
         Set<Pid> testSet = MinterServiceImpl.mint(5, defaultSetting);
@@ -160,12 +172,12 @@ public class MinterServiceImplTest {
         UsedSetting usedSetting = getSampleUsedSetting();
 
         // assume that any Pids created aren't already persisted and pretend to persist them
-        when(PidDao.findByName(any(String.class))).thenReturn(null);
-        doNothing().when(PidDao).savePid(any(Pid.class));
+        when(PidRepo.findOne(any(String.class))).thenReturn(null);
+        doNothing().when(PidRepo).save(any(Pid.class));
 
         // pretend to find and retrieve variable usedSetting
-        when(UsedSettingDao.findUsedSetting(any(UsedSetting.class))).thenReturn(usedSetting);
-        when(UsedSettingDao.findUsedSettingById(anyInt())).thenReturn(usedSetting);
+        when(UsedSettingRepo.findUsedSetting(any(UsedSetting.class))).thenReturn(usedSetting);
+        when(UsedSettingRepo.findOne(anyInt())).thenReturn(usedSetting);
 
         // try to mint an amount greater than what is available
         Set<Pid> testSet = MinterServiceImpl.mint(6, defaultSetting);
@@ -190,12 +202,12 @@ public class MinterServiceImplTest {
         defaultSetting.setRandom(isRandom);
 
         // assume that any Pids created aren't already persisted and pretend to persist them
-        when(PidDao.findByName(any(String.class))).thenReturn(null);
-        doNothing().when(PidDao).savePid(any(Pid.class));
+        when(PidRepo.findOne(any(String.class))).thenReturn(null);
+        doNothing().when(PidRepo).save(any(Pid.class));
 
         // assume that UsedSetting entity with the relevant parameters does not exist
-        when(UsedSettingDao.findUsedSetting(any(UsedSetting.class))).thenReturn(null);
-        doNothing().when(UsedSettingDao).save(any(UsedSetting.class));
+        when(UsedSettingRepo.findUsedSetting(any(UsedSetting.class))).thenReturn(null);
+        doNothing().when(UsedSettingRepo).save(any(UsedSetting.class));
 
         // try to mint an amount greater than what is possible
         Set<Pid> testSet = MinterServiceImpl.mint(11, defaultSetting);
@@ -221,13 +233,13 @@ public class MinterServiceImplTest {
         defaultSetting.setRandom(isRandom);
 
         // pretend any Pid with the name "0" is the only Pid that exists
-        when(PidDao.findByName(any(String.class))).thenReturn(null);
-        when(PidDao.findByName("0")).thenReturn(new TestPid(0));
-        doNothing().when(PidDao).savePid(any(Pid.class));
+        when(PidRepo.findOne(any(String.class))).thenReturn(null);
+        when(PidRepo.findOne("0")).thenReturn(new TestPid(0));
+        doNothing().when(PidRepo).save(any(Pid.class));
 
         // assume that UsedSetting entity with the relevant parameters does not exist
-        when(UsedSettingDao.findUsedSetting(any(UsedSetting.class))).thenReturn(null);
-        doNothing().when(UsedSettingDao).save(any(UsedSetting.class));
+        when(UsedSettingRepo.findUsedSetting(any(UsedSetting.class))).thenReturn(null);
+        doNothing().when(UsedSettingRepo).save(any(UsedSetting.class));
 
         // try to mint an amount greater than what is possible
         Set<Pid> testSet = MinterServiceImpl.mint(10, defaultSetting);
@@ -240,10 +252,10 @@ public class MinterServiceImplTest {
     @Test
     public void testGetCurrentSettingWithExistingDefaultSetting() {
         DefaultSetting defaultSetting = DefaultSettingList.get(0);
-        when(DefaultSettingDao.getDefaultSetting()).thenReturn(defaultSetting);
+        when(DefaultSettingRepo.findCurrentDefaultSetting()).thenReturn(defaultSetting);
 
         MinterServiceImpl.getCurrentSetting();
-        verify(DefaultSettingDao, atLeastOnce()).getDefaultSetting();
+        verify(DefaultSettingRepo, atLeastOnce()).findCurrentDefaultSetting();
     }
 
     /**
@@ -254,7 +266,7 @@ public class MinterServiceImplTest {
     @Test
     public void testGetCurrentSettingWithoutExistingDefaultSetting() {
         DefaultSetting defaultSetting = DefaultSettingList.get(0);
-        when(DefaultSettingDao.getDefaultSetting()).thenReturn(null);
+        when(DefaultSettingRepo.findCurrentDefaultSetting()).thenReturn(null);
         DefaultSetting actualSetting = MinterServiceImpl.getCurrentSetting();
 
         Assert.assertEquals(actualSetting.getCharMap(), defaultSetting.getCharMap());
@@ -274,10 +286,10 @@ public class MinterServiceImplTest {
     @Test
     public void testUpdateCurrentSetting() {
         DefaultSetting defaultSetting = DefaultSettingList.get(0);
-        when(DefaultSettingDao.getDefaultSetting()).thenReturn(defaultSetting);
+        when(DefaultSettingRepo.findCurrentDefaultSetting()).thenReturn(defaultSetting);
 
         MinterServiceImpl.updateCurrentSetting(defaultSetting);
-        verify(DefaultSettingDao, atLeastOnce()).getDefaultSetting();
+        verify(DefaultSettingRepo, atLeastOnce()).findCurrentDefaultSetting();
     }
 
     /**
