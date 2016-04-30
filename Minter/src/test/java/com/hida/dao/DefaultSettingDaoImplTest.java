@@ -16,7 +16,10 @@ import org.testng.annotations.Test;
 public class DefaultSettingDaoImplTest extends EntityDaoImplTest {
 
     @Autowired
-    DefaultSettingDao DefaultSettingDao;
+    private DefaultSettingDao DefaultSettingDao;
+    
+    @Autowired
+    private DefaultSettingRepository DefaultSettingRepo;
 
     /**
      * Returns a data set that Hibernate assumes to be in persistence.
@@ -36,8 +39,8 @@ public class DefaultSettingDaoImplTest extends EntityDaoImplTest {
      */
     @Test
     public void saveTest() {
-        DefaultSettingDao.save(getSampleDefaultSetting());
-        DefaultSetting entity = DefaultSettingDao.getDefaultSetting();
+        DefaultSettingRepo.save(getSampleDefaultSetting());
+        DefaultSetting entity = DefaultSettingRepo.findCurrentDefaultSetting();
         Assert.assertNotNull(entity);
     }
 
@@ -46,7 +49,7 @@ public class DefaultSettingDaoImplTest extends EntityDaoImplTest {
      */
     @Test
     public void getDefaultSettingTest() {
-        DefaultSetting entity = DefaultSettingDao.getDefaultSetting();
+        DefaultSetting entity = DefaultSettingRepo.findCurrentDefaultSetting();
         Assert.assertNotNull(entity);
     }
 
