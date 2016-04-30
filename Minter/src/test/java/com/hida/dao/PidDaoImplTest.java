@@ -3,6 +3,7 @@ package com.hida.dao;
 import com.hida.model.AutoId;
 import com.hida.model.CustomId;
 import com.hida.model.Pid;
+import java.util.Iterator;
 import org.dbunit.dataset.IDataSet;
 import org.dbunit.dataset.xml.FlatXmlDataSet;
 import org.hibernate.NonUniqueObjectException;
@@ -19,7 +20,10 @@ import org.testng.annotations.Test;
 public class PidDaoImplTest extends EntityDaoImplTest {
 
     @Autowired
-    PidDao PidDao;
+    private PidDao PidDao;
+    
+    @Autowired
+    private PidRepository PidRepo;
 
     /**
      * Retrieves data from an xml file sheet to mock Pids.
@@ -39,8 +43,8 @@ public class PidDaoImplTest extends EntityDaoImplTest {
      */
     @Test
     public void testFindByName() {
-        Pid entity1 = PidDao.findByName("1");
-        Pid entity2 = PidDao.findByName("2");
+        Pid entity1 = PidRepo.findOne("1");
+        Pid entity2 = PidRepo.findOne("2");
         Assert.assertNotNull(entity1);
         Assert.assertNotNull(entity2);
     }
@@ -53,10 +57,14 @@ public class PidDaoImplTest extends EntityDaoImplTest {
         Pid autoSample = getSampleAutoId();
         Pid customSample = getSampleCustomId();
 
-        PidDao.savePid(autoSample);
-        PidDao.savePid(customSample);
+        PidRepo.save(autoSample);
+        PidRepo.save(customSample);
+        
+        Pid autoEntity = PidRepo.findOne(autoSample.getName());
+        Pid customEntity = PidRepo.findOne(customSample.getName());
 
-        Assert.assertEquals(PidDao.findAllPids().size(), 4);
+        Assert.assertEquals(autoSample.getName(), autoEntity.getName());
+        Assert.assertEquals(customSample.getName(), customEntity.getName());
     }
 
     /**
@@ -64,7 +72,13 @@ public class PidDaoImplTest extends EntityDaoImplTest {
      */
     @Test
     public void testFindAllPids() {
-        int size = PidDao.findAllPids().size();
+        Iterator<Pid> iterator = PidRepo.findAll().iterator();
+        
+        int size = 0;
+        while(iterator.hasNext()){
+            iterator.next();
+            size++;
+        }
 
         Assert.assertEquals(size, 2);
     }
@@ -77,8 +91,8 @@ public class PidDaoImplTest extends EntityDaoImplTest {
         Pid autoSample1 = getSampleAutoId();
         Pid autoSample2 = getSampleAutoId();
 
-        PidDao.savePid(autoSample1);
-        PidDao.savePid(autoSample2);
+        PidRepo.save(autoSample1);
+        PidRepo.save(autoSample2);
     }
 
     /**
@@ -90,8 +104,8 @@ public class PidDaoImplTest extends EntityDaoImplTest {
         Pid customSample1 = getSampleCustomId();
         Pid customSample2 = getSampleCustomId();
 
-        PidDao.savePid(customSample1);
-        PidDao.savePid(customSample2);
+        PidRepo.save(customSample1);
+        PidRepo.save(customSample2);
     }
 
     /**
