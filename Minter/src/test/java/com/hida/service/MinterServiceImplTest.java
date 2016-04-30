@@ -1,6 +1,5 @@
 package com.hida.service;
 
-import com.hida.configuration.RepositoryConfiguration;
 import com.hida.dao.DefaultSettingRepository;
 import com.hida.dao.PidRepository;
 import com.hida.dao.UsedSettingRepository;
@@ -20,7 +19,6 @@ import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.mockito.MockitoAnnotations;
-import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
@@ -31,7 +29,6 @@ import org.testng.annotations.Test;
  *
  * @author lruffin
  */
-@SpringApplicationConfiguration(classes = {RepositoryConfiguration.class})
 public class MinterServiceImplTest {
  
     @Mock 
