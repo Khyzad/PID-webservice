@@ -14,6 +14,7 @@ import java.util.TreeSet;
 import org.mockito.Mock;
 import org.mockito.InjectMocks;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.verify;
@@ -30,13 +31,13 @@ import org.testng.annotations.Test;
  * @author lruffin
  */
 public class MinterServiceImplTest {
- 
-    @Mock 
+
+    @Mock
     private DefaultSettingRepository DefaultSettingRepo;
-    
-    @Mock 
+
+    @Mock
     private PidRepository PidRepo;
-    
+
     @Mock
     private UsedSettingRepository UsedSettingRepo;
 
@@ -95,7 +96,12 @@ public class MinterServiceImplTest {
         when(PidRepo.save(any(Pid.class))).thenReturn(null);
 
         // assume the UsedSetting isn't persisted and pretend to persist it
-        when(UsedSettingRepo.findUsedSetting(any(UsedSetting.class))).thenReturn(null);        
+        when(UsedSettingRepo.findUsedSetting(any(String.class),
+                any(TokenType.class),
+                any(String.class),
+                anyInt(),
+                anyBoolean())).thenReturn(null);
+
         when(UsedSettingRepo.save(any(UsedSetting.class))).thenReturn(null);
 
         // check to see if all the Pids were created
@@ -119,7 +125,7 @@ public class MinterServiceImplTest {
         DefaultSetting defaultSetting = DefaultSettingList.get(1);
         defaultSetting.setAuto(isAuto);
         defaultSetting.setRandom(isRandom);
-        
+
         // get a sample UsedSetting entity
         UsedSetting usedSetting = getSampleUsedSetting();
 
@@ -127,8 +133,12 @@ public class MinterServiceImplTest {
         when(PidRepo.findOne(any(String.class))).thenReturn(null);
         when(PidRepo.save(any(Pid.class))).thenReturn(null);
 
-        // assume the UsedSetting isn't persisted and pretend to persist it
-        when(UsedSettingRepo.findUsedSetting(any(UsedSetting.class))).thenReturn(usedSetting);
+        // assume the UsedSetting isn't persisted and pretend to persist it        
+        when(UsedSettingRepo.findUsedSetting(any(String.class),
+                any(TokenType.class),
+                any(String.class),
+                anyInt(),
+                anyBoolean())).thenReturn(usedSetting);
         when(UsedSettingRepo.save(any(UsedSetting.class))).thenReturn(null);
 
         // check to see if all the Pids were created
@@ -163,7 +173,11 @@ public class MinterServiceImplTest {
         when(PidRepo.save(any(Pid.class))).thenReturn(null);
 
         // pretend to find and retrieve variable usedSetting
-        when(UsedSettingRepo.findUsedSetting(any(UsedSetting.class))).thenReturn(usedSetting);
+        when(UsedSettingRepo.findUsedSetting(any(String.class),
+                any(TokenType.class),
+                any(String.class),
+                anyInt(),
+                anyBoolean())).thenReturn(usedSetting);
         when(UsedSettingRepo.findOne(anyInt())).thenReturn(usedSetting);
 
         // try to mint an amount greater than what is available
@@ -193,7 +207,11 @@ public class MinterServiceImplTest {
         when(PidRepo.save(any(Pid.class))).thenReturn(null);
 
         // assume that UsedSetting entity with the relevant parameters does not exist
-        when(UsedSettingRepo.findUsedSetting(any(UsedSetting.class))).thenReturn(null);
+        when(UsedSettingRepo.findUsedSetting(any(String.class),
+                any(TokenType.class),
+                any(String.class),
+                anyInt(),
+                anyBoolean())).thenReturn(null);
         when(PidRepo.save(any(Pid.class))).thenReturn(null);
 
         // try to mint an amount greater than what is possible
@@ -225,7 +243,11 @@ public class MinterServiceImplTest {
         when(PidRepo.save(any(Pid.class))).thenReturn(null);
 
         // assume that UsedSetting entity with the relevant parameters does not exist
-        when(UsedSettingRepo.findUsedSetting(any(UsedSetting.class))).thenReturn(null);
+        when(UsedSettingRepo.findUsedSetting(any(String.class),
+                any(TokenType.class),
+                any(String.class),
+                anyInt(),
+                anyBoolean())).thenReturn(null);
         when(UsedSettingRepo.save(any(UsedSetting.class))).thenReturn(null);
 
         // try to mint an amount greater than what is possible

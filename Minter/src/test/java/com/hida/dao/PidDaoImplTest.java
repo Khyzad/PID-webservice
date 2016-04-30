@@ -1,5 +1,6 @@
 package com.hida.dao;
 
+import com.hida.configuration.RepositoryConfiguration;
 import com.hida.model.AutoId;
 import com.hida.model.CustomId;
 import com.hida.model.Pid;
@@ -7,7 +8,10 @@ import java.util.Iterator;
 import org.dbunit.dataset.IDataSet;
 import org.dbunit.dataset.xml.FlatXmlDataSet;
 import org.hibernate.NonUniqueObjectException;
+import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -17,10 +21,17 @@ import org.testng.annotations.Test;
  *
  * @author lruffin
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@SpringApplicationConfiguration(classes = {RepositoryConfiguration.class})
 public class PidDaoImplTest extends EntityDaoImplTest {
     
-    @Autowired
+    //@Autowired
     private PidRepository PidRepo;
+    
+    @Autowired
+    public void setPidRepository(PidRepository PidRepo) {
+        this.PidRepo = PidRepo;
+    }
 
     /**
      * Retrieves data from an xml file sheet to mock Pids.

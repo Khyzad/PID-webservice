@@ -1,11 +1,15 @@
 package com.hida.dao;
 
+import com.hida.configuration.RepositoryConfiguration;
 import com.hida.model.TokenType;
 import com.hida.model.UsedSetting;
 import java.util.Iterator;
 import org.dbunit.dataset.IDataSet;
 import org.dbunit.dataset.xml.FlatXmlDataSet;
+import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -14,10 +18,17 @@ import org.testng.annotations.Test;
  *
  * @author lruffin
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@SpringApplicationConfiguration(classes = {RepositoryConfiguration.class})
 public class UsedSettingDaoImplTest extends EntityDaoImplTest {
     
-    @Autowired
+    //@Autowired
     private UsedSettingRepository UsedSettingRepo;
+    
+    @Autowired
+    public void setUsedSettingRepository(UsedSettingRepository UsedSettingRepository) {
+        this.UsedSettingRepo = UsedSettingRepository;
+    }
 
     /**
      * Returns a data set that Hibernate assumes to be in persistence.
@@ -77,8 +88,12 @@ public class UsedSettingDaoImplTest extends EntityDaoImplTest {
      */
     @Test
     public void findUsedSettingTest() {
-        UsedSetting sampleSetting = getSampleUsedSetting();
-        UsedSetting entity = UsedSettingRepo.findUsedSetting(sampleSetting);
+        UsedSetting sampleSetting = getSampleUsedSetting();        
+        UsedSetting entity = UsedSettingRepo.findUsedSetting(sampleSetting.getPrefix(),
+                sampleSetting.getTokenType(),
+                sampleSetting.getCharMap(),
+                sampleSetting.getRootLength(),
+                sampleSetting.isSansVowels());
         Assert.assertNotNull(entity);
     }
 
