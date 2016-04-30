@@ -1,5 +1,6 @@
 package com.hida.service;
 
+import com.hida.configuration.RepositoryConfiguration;
 import com.hida.dao.DefaultSettingDao;
 import com.hida.dao.DefaultSettingRepository;
 import com.hida.dao.PidDao;
@@ -19,10 +20,10 @@ import org.mockito.InjectMocks;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Mockito.atLeastOnce;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.mockito.MockitoAnnotations;
+import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
@@ -33,6 +34,7 @@ import org.testng.annotations.Test;
  *
  * @author lruffin
  */
+@SpringApplicationConfiguration(classes = {RepositoryConfiguration.class})
 public class MinterServiceImplTest {
 
     @Mock
@@ -105,11 +107,11 @@ public class MinterServiceImplTest {
 
         // assume that any Pids created aren't already persisted and pretend to persist them
         when(PidRepo.findOne(any(String.class))).thenReturn(null);
-        doNothing().when(PidRepo).save(any(Pid.class));
+        when(PidRepo.save(any(Pid.class))).thenReturn(null);
 
         // assume the UsedSetting isn't persisted and pretend to persist it
-        when(UsedSettingRepo.findUsedSetting(any(UsedSetting.class))).thenReturn(null);
-        doNothing().when(UsedSettingRepo).save(any(UsedSetting.class));
+        when(UsedSettingRepo.findUsedSetting(any(UsedSetting.class))).thenReturn(null);        
+        when(UsedSettingRepo.save(any(UsedSetting.class))).thenReturn(null);
 
         // check to see if all the Pids were created
         Set<Pid> testSet = MinterServiceImpl.mint(10, defaultSetting);
@@ -138,11 +140,11 @@ public class MinterServiceImplTest {
 
         // assume that any Pids created aren't already persisted and pretend to persist them
         when(PidRepo.findOne(any(String.class))).thenReturn(null);
-        doNothing().when(PidRepo).save(any(Pid.class));
+        when(PidRepo.save(any(Pid.class))).thenReturn(null);
 
         // assume the UsedSetting isn't persisted and pretend to persist it
         when(UsedSettingRepo.findUsedSetting(any(UsedSetting.class))).thenReturn(usedSetting);
-        doNothing().when(UsedSettingRepo).save(any(UsedSetting.class));
+        when(UsedSettingRepo.save(any(UsedSetting.class))).thenReturn(null);
 
         // check to see if all the Pids were created
         Set<Pid> testSet = MinterServiceImpl.mint(5, defaultSetting);
@@ -173,7 +175,7 @@ public class MinterServiceImplTest {
 
         // assume that any Pids created aren't already persisted and pretend to persist them
         when(PidRepo.findOne(any(String.class))).thenReturn(null);
-        doNothing().when(PidRepo).save(any(Pid.class));
+        when(PidRepo.save(any(Pid.class))).thenReturn(null);
 
         // pretend to find and retrieve variable usedSetting
         when(UsedSettingRepo.findUsedSetting(any(UsedSetting.class))).thenReturn(usedSetting);
@@ -203,11 +205,11 @@ public class MinterServiceImplTest {
 
         // assume that any Pids created aren't already persisted and pretend to persist them
         when(PidRepo.findOne(any(String.class))).thenReturn(null);
-        doNothing().when(PidRepo).save(any(Pid.class));
+        when(PidRepo.save(any(Pid.class))).thenReturn(null);
 
         // assume that UsedSetting entity with the relevant parameters does not exist
         when(UsedSettingRepo.findUsedSetting(any(UsedSetting.class))).thenReturn(null);
-        doNothing().when(UsedSettingRepo).save(any(UsedSetting.class));
+        when(PidRepo.save(any(Pid.class))).thenReturn(null);
 
         // try to mint an amount greater than what is possible
         Set<Pid> testSet = MinterServiceImpl.mint(11, defaultSetting);
@@ -235,11 +237,11 @@ public class MinterServiceImplTest {
         // pretend any Pid with the name "0" is the only Pid that exists
         when(PidRepo.findOne(any(String.class))).thenReturn(null);
         when(PidRepo.findOne("0")).thenReturn(new TestPid(0));
-        doNothing().when(PidRepo).save(any(Pid.class));
+        when(PidRepo.save(any(Pid.class))).thenReturn(null);
 
         // assume that UsedSetting entity with the relevant parameters does not exist
         when(UsedSettingRepo.findUsedSetting(any(UsedSetting.class))).thenReturn(null);
-        doNothing().when(UsedSettingRepo).save(any(UsedSetting.class));
+        when(UsedSettingRepo.save(any(UsedSetting.class))).thenReturn(null);
 
         // try to mint an amount greater than what is possible
         Set<Pid> testSet = MinterServiceImpl.mint(10, defaultSetting);
