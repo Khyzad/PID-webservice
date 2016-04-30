@@ -2,6 +2,7 @@ package com.hida.dao;
 
 import com.hida.model.TokenType;
 import com.hida.model.UsedSetting;
+import java.util.Iterator;
 import org.dbunit.dataset.IDataSet;
 import org.dbunit.dataset.xml.FlatXmlDataSet;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +17,10 @@ import org.testng.annotations.Test;
 public class UsedSettingDaoImplTest extends EntityDaoImplTest {
 
     @Autowired
-    UsedSettingDao UsedSettingDao;
+    private UsedSettingDao UsedSettingDao;
+    
+    @Autowired
+    private UsedSettingRepository UsedSettingRepo;
 
     /**
      * Returns a data set that Hibernate assumes to be in persistence.
@@ -37,8 +41,12 @@ public class UsedSettingDaoImplTest extends EntityDaoImplTest {
      */
     @Test
     public void saveTest() {
-        UsedSettingDao.save(getSampleUsedSetting());
-        Assert.assertEquals(UsedSettingDao.findAllUsedSettings().size(), 2);
+        final UsedSetting setting = getSampleUsedSetting();
+        setting.setId(1);
+        
+        UsedSettingRepo.save(getSampleUsedSetting());
+        UsedSetting entity = UsedSettingRepo.findOne(setting.getId());
+        Assert.assertNotNull(entity);
     }
 
     /**
@@ -46,7 +54,7 @@ public class UsedSettingDaoImplTest extends EntityDaoImplTest {
      */
     @Test
     public void findUsedSettingByIdTest() {
-        UsedSetting entity = UsedSettingDao.findUsedSettingById(1);
+        UsedSetting entity = UsedSettingRepo.findOne(1);
         Assert.assertNotNull(entity);
     }
 
@@ -56,7 +64,14 @@ public class UsedSettingDaoImplTest extends EntityDaoImplTest {
      */
     @Test
     public void findAllUsedSettingsTest() {
-        int size = UsedSettingDao.findAllUsedSettings().size();
+        Iterator<UsedSetting> iterator = UsedSettingRepo.findAll().iterator();
+        
+        int size = 0;
+        while(iterator.hasNext()){
+            iterator.next();
+            size++;
+        }
+        
         Assert.assertEquals(size, 1);
     }
 
@@ -66,7 +81,7 @@ public class UsedSettingDaoImplTest extends EntityDaoImplTest {
     @Test
     public void findUsedSettingTest() {
         UsedSetting sampleSetting = getSampleUsedSetting();
-        UsedSetting entity = UsedSettingDao.findUsedSetting(sampleSetting);
+        UsedSetting entity = UsedSettingRepo.findUsedSetting(sampleSetting);
         Assert.assertNotNull(entity);
     }
 
