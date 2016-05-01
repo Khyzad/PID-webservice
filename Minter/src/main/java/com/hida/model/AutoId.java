@@ -28,7 +28,7 @@ public class AutoId extends Pid {
      */
     public AutoId(AutoId id) {
         super(id);
-        this.TokenMap = id.getTokenMap();
+        this.TokenMap = id.getTokenMap();        
     }
 
     /**
@@ -44,6 +44,7 @@ public class AutoId extends Pid {
     public AutoId(String prefix, int[] baseMap, String tokenMap) {
         super(baseMap, prefix);
         this.TokenMap = tokenMap;
+        this.Name = findName();
     }
 
     /**
@@ -70,28 +71,36 @@ public class AutoId extends Pid {
             }
         }
 
+        // set the value of the newly incremented name
+        Name = findName();
+
         return !overflow;
     }
-
-    @Override
-    public String toString() {
-        return getName();
-    }
-
+    
     /**
      * Creates the name of the id based on the indices contained in the BaseMap
      * and the characters in the TokenMap
      *
-     * @return The Name of the Pid
+     * @return The determined Name of the Pid
      */
-    @Override
-    public String getName() {
+    private String findName() {
         Name = "";
         for (int i = 0; i < this.getBaseMap().length; i++) {
             Name += TokenMap.charAt(this.getBaseMap()[i]);
         }
         return this.getPrefix() + Name;
     }
+
+    @Override
+    public String toString() {
+        return Name;
+    }
+
+    
+    @Override
+    public String getName() {
+        return Name;
+    }   
 
     public String getTokenMap() {
         return TokenMap;
