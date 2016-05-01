@@ -4,14 +4,8 @@ import com.hida.configuration.RepositoryConfiguration;
 import com.hida.model.AutoId;
 import com.hida.model.CustomId;
 import com.hida.model.Pid;
-import java.util.Iterator;
-import org.dbunit.dataset.IDataSet;
-import org.dbunit.dataset.xml.FlatXmlDataSet;
-import org.hibernate.NonUniqueObjectException;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -21,47 +15,21 @@ import org.testng.annotations.Test;
  *
  * @author lruffin
  */
-@RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = {RepositoryConfiguration.class})
-public class PidDaoImplTest extends EntityDaoImplTest {
-    
-    //@Autowired
+public class PidDaoImplTest {
+        
     private PidRepository PidRepo;
-    
+        
     @Autowired
     public void setPidRepository(PidRepository PidRepo) {
         this.PidRepo = PidRepo;
-    }
-
+    } 
+        
     /**
-     * Retrieves data from an xml file sheet to mock Pids.
-     *
-     * @return a data set
-     * @throws Exception
-     */
-    @Override
-    protected IDataSet getDataSet() throws Exception {
-        IDataSet dataSet = new FlatXmlDataSet(this.getClass().getClassLoader().
-                getResourceAsStream("Pid.xml"));
-        return dataSet;
-    }
-
-    /**
-     * Tests to see if PidDao can find an Pid by it's name.
+     * Tests to see if Pid can be saved and found.
      */
     @Test
-    public void testFindByName() {
-        Pid entity1 = PidRepo.findOne("1");
-        Pid entity2 = PidRepo.findOne("2");
-        Assert.assertNotNull(entity1);
-        Assert.assertNotNull(entity2);
-    }
-
-    /**
-     * Tests to see if Pid can be saved.
-     */
-    @Test
-    public void testSavePid() {
+    public void testFindAndSave() {
         Pid autoSample = getSampleAutoId();
         Pid customSample = getSampleCustomId();
 
@@ -70,7 +38,7 @@ public class PidDaoImplTest extends EntityDaoImplTest {
         
         Pid autoEntity = PidRepo.findOne(autoSample.getName());
         Pid customEntity = PidRepo.findOne(customSample.getName());
-
+        
         Assert.assertEquals(autoSample.getName(), autoEntity.getName());
         Assert.assertEquals(customSample.getName(), customEntity.getName());
     }
@@ -80,40 +48,43 @@ public class PidDaoImplTest extends EntityDaoImplTest {
      */
     @Test
     public void testFindAllPids() {
-        Iterator<Pid> iterator = PidRepo.findAll().iterator();
+        long size = PidRepo.count();
         
-        int size = 0;
-        while(iterator.hasNext()){
-            iterator.next();
-            size++;
-        }
-
         Assert.assertEquals(size, 2);
     }
 
     /**
      * Tests to see if AutoIds with the same name can be added to the database.
      */
-    @Test(expectedExceptions = NonUniqueObjectException.class)
-    public void testNonUniqueObjectExceptionWithAutoId() {
+    @Test
+    public void testUniqueAutoId() {        
         Pid autoSample1 = getSampleAutoId();
         Pid autoSample2 = getSampleAutoId();
 
         PidRepo.save(autoSample1);
         PidRepo.save(autoSample2);
+        
+        long size = PidRepo.count();
+        
+        Assert.assertEquals(size, 2);
+        
     }
 
     /**
      * Tests to see if CustomIds with the same name can be added to the
      * database.
      */
-    @Test(expectedExceptions = NonUniqueObjectException.class)
-    public void testNonUniqueObjectExceptionWithCustomId() {
+    @Test
+    public void testUniqueCustomId() {
         Pid customSample1 = getSampleCustomId();
         Pid customSample2 = getSampleCustomId();
 
         PidRepo.save(customSample1);
         PidRepo.save(customSample2);
+        
+        long size = PidRepo.count();
+        
+        Assert.assertEquals(size, 2);
     }
 
     /**
