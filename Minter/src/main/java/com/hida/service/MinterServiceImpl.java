@@ -1,9 +1,9 @@
 package com.hida.service;
 
-import com.hida.dao.DefaultSettingRepository;
-import com.hida.dao.PidRepository;
+import com.hida.repositories.DefaultSettingRepository;
+import com.hida.repositories.PidRepository;
 import com.hida.model.TokenType;
-import com.hida.dao.UsedSettingRepository;
+import com.hida.repositories.UsedSettingRepository;
 import com.hida.model.AutoIdGenerator;
 import com.hida.model.CustomIdGenerator;
 import com.hida.model.DefaultSetting;

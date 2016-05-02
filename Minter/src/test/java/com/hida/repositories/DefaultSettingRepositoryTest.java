@@ -1,5 +1,6 @@
-package com.hida.dao;
+package com.hida.repositories;
 
+import com.hida.repositories.DefaultSettingRepository;
 import com.hida.configuration.RepositoryConfiguration;
 import com.hida.model.DefaultSetting;
 import com.hida.model.TokenType;
@@ -19,7 +20,7 @@ import org.testng.Assert;
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = {RepositoryConfiguration.class})
 @TestPropertySource(locations = "classpath:testConfig.properties")
-public class DefaultSettingDaoImplTest {
+public class DefaultSettingRepositoryTest {
        
     private DefaultSettingRepository DefaultSettingRepo;
     

@@ -1,5 +1,6 @@
-package com.hida.dao;
+package com.hida.repositories;
 
+import com.hida.repositories.PidRepository;
 import com.hida.configuration.RepositoryConfiguration;
 import com.hida.model.AutoId;
 import com.hida.model.CustomId;
@@ -22,7 +23,7 @@ import org.testng.Assert;
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = {RepositoryConfiguration.class})
 @TestPropertySource(locations = "classpath:testConfig.properties")
-public class PidDaoImplTest {
+public class PidRepositoryTest {
 
     private PidRepository PidRepo;
 

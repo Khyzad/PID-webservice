@@ -251,7 +251,7 @@ public class MinterController {
 
         return model;
     }
-
+    
     /**
      * Returns a view that displays the error message of
      * NotEnoughPermutationsException.
@@ -309,11 +309,11 @@ public class MinterController {
         mav.addObject("exception", exception.getClass().getSimpleName());
         mav.addObject("message", exception.getMessage());
         Logger.error("General Error: " + exception.getMessage());
-
+        
         mav.setViewName("error");
         return mav;
-    }
-
+        }
+        
     /**
      * Overrides the default value of cached value with values given in the
      * parameter. If the parameters do not contain any of the valid parameters,

@@ -1,4 +1,4 @@
-package com.hida.dao;
+package com.hida.repositories;
 
 import com.hida.model.Pid;
 import org.springframework.data.repository.CrudRepository;
