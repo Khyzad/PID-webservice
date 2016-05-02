@@ -34,6 +34,7 @@ public class CustomId extends Pid {
     public CustomId(CustomId id) {
         super(id);
         this.TokenMapArray = Arrays.copyOf(id.getTokenMapArray(), id.getTokenMapArray().length);
+        this.Name = findName();
     }
 
     /**

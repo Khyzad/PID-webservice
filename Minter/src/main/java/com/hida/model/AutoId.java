@@ -28,7 +28,8 @@ public class AutoId extends Pid {
      */
     public AutoId(AutoId id) {
         super(id);
-        this.TokenMap = id.getTokenMap();        
+        this.TokenMap = id.getTokenMap();     
+        this.Name = findName();
     }
 
     /**
