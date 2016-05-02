@@ -16,7 +16,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @Configuration
 @EnableAutoConfiguration
 @EntityScan(basePackages = {"com.hida.model"})
-@EnableJpaRepositories(basePackages = {"com.hida.dao"})
+@EnableJpaRepositories(basePackages = {"com.hida.repositories"})
 @EnableTransactionManagement
 public class RepositoryConfiguration {
 }

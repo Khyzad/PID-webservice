@@ -1,10 +1,8 @@
 package com.hida.repositories;
 
-import com.hida.repositories.UsedSettingRepository;
 import com.hida.configuration.RepositoryConfiguration;
 import com.hida.model.TokenType;
 import com.hida.model.UsedSetting;
-import java.util.Iterator;
 import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;

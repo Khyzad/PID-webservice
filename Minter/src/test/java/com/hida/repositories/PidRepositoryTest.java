@@ -1,6 +1,5 @@
 package com.hida.repositories;
 
-import com.hida.repositories.PidRepository;
 import com.hida.configuration.RepositoryConfiguration;
 import com.hida.model.AutoId;
 import com.hida.model.CustomId;
