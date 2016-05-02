@@ -6,7 +6,6 @@ import com.hida.model.NotEnoughPermutationsException;
 import com.hida.model.Pid;
 import com.hida.model.TokenType;
 import com.hida.service.MinterService;
-import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,6 +26,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 
 /**
@@ -34,8 +34,8 @@ import org.springframework.web.servlet.ModelAndView;
  *
  * @author lruffin
  */
-@Controller
-@RequestMapping("/")
+@RestController
+@RequestMapping("/Minter")
 public class MinterController {
 
     /* 
@@ -251,7 +251,7 @@ public class MinterController {
 
         return model;
     }
-    
+            
     /**
      * Returns a view that displays the error message of
      * NotEnoughPermutationsException.
@@ -303,7 +303,7 @@ public class MinterController {
      * @return The view of the error message
      */
     @ExceptionHandler(Exception.class)
-    public ModelAndView handleGeneralError(HttpServletRequest req, Exception exception) {
+    public ModelAndView handleGeneralError(HttpServletRequest req, Exception exception) {        
         ModelAndView mav = new ModelAndView();
         mav.addObject("status", 500);
         mav.addObject("exception", exception.getClass().getSimpleName());
