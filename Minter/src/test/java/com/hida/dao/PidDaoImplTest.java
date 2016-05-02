@@ -6,6 +6,7 @@ import com.hida.model.CustomId;
 import com.hida.model.Pid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.test.context.TestPropertySource;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -16,6 +17,7 @@ import org.testng.annotations.Test;
  * @author lruffin
  */
 @SpringApplicationConfiguration(classes = {RepositoryConfiguration.class})
+@TestPropertySource(locations="classpath:testConfig.properties")
 public class PidDaoImplTest {
         
     private PidRepository PidRepo;
@@ -32,10 +34,10 @@ public class PidDaoImplTest {
     public void testFindAndSave() {
         Pid autoSample = getSampleAutoId();
         Pid customSample = getSampleCustomId();
-
+        
         PidRepo.save(autoSample);
         PidRepo.save(customSample);
-        
+                
         Pid autoEntity = PidRepo.findOne(autoSample.getName());
         Pid customEntity = PidRepo.findOne(customSample.getName());
         
@@ -48,9 +50,9 @@ public class PidDaoImplTest {
      */
     @Test
     public void testFindAllPids() {
-        long size = PidRepo.count();
+        long size = PidRepo.count();                        
         
-        Assert.assertEquals(size, 2);
+        Assert.assertEquals(size, 2);        
     }
 
     /**
@@ -110,5 +112,5 @@ public class PidDaoImplTest {
 
         return sample;
     }
-
-}
+    
+    }
