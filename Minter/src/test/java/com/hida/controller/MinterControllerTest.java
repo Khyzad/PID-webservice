@@ -32,6 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.testng.annotations.DataProvider;
+import org.springframework.web.servlet.ModelAndView;
 
 /**
  * Class that tests MinterController
@@ -47,7 +48,7 @@ public class MinterControllerTest {
     MinterController Controller;
 
     @Spy
-    ModelMap ModelMap;
+    ModelAndView Mav;
     
     private final PidTest PidTest = new PidTest();
     private final String PREPEND = "http://digitalarchives.hawaii.gov/70111/";
@@ -204,12 +205,14 @@ public class MinterControllerTest {
         when(MinterServiceDao.mint(anyInt(), any(DefaultSetting.class))).
                 thenReturn(getSampleSet(tempSetting));
 
+        ModelAndView mav = new ModelAndView();
+        
         // check to see if the correct jsp page is returned
-        String jspName = Controller.printPids(AMOUNT, ModelMap, map);
+        String jspName = Controller.printPids(AMOUNT, mav, map).getViewName();
         Assert.assertEquals("mint", jspName);
 
         // create Json objects to extract Json array
-        String message = (String) ModelMap.get("message");
+        String message = (String) Mav.getModel().get("message");
         Logger.debug(message);
         JSONArray testJsonArray = new JSONArray(message);
 
@@ -252,11 +255,11 @@ public class MinterControllerTest {
                 thenReturn(getSampleSet(setting));
 
         // check to see if the correct jsp page is returned
-        String jspName = Controller.printPids(AMOUNT, ModelMap, new HashMap<String, String>());
+        String jspName = Controller.printPids(AMOUNT, Mav, new HashMap<String, String>()).getViewName();
         Assert.assertEquals("mint", jspName);
 
         // create Json objects to extract Json array
-        String message = (String) ModelMap.get("message");
+        String message = (String) Mav.getModel().get("message");;
         Logger.debug(message);
         JSONArray testJsonArray = new JSONArray(message);
 
@@ -286,7 +289,7 @@ public class MinterControllerTest {
         DefaultSetting setting = this.getSampleDefaultSetting();
 
         when(MinterServiceDao.getCurrentSetting()).thenReturn(setting);
-        Controller.printPids(AMOUNT, ModelMap, parameters);
+        Controller.printPids(AMOUNT, Mav, parameters);
     }
 
     /**
@@ -303,7 +306,7 @@ public class MinterControllerTest {
         DefaultSetting setting = this.getSampleDefaultSetting();
 
         when(MinterServiceDao.getCurrentSetting()).thenReturn(setting);
-        Controller.printPids(AMOUNT, ModelMap, parameters);
+        Controller.printPids(AMOUNT, Mav, parameters);
     }
 
     /**
@@ -320,7 +323,7 @@ public class MinterControllerTest {
         DefaultSetting setting = this.getSampleDefaultSetting();
 
         when(MinterServiceDao.getCurrentSetting()).thenReturn(setting);
-        Controller.printPids(AMOUNT, ModelMap, parameters);
+        Controller.printPids(AMOUNT, Mav, parameters);
     }
 
     /**
@@ -336,7 +339,7 @@ public class MinterControllerTest {
         DefaultSetting setting = this.getSampleDefaultSetting();
 
         when(MinterServiceDao.getCurrentSetting()).thenReturn(setting);
-        Controller.printPids(-1, ModelMap, parameters);
+        Controller.printPids(-1, Mav, parameters);
     }
 
     /**
@@ -353,7 +356,7 @@ public class MinterControllerTest {
         DefaultSetting setting = this.getSampleDefaultSetting();
 
         when(MinterServiceDao.getCurrentSetting()).thenReturn(setting);
-        Controller.printPids(AMOUNT, ModelMap, parameters);
+        Controller.printPids(AMOUNT, Mav, parameters);
     }
 
     /**

@@ -179,7 +179,7 @@ public class MinterController {
      * will resort to using the default values found in minter_config.properties
      *
      * @param requestedAmount requested number of ids to mint
-     * @param model serves as a holder for the model so that attributes can be
+     * @param mav serves as a holder for the model so that attributes can be
      * added.
      * @param parameters parameters given by user to instill variety in ids
      * @return paths user to mint.jsp
@@ -187,7 +187,7 @@ public class MinterController {
      * any methods
      */
     @RequestMapping(value = {"/mint/{requestedAmount}"}, method = {RequestMethod.GET})
-    public String printPids(@PathVariable long requestedAmount, ModelMap model,
+    public ModelAndView printPids(@PathVariable long requestedAmount, ModelAndView mav,
             @RequestParam Map<String, String> parameters) throws Exception {
 
         // ensure that only one thread access the minter at any given time
@@ -213,7 +213,7 @@ public class MinterController {
 
             // print list of ids to screen
             Logger.debug(message);
-            model.addAttribute("message", message);
+            mav.addObject("message", message);
 
         }
         finally {
@@ -221,8 +221,10 @@ public class MinterController {
             RequestLock.unlock();
             Logger.warn("Request to Minter Finished, UNLOCKING MINTER");
         }
+        mav.setViewName("mint");
         // return to mint.jsp
-        return "mint";
+        //return "mint";
+        return mav;
     }
 
     /**
