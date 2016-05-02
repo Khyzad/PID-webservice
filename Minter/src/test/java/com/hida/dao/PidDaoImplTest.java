@@ -4,11 +4,14 @@ import com.hida.configuration.RepositoryConfiguration;
 import com.hida.model.AutoId;
 import com.hida.model.CustomId;
 import com.hida.model.Pid;
+import org.junit.After;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.testng.Assert;
-import org.testng.annotations.Test;
 
 /**
  * Tests the functionality of PidDao and ensures that it properly interacts with
@@ -16,33 +19,16 @@ import org.testng.annotations.Test;
  *
  * @author lruffin
  */
+@RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = {RepositoryConfiguration.class})
-@TestPropertySource(locations="classpath:testConfig.properties")
+@TestPropertySource(locations = "classpath:testConfig.properties")
 public class PidDaoImplTest {
-        
+
     private PidRepository PidRepo;
-        
+
     @Autowired
     public void setPidRepository(PidRepository PidRepo) {
         this.PidRepo = PidRepo;
-    } 
-        
-    /**
-     * Tests to see if Pid can be saved and found.
-     */
-    @Test
-    public void testFindAndSave() {
-        Pid autoSample = getSampleAutoId();
-        Pid customSample = getSampleCustomId();
-        
-        PidRepo.save(autoSample);
-        PidRepo.save(customSample);
-                
-        Pid autoEntity = PidRepo.findOne(autoSample.getName());
-        Pid customEntity = PidRepo.findOne(customSample.getName());
-        
-        Assert.assertEquals(autoSample.getName(), autoEntity.getName());
-        Assert.assertEquals(customSample.getName(), customEntity.getName());
     }
 
     /**
@@ -50,26 +36,31 @@ public class PidDaoImplTest {
      */
     @Test
     public void testFindAllPids() {
-        long size = PidRepo.count();                        
-        
-        Assert.assertEquals(size, 2);        
+        Pid autoSample = getSampleAutoId();
+        Pid customSample = getSampleCustomId();
+
+        PidRepo.save(autoSample);
+        PidRepo.save(customSample);
+
+        long size = PidRepo.count();
+
+        Assert.assertEquals(size, 2);
     }
 
     /**
      * Tests to see if AutoIds with the same name can be added to the database.
      */
     @Test
-    public void testUniqueAutoId() {        
+    public void testUniqueAutoId() {
         Pid autoSample1 = getSampleAutoId();
         Pid autoSample2 = getSampleAutoId();
 
         PidRepo.save(autoSample1);
         PidRepo.save(autoSample2);
-        
+
         long size = PidRepo.count();
-        
-        Assert.assertEquals(size, 2);
-        
+
+        Assert.assertEquals(size, 1);
     }
 
     /**
@@ -83,10 +74,10 @@ public class PidDaoImplTest {
 
         PidRepo.save(customSample1);
         PidRepo.save(customSample2);
-        
+
         long size = PidRepo.count();
-        
-        Assert.assertEquals(size, 2);
+
+        Assert.assertEquals(size, 1);
     }
 
     /**
@@ -112,5 +103,12 @@ public class PidDaoImplTest {
 
         return sample;
     }
-    
+
+    /**
+     * Deletes all entries in the in-memory database after each test
+     */
+    @After
+    public void tearDown() {
+        PidRepo.deleteAll();
     }
+}
