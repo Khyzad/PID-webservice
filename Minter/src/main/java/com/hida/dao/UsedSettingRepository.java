@@ -16,7 +16,7 @@ public interface UsedSettingRepository extends CrudRepository<UsedSetting, Integ
             + "s.TokenType = :tokenType and "
             + "s.CharMap = :charMap and "
             + "s.RootLength = :rootLength and "
-            + "s.SansVowels = :sansVowels")
+            + "s.SansVowels = :sansVowel")
     public UsedSetting findUsedSetting(@Param("prefix") String prefix,
             @Param("tokenType") TokenType tokenType,
             @Param("charMap") String charMap,
