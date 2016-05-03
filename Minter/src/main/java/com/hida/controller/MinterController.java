@@ -6,7 +6,6 @@ import com.hida.model.NotEnoughPermutationsException;
 import com.hida.model.Pid;
 import com.hida.model.TokenType;
 import com.hida.service.MinterService;
-import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -65,8 +64,8 @@ public class MinterController {
      * @throws BadParameterException Thrown whenever a bad parameter is
      * detected.
      */
-    @RequestMapping(value = {"/confirmation"}, method = {RequestMethod.POST})
-    public String handleForm(HttpServletRequest request, HttpServletResponse response)
+    @RequestMapping(value = {""}, method = {RequestMethod.POST})
+    public ModelAndView handleForm(HttpServletRequest request, HttpServletResponse response)
             throws BadParameterException {
         try {
             // prevents other clients from accessing the database whenever the form is submitted
@@ -170,7 +169,9 @@ public class MinterController {
             Logger.warn("Request to update default settings finished, UNLOCKING MINTER");
         }
         // redirect to the administration panel located at http://[domain]/
-        return "redirect:";
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("redirect:Minter");
+        return mav;
 
     }
 
