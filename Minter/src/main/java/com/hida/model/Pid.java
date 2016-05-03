@@ -33,9 +33,6 @@ public abstract class Pid implements Comparable<Pid> {
     protected int[] BaseMap;
 
     @Transient
-    protected boolean Unique = true;
-
-    @Transient
     protected String Prefix;
 
     /**
@@ -53,7 +50,6 @@ public abstract class Pid implements Comparable<Pid> {
     public Pid(Pid id) {
         this.Prefix = id.Prefix;
         this.BaseMap = Arrays.copyOf(id.getBaseMap(), id.getBaseMap().length);
-        this.Unique = id.Unique;
     }
 
     /**
@@ -163,38 +159,8 @@ public abstract class Pid implements Comparable<Pid> {
      */
     public void setBaseMap(int[] baseMap) {
         this.BaseMap = baseMap;
-    }
-
-    /**
-     * Determines whether or not particular Pid is not the first to be created
-     * with it's particular BaseMap.
-     *
-     * Returns true by default unless previously modified.
-     *
-     * @return returns whether or not this id is unique against the database.
-     */
-    public boolean isUnique() {
-        return Unique;
-    }
-
-    /**
-     * Determines whether or not particular Pid is not the first to be created
-     * with it's particular BaseMap.
-     *
-     * Should only be used to set false whenever it is determined that this Pid
-     * is not the first to have it's BaseMap value with a given prefix.
-     *
-     * @param isUnique sets the uniqueness value
-     */
-    public void setUnique(boolean isUnique) {
-        this.Unique = isUnique;
-    }
-
-    /**
-     * Method to retrieve the prefix of the id
-     *
-     * @return
-     */
+    }      
+    
     public String getPrefix() {
         return Prefix;
     }
