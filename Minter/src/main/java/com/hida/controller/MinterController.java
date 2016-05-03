@@ -29,7 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 
 /**
- * A controller class that paths the user to all jsp files in WEB_INF/jsp.
+ * A controller class that paths the user to the template folder in resources.
  *
  * @author lruffin
  */
@@ -168,11 +168,11 @@ public class MinterController {
             RequestLock.unlock();
             Logger.warn("Request to update default settings finished, UNLOCKING MINTER");
         }
+        
         // redirect to the administration panel located at http://[domain]/
         ModelAndView mav = new ModelAndView();
         mav.setViewName("redirect:Minter");
         return mav;
-
     }
 
     /**
@@ -223,8 +223,8 @@ public class MinterController {
             Logger.warn("Request to Minter Finished, UNLOCKING MINTER");
         }
         mav.setViewName("mint");
-        // return to mint.jsp
-        //return "mint";
+
+        // return to mint       
         return mav;
     }
 
@@ -254,7 +254,7 @@ public class MinterController {
 
         return model;
     }
-            
+
     /**
      * Returns a view that displays the error message of
      * NotEnoughPermutationsException.
@@ -306,17 +306,17 @@ public class MinterController {
      * @return The view of the error message
      */
     @ExceptionHandler(Exception.class)
-    public ModelAndView handleGeneralError(HttpServletRequest req, Exception exception) {        
+    public ModelAndView handleGeneralError(HttpServletRequest req, Exception exception) {
         ModelAndView mav = new ModelAndView();
         mav.addObject("status", 500);
         mav.addObject("exception", exception.getClass().getSimpleName());
         mav.addObject("message", exception.getMessage());
         Logger.error("General Error: " + exception.getMessage());
-        
+
         mav.setViewName("error");
         return mav;
-        }
-        
+    }
+
     /**
      * Overrides the default value of cached value with values given in the
      * parameter. If the parameters do not contain any of the valid parameters,
