@@ -7,11 +7,12 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 
 /**
+ * Allows the use of CRUD operations on UsedSetting objects
  *
  * @author lruffin
  */
-public interface UsedSettingRepository extends CrudRepository<UsedSetting, Integer>{
-    
+public interface UsedSettingRepository extends CrudRepository<UsedSetting, Integer> {
+
     @Query("select s from UsedSetting s where s.Prefix = :prefix and "
             + "s.TokenType = :tokenType and "
             + "s.CharMap = :charMap and "
