@@ -41,6 +41,7 @@ public class MinterController {
      * Logger; logfile to be stored in resource folder    
      */
     private static final Logger Logger = LoggerFactory.getLogger(MinterController.class);
+    
     /**
      * Creates a fair reentrant RequestLock to serialize each request
      * sequentially instead of concurrently.

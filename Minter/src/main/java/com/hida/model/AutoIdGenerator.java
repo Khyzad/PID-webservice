@@ -100,7 +100,7 @@ public class AutoIdGenerator extends IdGenerator {
                 tempIdBaseMap[j] = Rng.nextInt(tokenMap.length());
             }
             Pid currentId = new AutoId(Prefix, tempIdBaseMap, tokenMap);
-            Logger.info("Generated Auto Random ID: " + currentId);
+            Logger.trace("Generated Auto Random ID: " + currentId);
 
             while (tempIdList.contains(currentId)) {
                 currentId.incrementId();
@@ -118,8 +118,6 @@ public class AutoIdGenerator extends IdGenerator {
      */
     @Override
     public Set<Pid> sequentialMint(long amount) {
-        //Logger.info("in genIdAutoSequential: " + amount);        
-
         // checks to see if its possible to produce or add requested amount of
         long total = calculatePermutations();
         if (total < amount) {
@@ -135,7 +133,7 @@ public class AutoIdGenerator extends IdGenerator {
         for (int i = 0; i < amount; i++) {
             AutoId nextId = new AutoId(currentId);
             idSet.add(currentId);
-            Logger.info("Generated Auto Sequential ID: " + currentId);
+            Logger.trace("Generated Auto Sequential ID: " + currentId);
             nextId.incrementId();
             currentId = new AutoId(nextId);
         }

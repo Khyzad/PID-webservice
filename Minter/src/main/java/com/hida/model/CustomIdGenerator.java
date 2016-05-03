@@ -83,7 +83,7 @@ public class CustomIdGenerator extends IdGenerator {
                 tempIdBaseMap[j] = Rng.nextInt(tokenMapArray[j].length());
             }
             Pid currentId = new CustomId(Prefix, tempIdBaseMap, tokenMapArray);
-            Logger.info("Generated Custom Random ID: " + currentId);
+            Logger.trace("Generated Custom Random ID: " + currentId);
             while (!tempIdList.add(currentId)) {
                 currentId.incrementId();
             }
@@ -99,8 +99,6 @@ public class CustomIdGenerator extends IdGenerator {
      */
     @Override
     public Set<Pid> sequentialMint(long amount) {
-        //Logger.info("in genIdCustomSequential: " + amount);
-
         // checks to see if its possible to produce or add requested amount of
         long total = calculatePermutations();
         if (total < amount) {
@@ -121,7 +119,7 @@ public class CustomIdGenerator extends IdGenerator {
         for (int i = 0; i < amount; i++) {
             CustomId nextId = new CustomId(currentId);
             idSet.add(currentId);
-            Logger.info("Generated Custom Sequential ID: " + currentId);
+            Logger.trace("Generated Custom Sequential ID: " + currentId);
             nextId.incrementId();
             currentId = new CustomId(nextId);
         }
