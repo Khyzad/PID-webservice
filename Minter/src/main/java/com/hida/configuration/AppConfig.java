@@ -18,7 +18,7 @@ public class AppConfig {
     @Bean
     ServletRegistrationBean h2servletRegistration(){
         ServletRegistrationBean registrationBean = new ServletRegistrationBean( new WebServlet());
-        registrationBean.addUrlMappings("/console/*");
+        registrationBean.addUrlMappings("/Minter/console/*");
         return registrationBean;
     }
 }
