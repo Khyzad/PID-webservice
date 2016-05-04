@@ -30,7 +30,7 @@ import org.testng.annotations.Test;
  *
  * @author lruffin
  */
-public class MinterServiceImplTest {
+public class MinterServiceTest {
 
     @Mock
     private DefaultSettingRepository DefaultSettingRepo;
