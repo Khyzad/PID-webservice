@@ -1,5 +1,7 @@
 package com.hida.service;
 
+import com.hida.model.AutoId;
+import com.hida.model.AutoIdGenerator;
 import com.hida.repositories.DefaultSettingRepository;
 import com.hida.repositories.PidRepository;
 import com.hida.repositories.UsedSettingRepository;
@@ -9,6 +11,7 @@ import com.hida.model.Pid;
 import com.hida.model.TokenType;
 import com.hida.model.UsedSetting;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
 import org.mockito.Mock;
@@ -42,9 +45,9 @@ public class MinterServiceTest {
     private UsedSettingRepository UsedSettingRepo;
 
     @InjectMocks
-    private MinterService MinterServiceImpl;
+    private MinterService MinterService;
 
-    private ArrayList<DefaultSetting> DefaultSettingList = new ArrayList<>();
+    private final ArrayList<DefaultSetting> DefaultSettingList = new ArrayList<>();
 
     private Set<Pid> PidSet = new TreeSet<>();
 
@@ -76,8 +79,8 @@ public class MinterServiceTest {
     }
 
     /**
-     * Tests the MinterService by assuming that the settings aren't
- currently stored in the database
+     * Tests the MinterService by assuming that the settings aren't currently
+     * stored in the database
      *
      * @param isRandom Determines if the PIDs are created randomly or
      * sequentially
@@ -105,14 +108,14 @@ public class MinterServiceTest {
         when(UsedSettingRepo.save(any(UsedSetting.class))).thenReturn(null);
 
         // check to see if all the Pids were created
-        Set<Pid> testSet = MinterServiceImpl.mint(10, defaultSetting);
+        Set<Pid> testSet = MinterService.mint(10, defaultSetting);
         boolean containsAll = testSet.containsAll(PidSet);
         Assert.assertEquals(containsAll, true);
     }
 
     /**
-     * Tests the MinterService under the scenario where UsedSetting entity
- with matching parameters already exist.
+     * Tests the MinterService under the scenario where UsedSetting entity with
+     * matching parameters already exist.
      *
      * @param isRandom Determines if the PIDs are created randomly or
      * sequentially
@@ -142,15 +145,15 @@ public class MinterServiceTest {
         when(UsedSettingRepo.save(any(UsedSetting.class))).thenReturn(null);
 
         // check to see if all the Pids were created
-        Set<Pid> testSet = MinterServiceImpl.mint(5, defaultSetting);
+        Set<Pid> testSet = MinterService.mint(5, defaultSetting);
         boolean containsAll = PidSet.containsAll(testSet);
         Assert.assertEquals(containsAll, true);
     }
 
     /**
-     * Tests the MinterService to ensure that a
- NotEnoughPermutationsException is thrown whenever the amount retrieved
- from FindUsedSetting is less than the requested amount.
+     * Tests the MinterService to ensure that a NotEnoughPermutationsException
+     * is thrown whenever the amount retrieved from FindUsedSetting is less than
+     * the requested amount.
      *
      * @param isRandom Determines if the PIDs are created randomly or
      * sequentially
@@ -181,13 +184,13 @@ public class MinterServiceTest {
         when(UsedSettingRepo.findOne(anyInt())).thenReturn(usedSetting);
 
         // try to mint an amount greater than what is available
-        Set<Pid> testSet = MinterServiceImpl.mint(6, defaultSetting);
+        Set<Pid> testSet = MinterService.mint(6, defaultSetting);
     }
 
     /**
-     * Tests the MinterService to ensure that a
- NotEnoughPermutationsException is thrown whenever the requested amount of
- Pids to mint exceeds the possible number of permutations.
+     * Tests the MinterService to ensure that a NotEnoughPermutationsException
+     * is thrown whenever the requested amount of Pids to mint exceeds the
+     * possible number of permutations.
      *
      * @param isRandom Determines if the PIDs are created randomly or
      * sequentially
@@ -215,15 +218,14 @@ public class MinterServiceTest {
         when(PidRepo.save(any(Pid.class))).thenReturn(null);
 
         // try to mint an amount greater than what is possible
-        Set<Pid> testSet = MinterServiceImpl.mint(11, defaultSetting);
+        Set<Pid> testSet = MinterService.mint(11, defaultSetting);
     }
 
     /**
-     * Tests the MinterService to ensure that a
- NotEnoughPermutationsException is thrown whenever it is no longer
- possible to 'roll' Pids. This is important because there may be different
-     * settings that may have created Pids that could match the fields of the
-     * currently used setting.
+     * Tests the MinterService to ensure that a NotEnoughPermutationsException
+     * is thrown whenever it is no longer possible to 'roll' Pids. This is
+     * important because there may be different settings that may have created
+     * Pids that could match the fields of the currently used setting.
      *
      * @param isRandom Determines if the PIDs are created randomly or
      * sequentially
@@ -238,8 +240,10 @@ public class MinterServiceTest {
         defaultSetting.setRandom(isRandom);
 
         // pretend any Pid with the name "0" is the only Pid that exists
+        Iterator<Pid> iter = PidSet.iterator();
+        Pid id = iter.next();
         when(PidRepo.findOne(any(String.class))).thenReturn(null);
-        when(PidRepo.findOne("0")).thenReturn(new TestPid(0));
+        when(PidRepo.findOne("0")).thenReturn(id);
         when(PidRepo.save(any(Pid.class))).thenReturn(null);
 
         // assume that UsedSetting entity with the relevant parameters does not exist
@@ -251,32 +255,32 @@ public class MinterServiceTest {
         when(UsedSettingRepo.save(any(UsedSetting.class))).thenReturn(null);
 
         // try to mint an amount greater than what is possible
-        Set<Pid> testSet = MinterServiceImpl.mint(10, defaultSetting);
+        Set<Pid> testSet = MinterService.mint(10, defaultSetting);
     }
 
     /**
      * Test in MinterService that ensures that the CurrentSetting is sought
- after.
+     * after.
      */
     @Test
     public void testGetCurrentSettingWithExistingDefaultSetting() {
         DefaultSetting defaultSetting = DefaultSettingList.get(0);
         when(DefaultSettingRepo.findCurrentDefaultSetting()).thenReturn(defaultSetting);
 
-        MinterServiceImpl.getCurrentSetting();
+        MinterService.getCurrentSetting();
         verify(DefaultSettingRepo, atLeastOnce()).findCurrentDefaultSetting();
     }
 
     /**
      * Test in MinterService that ensures that the CurrentSetting is sought
- after and if it does not exist, a new DefaultSetting is created and
- saved.
+     * after and if it does not exist, a new DefaultSetting is created and
+     * saved.
      */
     @Test
     public void testGetCurrentSettingWithoutExistingDefaultSetting() {
         DefaultSetting defaultSetting = DefaultSettingList.get(0);
         when(DefaultSettingRepo.findCurrentDefaultSetting()).thenReturn(null);
-        DefaultSetting actualSetting = MinterServiceImpl.getCurrentSetting();
+        DefaultSetting actualSetting = MinterService.getCurrentSetting();
 
         Assert.assertEquals(actualSetting.getCharMap(), defaultSetting.getCharMap());
         Assert.assertEquals(actualSetting.getPrefix(), defaultSetting.getPrefix());
@@ -289,15 +293,15 @@ public class MinterServiceTest {
     }
 
     /**
-     * Test in MinterService that checks if CurrentSetting in
- MinterService is being properly updated.
+     * Test in MinterService that checks if CurrentSetting in MinterService is
+     * being properly updated.
      */
     @Test
     public void testUpdateCurrentSetting() {
         DefaultSetting defaultSetting = DefaultSettingList.get(0);
         when(DefaultSettingRepo.findCurrentDefaultSetting()).thenReturn(defaultSetting);
 
-        MinterServiceImpl.updateCurrentSetting(defaultSetting);
+        MinterService.updateCurrentSetting(defaultSetting);
         verify(DefaultSettingRepo, atLeastOnce()).findCurrentDefaultSetting();
     }
 
@@ -332,9 +336,8 @@ public class MinterServiceTest {
      * Create a sample set of Pid
      */
     private void initializePidSet() {
-        for (int i = 0; i < 10; i++) {
-            PidSet.add(new TestPid(i));
-        }
+        AutoIdGenerator gen = new AutoIdGenerator("", true, TokenType.DIGIT, 1);
+        PidSet = gen.sequentialMint(10);        
     }
 
     /**
@@ -351,19 +354,5 @@ public class MinterServiceTest {
                 5); // amount
     }
 
-    /**
-     * A test class used to create Pid
-     */
-    private class TestPid extends Pid {
-
-        public TestPid(int n) {
-            BaseMap = new int[1];
-            BaseMap[0] = n;
-        }
-
-        @Override
-        public boolean incrementId() {
-            throw new UnsupportedOperationException("Not supported yet.");
-        }
-    }
+    
 }
