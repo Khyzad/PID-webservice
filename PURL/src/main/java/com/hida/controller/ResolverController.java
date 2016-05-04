@@ -81,7 +81,7 @@ public class ResolverController {
      * @throws IOException Thrown by Jackson library
      */
     @RequestMapping("/edit")
-    public String edit(@RequestParam(value = "purlid", required = true) String purl,
+    public String edit(@RequestParam(value = "purl", required = true) String purl,
             @RequestParam(value = "url", required = true) String url) throws IOException {
         if (Logger.isInfoEnabled()) {
             Logger.info("Edit was Called");
@@ -113,7 +113,7 @@ public class ResolverController {
      * @throws IOException Thrown by Jackson library
      */
     @RequestMapping("/insert")
-    public String insert(@RequestParam(value = "purlid", required = true) String purl,
+    public String insert(@RequestParam(value = "purl", required = true) String purl,
             @RequestParam(value = "url", required = true) String url,
             @RequestParam(value = "erc", required = true) String erc,
             @RequestParam(value = "who", required = true) String who,
