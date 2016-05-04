@@ -19,13 +19,13 @@ import org.testng.annotations.BeforeClass;
  *
  * @author lruffin
  */
-public class ResolverServiceImplTest {
+public class ResolverServiceTest {
 
     @Mock
     private CitationRepository CitationRepo;
 
     @InjectMocks
-    private ResolverServiceImpl Service;
+    private ResolverService Service;
 
     /**
      * Sets up Mockito

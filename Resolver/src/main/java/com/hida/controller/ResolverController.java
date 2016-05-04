@@ -11,7 +11,6 @@ import javax.json.JsonObject;
 import javax.servlet.http.HttpServletRequest;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -32,7 +31,6 @@ public class ResolverController {
     private static final org.slf4j.Logger Logger
             = LoggerFactory.getLogger(ResolverController.class);
 
-    @Autowired
     private ResolverService ResolverService;
 
     /**
