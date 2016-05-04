@@ -1,8 +1,7 @@
-package com.hida.dao;
+package com.hida.repositories;
 
 import com.hida.configuration.RepositoryConfiguration;
 import com.hida.model.Citation;
-import com.hida.repositories.CitationRepository;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
@@ -20,7 +19,7 @@ import org.testng.Assert;
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = {RepositoryConfiguration.class})
 @TestPropertySource(locations = "classpath:testConfig.properties")
-public class CitationDaoImplTest {
+public class CitationRepositoryTest {
     
     @Autowired
     private CitationRepository CitationRepo;   
