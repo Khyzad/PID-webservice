@@ -21,7 +21,7 @@ public class ResolverServiceImpl implements ResolverService {
     @Autowired
     private CitationRepository CitationRepo;
 
-    final static Logger logger = Logger.getLogger(ResolverServiceImpl.class);
+    private final static Logger logger = Logger.getLogger(ResolverServiceImpl.class);
 
     /**
      * Retrieves url of provided purlid
