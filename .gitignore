@@ -18,3 +18,5 @@ doc/
 *.script
 Minter/*.properties
 Minter/*.log
+Resolver/*.properties
+Resolver/*.log
