@@ -1,7 +1,7 @@
 package com.hida.service;
 
-import com.hida.repositories.CitationDao;
 import com.hida.model.Citation;
+import com.hida.repositories.CitationRepository;
 import org.mockito.InjectMocks;
 import static org.mockito.Matchers.any;
 import org.mockito.Mock;
@@ -21,7 +21,7 @@ import org.testng.annotations.BeforeClass;
 public class ResolverServiceImplTest {
 
     @Mock
-    private CitationDao Dao;
+    private CitationRepository CitationRepo;
 
     @InjectMocks
     private ResolverServiceImpl Service;
@@ -43,11 +43,11 @@ public class ResolverServiceImplTest {
     public void testRetrieveUrl() {
         Citation entity = new Citation();
         entity.setUrl("");
-        when(Dao.findByPurl(any(String.class))).thenReturn(entity);
+        when(CitationRepo.findOne(any(String.class))).thenReturn(entity);
 
         Service.retrieveUrl("");
 
-        verify(Dao, atLeastOnce()).findByPurl(any(String.class));
+        verify(CitationRepo, atLeastOnce()).findOne(any(String.class));
     }
 
     /**
@@ -56,10 +56,10 @@ public class ResolverServiceImplTest {
     @Test
     public void testEditUrl() {
         Citation entity = new Citation();
-        when(Dao.findByPurl(any(String.class))).thenReturn(entity);
+        when(CitationRepo.findOne(any(String.class))).thenReturn(entity);
 
         Service.editUrl("", "");
-        verify(Dao, atLeastOnce()).findByPurl(any(String.class));
+        verify(CitationRepo, atLeastOnce()).findOne(any(String.class));
     }
 
     /**
@@ -68,11 +68,11 @@ public class ResolverServiceImplTest {
     @Test
     public void testDeleteCitation() {
         Citation entity = new Citation();
-        when(Dao.findByPurl(any(String.class))).thenReturn(entity);
-        doNothing().when(Dao).deletePurl(entity);
+        when(CitationRepo.findOne(any(String.class))).thenReturn(entity);
+        doNothing().when(CitationRepo).delete(entity);
 
         Service.deleteCitation("");
-        verify(Dao, atLeastOnce()).deletePurl(any(Citation.class));
+        verify(CitationRepo, atLeastOnce()).delete(any(Citation.class));
     }
 
     /**
@@ -81,9 +81,9 @@ public class ResolverServiceImplTest {
     @Test
     public void testRetrieveModel() {
         Citation entity = new Citation();
-        when(Dao.findByPurl(any(String.class))).thenReturn(entity);
+        when(CitationRepo.findOne(any(String.class))).thenReturn(entity);
 
-        verify(Dao, atLeastOnce()).findByPurl(any(String.class));
+        verify(CitationRepo, atLeastOnce()).findOne(any(String.class));
     }
 
     /**
@@ -92,10 +92,10 @@ public class ResolverServiceImplTest {
     @Test
     public void testInsertCitation() {
         Citation purl = new Citation();
-        doNothing().when(Dao).savePurl(purl);
+        doNothing().when(CitationRepo).save(purl);
 
         Service.insertCitation(purl);
-        verify(Dao, atLeastOnce()).savePurl(any(Citation.class));
+        verify(CitationRepo, atLeastOnce()).save(any(Citation.class));
     }
 
 }
