@@ -41,11 +41,8 @@ public class ResolverController {
      * @return view to the home page
      */
     @RequestMapping(value = {""}, method = {RequestMethod.GET})
-    public ModelAndView displayIndex() {
-        ModelAndView model = new ModelAndView();
-        model.setViewName("home");
-
-        return model;
+    public String displayIndex() {        
+        return "";
     }
 
     /**
@@ -58,7 +55,7 @@ public class ResolverController {
      * @throws IOException Thrown by Jackson library
      */
     @RequestMapping("/retrieve")
-    public ModelAndView retrieve(@RequestParam(value = "purl", required = true) String purl)
+    public String retrieve(@RequestParam(value = "purl", required = true) String purl)
             throws IOException {
         if (Logger.isInfoEnabled()) {
             Logger.info("Retrieve was Called");
@@ -68,10 +65,9 @@ public class ResolverController {
 
         // show retrieve view, attach citation jsonString.  converted to json at view.
         String jsonString = this.convertCitationToJson(citation);
-        ModelAndView mv = new ModelAndView("result", "message", jsonString);
 
         Logger.info("Retrieve returned: " + null);
-        return mv;
+        return jsonString;
     }
 
     /**
@@ -85,7 +81,7 @@ public class ResolverController {
      * @throws IOException Thrown by Jackson library
      */
     @RequestMapping("/edit")
-    public ModelAndView edit(@RequestParam(value = "purlid", required = true) String purl,
+    public String edit(@RequestParam(value = "purlid", required = true) String purl,
             @RequestParam(value = "url", required = true) String url) throws IOException {
         if (Logger.isInfoEnabled()) {
             Logger.info("Edit was Called");
@@ -96,10 +92,9 @@ public class ResolverController {
 
         // show edit view, attach purl jsonString.  converted to json at view.
         String jsonString = this.convertCitationToJson(citation);
-        ModelAndView mv = new ModelAndView("result", "message", jsonString);
 
         Logger.info("Edit returned: " + jsonString);
-        return mv;
+        return jsonString;
 
     }
 
@@ -118,7 +113,7 @@ public class ResolverController {
      * @throws IOException Thrown by Jackson library
      */
     @RequestMapping("/insert")
-    public ModelAndView insert(@RequestParam(value = "purlid", required = true) String purl,
+    public String insert(@RequestParam(value = "purlid", required = true) String purl,
             @RequestParam(value = "url", required = true) String url,
             @RequestParam(value = "erc", required = true) String erc,
             @RequestParam(value = "who", required = true) String who,
@@ -136,10 +131,9 @@ public class ResolverController {
 
         //show edit view, attach purl jsonString.  converted to json at view.
         String jsonString = this.convertCitationToJson(citation);
-        ModelAndView mv = new ModelAndView("result", "message", jsonString);
 
         Logger.info("insert returned: " + null);
-        return mv;
+        return jsonString;
 
     }
 

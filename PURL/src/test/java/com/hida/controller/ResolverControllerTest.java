@@ -44,18 +44,13 @@ public class ResolverControllerTest {
     @Test
     public void testRetrieve() throws Exception {
         Citation entity = getSampleCitation();
-        when(Service.retrieveCitation(any(String.class))).thenReturn(entity);
-
-        // test to see that the correct view is returned
-        ModelAndView mav = Controller.retrieve("");
-        Assert.assertEquals("result", mav.getViewName());
+        when(Service.retrieveCitation(any(String.class))).thenReturn(entity);       
 
         // test to see that Service at least makes a call to get a Citation object
         verify(Service, atLeastOnce()).retrieveCitation(any(String.class));
 
         // test to see that Json is formated properly
-        Map<String, Object> map = mav.getModel();
-        String jsonObject = (String) map.get("message");
+        String jsonObject = Controller.retrieve(entity.getPurl());
         testJsonObject(jsonObject, entity);
     }
 
@@ -71,15 +66,10 @@ public class ResolverControllerTest {
 
         // pretend the entity was edited and return new entity
         doNothing().when(Service).editUrl(any(String.class), any(String.class));
-        when(Service.retrieveCitation(any(String.class))).thenReturn(entity);
-
-        // test to see that the correct view is returned
-        ModelAndView mav = Controller.edit("", "");
-        Assert.assertEquals("result", mav.getViewName());
+        when(Service.retrieveCitation(any(String.class))).thenReturn(entity);       
 
         // test to see that Json is formated properly
-        Map<String, Object> map = mav.getModel();
-        String jsonObject = (String) map.get("message");
+        String jsonObject = Controller.edit(entity.getPurl(), entity.getUrl());
         testJsonObject(jsonObject, entity);
     }
 
@@ -94,22 +84,15 @@ public class ResolverControllerTest {
         Citation entity = getSampleCitation();
 
         // pretend the entity was inserted 
-        doNothing().when(Service).insertCitation(any(Citation.class));
+        doNothing().when(Service).insertCitation(any(Citation.class));       
 
-        // call insert
-        ModelAndView mav = Controller.insert(entity.getPurl(),
+        // test to see that Json is formated properly
+        String jsonObject = Controller.insert(entity.getPurl(),
                 entity.getUrl(),
                 entity.getErc(),
                 entity.getWho(),
                 entity.getWhat(),
                 entity.getDate());
-
-        // test to see that the correct view is returned
-        Assert.assertEquals("result", mav.getViewName());
-
-        // test to see that Json is formated properly
-        Map<String, Object> map = mav.getModel();
-        String jsonObject = (String) map.get("message");
         testJsonObject(jsonObject, entity);
     }
 
