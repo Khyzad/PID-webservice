@@ -42,11 +42,11 @@ public class MinterServiceTest {
     private UsedSettingRepository UsedSettingRepo;
 
     @InjectMocks
-    MinterService MinterServiceImpl;
+    private MinterService MinterServiceImpl;
 
-    ArrayList<DefaultSetting> DefaultSettingList = new ArrayList<>();
+    private ArrayList<DefaultSetting> DefaultSettingList = new ArrayList<>();
 
-    Set<Pid> PidSet = new TreeSet<>();
+    private Set<Pid> PidSet = new TreeSet<>();
 
     /**
      * Sets up Mockito

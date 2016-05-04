@@ -18,7 +18,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
-import org.springframework.ui.ModelMap;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import org.json.JSONArray;
@@ -42,13 +41,13 @@ import org.springframework.web.servlet.ModelAndView;
 public class MinterControllerTest {
 
     @Mock
-    MinterService MinterServiceDao;
+    private MinterService MinterServiceDao;
 
     @InjectMocks
-    MinterController Controller;
+    private MinterController Controller;
 
     @Spy
-    ModelAndView Mav;
+    private ModelAndView Mav;
     
     private final PidTest PidTest = new PidTest();
     private final String PREPEND = "http://digitalarchives.hawaii.gov/70111/";
