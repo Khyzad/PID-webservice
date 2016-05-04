@@ -26,7 +26,7 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 /**
- * This class tests the functionality of MinterServiceImpl using Mockito.
+ * This class tests the functionality of MinterService using Mockito.
  *
  * @author lruffin
  */
@@ -42,7 +42,7 @@ public class MinterServiceImplTest {
     private UsedSettingRepository UsedSettingRepo;
 
     @InjectMocks
-    MinterServiceImpl MinterServiceImpl;
+    MinterService MinterServiceImpl;
 
     ArrayList<DefaultSetting> DefaultSettingList = new ArrayList<>();
 
@@ -76,8 +76,8 @@ public class MinterServiceImplTest {
     }
 
     /**
-     * Tests the MinterServiceImpl by assuming that the settings aren't
-     * currently stored in the database
+     * Tests the MinterService by assuming that the settings aren't
+ currently stored in the database
      *
      * @param isRandom Determines if the PIDs are created randomly or
      * sequentially
@@ -111,8 +111,8 @@ public class MinterServiceImplTest {
     }
 
     /**
-     * Tests the MinterServiceImpl under the scenario where UsedSetting entity
-     * with matching parameters already exist.
+     * Tests the MinterService under the scenario where UsedSetting entity
+ with matching parameters already exist.
      *
      * @param isRandom Determines if the PIDs are created randomly or
      * sequentially
@@ -148,9 +148,9 @@ public class MinterServiceImplTest {
     }
 
     /**
-     * Tests the MinterServiceImpl to ensure that a
-     * NotEnoughPermutationsException is thrown whenever the amount retrieved
-     * from FindUsedSetting is less than the requested amount.
+     * Tests the MinterService to ensure that a
+ NotEnoughPermutationsException is thrown whenever the amount retrieved
+ from FindUsedSetting is less than the requested amount.
      *
      * @param isRandom Determines if the PIDs are created randomly or
      * sequentially
@@ -185,9 +185,9 @@ public class MinterServiceImplTest {
     }
 
     /**
-     * Tests the MinterServiceImpl to ensure that a
-     * NotEnoughPermutationsException is thrown whenever the requested amount of
-     * Pids to mint exceeds the possible number of permutations.
+     * Tests the MinterService to ensure that a
+ NotEnoughPermutationsException is thrown whenever the requested amount of
+ Pids to mint exceeds the possible number of permutations.
      *
      * @param isRandom Determines if the PIDs are created randomly or
      * sequentially
@@ -219,9 +219,9 @@ public class MinterServiceImplTest {
     }
 
     /**
-     * Tests the MinterServiceImpl to ensure that a
-     * NotEnoughPermutationsException is thrown whenever it is no longer
-     * possible to 'roll' Pids. This is important because there may be different
+     * Tests the MinterService to ensure that a
+ NotEnoughPermutationsException is thrown whenever it is no longer
+ possible to 'roll' Pids. This is important because there may be different
      * settings that may have created Pids that could match the fields of the
      * currently used setting.
      *
@@ -255,8 +255,8 @@ public class MinterServiceImplTest {
     }
 
     /**
-     * Test in MinterServiceImpl that ensures that the CurrentSetting is sought
-     * after.
+     * Test in MinterService that ensures that the CurrentSetting is sought
+ after.
      */
     @Test
     public void testGetCurrentSettingWithExistingDefaultSetting() {
@@ -268,9 +268,9 @@ public class MinterServiceImplTest {
     }
 
     /**
-     * Test in MinterServiceImpl that ensures that the CurrentSetting is sought
-     * after and if it does not exist, a new DefaultSetting is created and
-     * saved.
+     * Test in MinterService that ensures that the CurrentSetting is sought
+ after and if it does not exist, a new DefaultSetting is created and
+ saved.
      */
     @Test
     public void testGetCurrentSettingWithoutExistingDefaultSetting() {
@@ -289,8 +289,8 @@ public class MinterServiceImplTest {
     }
 
     /**
-     * Test in MinterServiceImpl that checks if CurrentSetting in
-     * MinterServiceImpl is being properly updated.
+     * Test in MinterService that checks if CurrentSetting in
+ MinterService is being properly updated.
      */
     @Test
     public void testUpdateCurrentSetting() {

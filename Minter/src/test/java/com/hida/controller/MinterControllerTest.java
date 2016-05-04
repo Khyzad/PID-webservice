@@ -8,7 +8,7 @@ import com.hida.model.IdGenerator;
 import com.hida.model.Pid;
 import com.hida.model.PidTest;
 import com.hida.model.TokenType;
-import com.hida.service.MinterServiceImpl;
+import com.hida.service.MinterService;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -42,7 +42,7 @@ import org.springframework.web.servlet.ModelAndView;
 public class MinterControllerTest {
 
     @Mock
-    MinterServiceImpl MinterServiceDao;
+    MinterService MinterServiceDao;
 
     @InjectMocks
     MinterController Controller;
