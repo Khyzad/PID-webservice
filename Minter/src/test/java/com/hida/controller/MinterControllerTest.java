@@ -61,7 +61,7 @@ public class MinterControllerTest {
     }
 
     /**
-     * Returns a data set. Each array contains attributes found in setting.jsp
+     * Returns a data set. Each array contains attributes found in setting.html
      *
      * @return A data set
      */
@@ -122,7 +122,7 @@ public class MinterControllerTest {
     }
 
     /**
-     * Tests data entry in the administration panel found at setting.jsp.
+     * Tests data entry in the administration panel found at setting.html
      *
      * The following parameters are parameters that are contained in the request
      * object
@@ -205,12 +205,10 @@ public class MinterControllerTest {
         when(MinterServiceDao.getCurrentSetting()).thenReturn(originalSetting);
         when(MinterServiceDao.mint(anyInt(), any(DefaultSetting.class))).
                 thenReturn(getSampleSet(tempSetting));
-
-        ModelAndView mav = new ModelAndView();
-        
-        // check to see if the correct jsp page is returned
-        String jspName = Controller.printPids(AMOUNT, mav, map).getViewName();
-        Assert.assertEquals("mint", jspName);
+       
+        // check to see if the correct html page is returned
+        String viewName = Controller.printPids(AMOUNT, Mav, map).getViewName();
+        Assert.assertEquals("mint", viewName);
 
         // create Json objects to extract Json array
         String message = (String) Mav.getModel().get("message");
@@ -255,9 +253,10 @@ public class MinterControllerTest {
         when(MinterServiceDao.mint(anyInt(), any(DefaultSetting.class))).
                 thenReturn(getSampleSet(setting));
 
-        // check to see if the correct jsp page is returned
-        String jspName = Controller.printPids(AMOUNT, Mav, new HashMap<String, String>()).getViewName();
-        Assert.assertEquals("mint", jspName);
+        // check to see if the correct html page is returned
+        String viewName = 
+                Controller.printPids(AMOUNT, Mav, new HashMap<String, String>()).getViewName();
+        Assert.assertEquals("mint", viewName);
 
         // create Json objects to extract Json array
         String message = (String) Mav.getModel().get("message");;
