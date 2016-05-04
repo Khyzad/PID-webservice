@@ -1,6 +1,5 @@
 package com.hida.controller;
 
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
@@ -15,15 +14,16 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
- * A controller class that paths the user to all jsp files in WEB_INF/jsp.
+ * A controller class that paths the user to template folder in resources.
  *
  * @author leland lopez
  * @author lruffin
  */
-@Controller
-@RequestMapping("/")
+@RestController
+@RequestMapping("/Resolver")
 public class ResolverController {
 
     /* 
@@ -49,9 +49,9 @@ public class ResolverController {
     }
 
     /**
-     * matches url: /PURL/retrieve retrieves corresponding citation row of provided
-     * citation returns model - purl and view : retrieve if successful returns
-     * model - null if not
+     * matches url: /PURL/retrieve retrieves corresponding citation row of
+     * provided citation returns model - purl and view : retrieve if successful
+     * returns model - null if not
      *
      * @param purl purl of desired retrieved row
      * @return ModelAndView Holds resulting Model and view information
@@ -76,7 +76,8 @@ public class ResolverController {
 
     /**
      * matches url: /PURL/edit edit Citation row url, with provided url returns
-     * model : Citation and view : edit if successful returns model : null if not
+     * model : Citation and view : edit if successful returns model : null if
+     * not
      *
      * @param purl purl of desired edited row
      * @param url The url that the desired Citation will have
