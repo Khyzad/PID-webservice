@@ -2,6 +2,7 @@ package com.hida.service;
 
 import com.hida.model.Citation;
 import com.hida.repositories.CitationRepository;
+import org.junit.Assert;
 import org.mockito.InjectMocks;
 import static org.mockito.Matchers.any;
 import org.mockito.Mock;
@@ -41,13 +42,17 @@ public class ResolverServiceImplTest {
      */
     @Test
     public void testRetrieveUrl() {
-        Citation entity = new Citation();
-        entity.setUrl("");
-        when(CitationRepo.findOne(any(String.class))).thenReturn(entity);
+        String purl = "purl";
+        String url = "url";
+        Citation entity = new Citation(purl);
+        entity.setUrl(url);
+        when(CitationRepo.findOne(purl)).thenReturn(entity);
 
-        Service.retrieveUrl("");
+        String entityUrl = Service.retrieveUrl(purl);
 
-        verify(CitationRepo, atLeastOnce()).findOne(any(String.class));
+        verify(CitationRepo, atLeastOnce()).findOne(purl);
+        Assert.assertEquals(url, entityUrl);
+        
     }
 
     /**
@@ -58,8 +63,10 @@ public class ResolverServiceImplTest {
         Citation entity = new Citation();
         when(CitationRepo.findOne(any(String.class))).thenReturn(entity);
 
-        Service.editUrl("", "");
+        String newUrl = "newUrl";
+        Service.editUrl("purl", newUrl);
         verify(CitationRepo, atLeastOnce()).findOne(any(String.class));
+        Assert.assertEquals(newUrl, entity.getUrl());
     }
 
     /**
@@ -79,11 +86,16 @@ public class ResolverServiceImplTest {
      * Tests to see if a Citation entity is retrievable
      */
     @Test
-    public void testRetrieveModel() {
-        Citation entity = new Citation();
-        when(CitationRepo.findOne(any(String.class))).thenReturn(entity);
+    public void testRetrieveCitation() {
+        Citation citation = new Citation();
+        String purl = "purl";
+        citation.setPurl(purl);
+        
+        when(CitationRepo.findOne(any(String.class))).thenReturn(citation);
 
+        Citation entity = Service.retrieveCitation(purl);
         verify(CitationRepo, atLeastOnce()).findOne(any(String.class));
+        Assert.assertEquals(citation, entity);
     }
 
     /**
@@ -93,7 +105,6 @@ public class ResolverServiceImplTest {
     public void testInsertCitation() {
         Citation purl = new Citation();
         when(CitationRepo.save(purl)).thenReturn(null);
-        
 
         Service.insertCitation(purl);
         verify(CitationRepo, atLeastOnce()).save(any(Citation.class));
