@@ -1,5 +1,6 @@
 package com.hida.dao;
 
+import com.hida.repositories.CitationDao;
 import com.hida.model.Citation;
 import org.dbunit.dataset.IDataSet;
 import org.dbunit.dataset.xml.FlatXmlDataSet;

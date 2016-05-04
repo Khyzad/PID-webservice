@@ -1,4 +1,4 @@
-package com.hida.dao;
+package com.hida.repositories;
 
 import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;

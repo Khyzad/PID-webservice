@@ -2,7 +2,7 @@ package com.hida.service;
 
 import org.apache.log4j.Logger;
 import com.hida.controller.ResolverController;
-import com.hida.dao.CitationDao;
+import com.hida.repositories.CitationDao;
 import com.hida.model.Citation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

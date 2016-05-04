@@ -1,6 +1,6 @@
 package com.hida.service;
 
-import com.hida.dao.CitationDao;
+import com.hida.repositories.CitationDao;
 import com.hida.model.Citation;
 import org.mockito.InjectMocks;
 import static org.mockito.Matchers.any;
