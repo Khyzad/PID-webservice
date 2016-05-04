@@ -169,8 +169,10 @@ public class MinterControllerTest {
         // return originalSetting whenever CurrentSetting is called
         when(MinterServiceDao.getCurrentSetting()).thenReturn(originalSetting);
         doNothing().when(MinterServiceDao).updateCurrentSetting(originalSetting);
+        
+        ModelAndView mav = Controller.handleForm(request, response);
 
-        Assert.assertEquals("redirect:", Controller.handleForm(request, response));
+        Assert.assertEquals("redirect:Minter", mav.getViewName());
     }
 
     /**
