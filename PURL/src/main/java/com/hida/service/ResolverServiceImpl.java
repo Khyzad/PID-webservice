@@ -2,20 +2,20 @@ package com.hida.service;
 
 import org.apache.log4j.Logger;
 import com.hida.controller.ResolverController;
-import com.hida.repositories.CitationDao;
 import com.hida.model.Citation;
+import com.hida.repositories.CitationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
  * ResolverServiceImpl
-
- holds functions that allow communication, and communicate with database
- methods 1.ResolverServiceImpl - sets up conn, specify, serverURL, username,
- password of database 2.Openconnection 3.closeConnection 4.retrieveUrl -
- retrieve url requested 5.insertCitation - insert purl, along with its url, who,
- what, when, erc 6.editUrl - edits url of a specified purl
+ *
+ * holds functions that allow communication, and communicate with database
+ * methods 1.ResolverServiceImpl - sets up conn, specify, serverURL, username,
+ * password of database 2.Openconnection 3.closeConnection 4.retrieveUrl -
+ * retrieve url requested 5.insertCitation - insert purl, along with its url,
+ * who, what, when, erc 6.editUrl - edits url of a specified purl
  *
  * @author lruffin
  * @author: leland lopez
@@ -23,13 +23,13 @@ import org.springframework.transaction.annotation.Transactional;
 @Service("resolverService")
 @Transactional
 public class ResolverServiceImpl implements ResolverService {
+   
 
     @Autowired
-    private CitationDao PurlDao;
-    
+    private CitationRepository CitationRepo;
+
     final static Logger logger = Logger.getLogger(ResolverController.class);
 
-    
     /**
      * retrieves url of provided purlid returns url string if successfull, null
      * if not
@@ -39,20 +39,20 @@ public class ResolverServiceImpl implements ResolverService {
      */
     @Override
     public String retrieveUrl(String purl) {
-        Citation entity = PurlDao.findByPurl(purl);
+        Citation entity = CitationRepo.findOne(purl);
         String url = entity.getUrl();
-        
+
         return url;
     }
 
     /**
      * inserts PURL into database returns true if successful, false if not
-     *     
-     * @param purl Citation to insert into database
+     *
+     * @param citation Citation to insert into database
      */
     @Override
-    public void insertCitation(Citation purl) {        
-        PurlDao.savePurl(purl);                
+    public void insertCitation(Citation citation) {
+        CitationRepo.save(citation);
     }
 
     /**
@@ -60,24 +60,24 @@ public class ResolverServiceImpl implements ResolverService {
      * successful, false if not
      *
      * @param purl purlid of desired edited row
-     * @param url url that desired row url will be changed to     
+     * @param url url that desired row url will be changed to
      */
     @Override
     public void editUrl(String purl, String url) {
-        Citation entity = PurlDao.findByPurl(purl);
-        entity.setUrl(url);        
+        Citation entity = CitationRepo.findOne(purl);
+        entity.setUrl(url);
     }
 
     /**
      * deletes db row with corresponding purlid returns true if successful,
      * false if not
      *
-     * @param purl purlid of desired deleted row   
+     * @param purl purlid of desired deleted row
      */
     @Override
     public void deleteCitation(String purl) {
-        Citation entity = PurlDao.findByPurl(purl);
-        PurlDao.deletePurl(entity);                
+        Citation entity = CitationRepo.findOne(purl);
+        CitationRepo.delete(entity);
     }
 
     /**
@@ -88,8 +88,8 @@ public class ResolverServiceImpl implements ResolverService {
      */
     @Override
     public Citation retrieveCitation(String purl) {
-        Citation entity = PurlDao.findByPurl(purl);
-        
-        return entity;        
-    }   
+        Citation entity = CitationRepo.findOne(purl);
+
+        return entity;
+    }
 }

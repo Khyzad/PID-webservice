@@ -8,6 +8,6 @@ import org.springframework.data.repository.CrudRepository;
  *
  * @author lruffin
  */
-public interface CitationRepository extends CrudRepository<Citation, Integer> {
+public interface CitationRepository extends CrudRepository<Citation, String> {
 
 }
