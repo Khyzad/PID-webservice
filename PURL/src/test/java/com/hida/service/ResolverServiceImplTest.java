@@ -92,7 +92,8 @@ public class ResolverServiceImplTest {
     @Test
     public void testInsertCitation() {
         Citation purl = new Citation();
-        doNothing().when(CitationRepo).save(purl);
+        when(CitationRepo.save(purl)).thenReturn(null);
+        
 
         Service.insertCitation(purl);
         verify(CitationRepo, atLeastOnce()).save(any(Citation.class));
