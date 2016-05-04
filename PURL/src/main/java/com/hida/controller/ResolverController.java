@@ -184,15 +184,7 @@ public class ResolverController {
         mav.addObject("status", 500);
         mav.addObject("exception", exception.getClass().getSimpleName());
         mav.addObject("message", exception.getMessage());
-        Logger.error("General Error: " + exception.getMessage());
-
-        StackTraceElement[] trace = exception.getStackTrace();
-        String error = "";
-        for (StackTraceElement element : trace) {
-            error += element.toString() + "\n";
-        }
-
-        mav.addObject("stacktrace", error);
+        Logger.error("General Error: " + exception.getMessage());       
 
         mav.setViewName("error");
         return mav;
