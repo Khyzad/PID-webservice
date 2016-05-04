@@ -23,6 +23,7 @@ import javax.json.JsonBuilderFactory;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
@@ -50,6 +51,7 @@ public class MinterController {
     /**
      * create a database to be used to create and count number of ids
      */
+    @Autowired
     private MinterService MinterService;
 
     /**

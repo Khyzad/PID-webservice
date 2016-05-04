@@ -212,7 +212,6 @@ public class MinterControllerTest {
 
         // create Json objects to extract Json array
         String message = (String) Mav.getModel().get("message");
-        Logger.debug(message);
         JSONArray testJsonArray = new JSONArray(message);
 
         // test the pid and ensure that they match the used setting
