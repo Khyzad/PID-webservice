@@ -1,10 +1,14 @@
 package com.hida.dao;
 
-import com.hida.repositories.CitationDao;
+import com.hida.configuration.RepositoryConfiguration;
 import com.hida.model.Citation;
 import org.dbunit.dataset.IDataSet;
 import org.dbunit.dataset.xml.FlatXmlDataSet;
+import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.testng.annotations.Test;
 import org.testng.Assert;
 
@@ -14,7 +18,10 @@ import org.testng.Assert;
  *
  * @author lruffin
  */
-public class CitationDaoImplTest extends EntityDaoImplTest {
+@RunWith(SpringJUnit4ClassRunner.class)
+@SpringApplicationConfiguration(classes = {RepositoryConfiguration.class})
+@TestPropertySource(locations = "classpath:testConfig.properties")
+public class CitationDaoImplTest {
     
     @Autowired
     private CitationDao Dao;
