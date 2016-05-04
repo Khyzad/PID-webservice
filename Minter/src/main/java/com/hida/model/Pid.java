@@ -98,32 +98,38 @@ public abstract class Pid implements Comparable<Pid> {
 
     /**
      * Used to define the natural ordering of how id's should be listed. When
-     * invoked, the two id's will be compared by their arrays as they represent
-     * the names.
+     * invoked, the two id's will be compared by their Names.
      *
      * @param t second Pid being compared.
-     * @return used to sort values in descending order.
+     * @return ordering is as follows: [0-9] < [a-z] < [A-Z] 
      */
     @Override
     public int compareTo(Pid t) {
-        int[] t1Array = this.getBaseMap();
-        int[] t2Array = t.getBaseMap();
-        if (this.equals(t)) {
-            return 0;
-        }
-        else {
-            for (int i = 0; i < t1Array.length; i++) {
-                // if the first Pid has a smaller value than the second Pid 
-                if (t1Array[i] < t2Array[i]) {
-                    return -1;
-                } // if the first Pid has a larger value than the second Pid
-                else if (t1Array[i] > t2Array[i]) {
-                    return 1;
-                }
+        String name1 = this.Name;
+        String name2 = t.Name;
+        if (name1.length() < name2.length()) {
+                return -1;
             }
-        }
-        // if the arrays of both Ids are equal
-        return 0;
+            else if (name1.length() > name2.length()) {
+                return 1;
+            }
+            else {
+                for (int i = 0; i < name1.length(); i++) {
+                    char c1 = name1.charAt(i);
+                    char c2 = name2.charAt(i);
+                    if (Character.isDigit(c1) && Character.isLetter(c2)
+                            || Character.isLowerCase(c1) && Character.isUpperCase(c2)
+                            || c1 < c2) {
+                        return -1;
+                    }
+                    else if ((Character.isLetter(c1) && Character.isDigit(c2))
+                            || Character.isUpperCase(c1) && Character.isLowerCase(c2)
+                            || c1 > c2) {
+                        return 1;
+                    }
+                }
+                return 0;
+            }        
     }
 
     /* getters and setters */
