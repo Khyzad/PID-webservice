@@ -1,6 +1,5 @@
 package com.hida.model;
 
-import java.util.Comparator;
 import junit.framework.Assert;
 
 /**
@@ -87,9 +86,8 @@ public class PidTest {
      * @param previous The previous name
      * @param next The next name
      */
-    public void testOrder(String previous, String next) {
-        PidComparator comparator = new PidComparator();
-        Assert.assertEquals(-1, comparator.compare(previous, next));
+    public void testOrder(Pid previous, Pid next) {        
+        Assert.assertEquals(-1, previous.compareTo(next));
     }
 
     /**
@@ -182,55 +180,5 @@ public class PidTest {
             }
         }
         return regex;
-    }
-
-    /**
-     * Comparator object used to compare the value of a Pid's name
-     */
-    private static class PidComparator implements Comparator<String> {
-
-        /**
-         * Used to compare to ids. If the first id has a smaller value than the
-         * second id, -1 is returned. If they are equal, 0 is returned.
-         * Otherwise 1 is returned. In terms of value, each character has a
-         * unique value associated with them. Numbers are valued less than
-         * lowercase letters, which are valued less than upper case letters.
-         *
-         * The least and greatest valued number is 0 and 9 respectively. The
-         * least and greatest valued lowercase letter is a and z respectively.
-         * The least and greatest valued uppercase letter is A and Z
-         * respectively.
-         *
-         * @param id1 the first id
-         * @param id2 the second id
-         * @return result of the comparison.
-         */
-        @Override
-        public int compare(String id1, String id2) {
-            if (id1.length() < id2.length()) {
-                return -1;
-            }
-            else if (id1.length() > id2.length()) {
-                return 1;
-            }
-            else {
-                for (int i = 0; i < id1.length(); i++) {
-                    char c1 = id1.charAt(i);
-                    char c2 = id2.charAt(i);
-                    if (Character.isDigit(c1) && Character.isLetter(c2)
-                            || Character.isLowerCase(c1) && Character.isUpperCase(c2)
-                            || c1 < c2) {
-                        return -1;
-                    }
-                    else if ((Character.isLetter(c1) && Character.isDigit(c2))
-                            || Character.isUpperCase(c1) && Character.isLowerCase(c2)
-                            || c1 > c2) {
-                        return 1;
-                    }
-                }
-                return 0;
-            }
-        }
-
-    }
+    }      
 }

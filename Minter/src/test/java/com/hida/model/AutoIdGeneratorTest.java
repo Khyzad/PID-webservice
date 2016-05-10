@@ -91,13 +91,13 @@ public class AutoIdGeneratorTest {
         Setting setting = new Setting(prefix, tokenType, null, rootLength, sansVowel);
         IdGenerator generator = new AutoIdGenerator(prefix, sansVowel, tokenType, rootLength);
         Set<Pid> sequentialSet = generator.sequentialMint(amount);
-        
-        String prev = null;
+                       
+        Pid prev = null;
         Iterator<Pid> iter = sequentialSet.iterator();
         while (iter.hasNext()) {
-            // fail if the id does not match the token 
-            String current = iter.next().toString();
-            PidTest.testTokenType(current, setting);
+            // fail if the length does not match
+            Pid current = iter.next();
+            PidTest.testTokenType(current.getName(), setting);
 
             if (prev != null) {
                 PidTest.testOrder(prev, current);
@@ -105,6 +105,7 @@ public class AutoIdGeneratorTest {
 
             prev = current;
         }
+        
 
         Assert.assertEquals(sequentialSet.size(), amount);
     }
@@ -153,11 +154,12 @@ public class AutoIdGeneratorTest {
         IdGenerator generator = new AutoIdGenerator(prefix, sansVowel, tokenType, rootLength);
         Set<Pid> sequentialSet = generator.sequentialMint(amount);
 
-        String prev = null;
+        Pid prev = null;
         Iterator<Pid> iter = sequentialSet.iterator();
         while (iter.hasNext()) {
-            String current = iter.next().toString();
-            PidTest.testPrefix(current, setting);
+            // fail if the length does not match
+            Pid current = iter.next();
+            PidTest.testPrefix(current.getName(), setting);
 
             if (prev != null) {
                 PidTest.testOrder(prev, current);
@@ -217,12 +219,12 @@ public class AutoIdGeneratorTest {
         AutoIdGenerator minter = new AutoIdGenerator(prefix, sansVowel, tokenType, rootLength);
         Set<Pid> sequentialSet = minter.sequentialMint(amount);
 
-        String prev = null;
+        Pid prev = null;
         Iterator<Pid> iter = sequentialSet.iterator();
         while (iter.hasNext()) {
             // fail if the length does not match
-            String current = iter.next().toString();
-            PidTest.testPrefix(current, setting);
+            Pid current = iter.next();
+            PidTest.testRootLength(current.getName(), setting);
 
             if (prev != null) {
                 PidTest.testOrder(prev, current);
@@ -256,7 +258,7 @@ public class AutoIdGeneratorTest {
         Set<Pid> randomSet = minter.randomMint(amount);
 
         for (Pid id : randomSet) {
-            PidTest.testPrefix(id.getName(), setting);
+            PidTest.testRootLength(id.getName(), setting);
         }
 
         // test to see if the amount matches the size of the generated set
