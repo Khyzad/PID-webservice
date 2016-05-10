@@ -36,12 +36,20 @@ import org.springframework.web.servlet.ModelAndView;
 @RestController
 @RequestMapping("/Minter")
 public class MinterController {
+    
+    
+    
+    
+    /**
+     * Default setting values stored in resources folder
+     */
+    private final String DEFAULT_SETTING_PATH = "src/main/resources/DefaultSetting.properties";
 
     /* 
      * Logger; logfile to be stored in resource folder    
      */
     private static final Logger Logger = LoggerFactory.getLogger(MinterController.class);
-    
+
     /**
      * Creates a fair reentrant RequestLock to serialize each request
      * sequentially instead of concurrently.
@@ -62,16 +70,15 @@ public class MinterController {
      * @param response HTTP response that redirects to the administration panel
      * after updating the new settings.
      * @return The name of the page to redirect.
-     * @throws BadParameterException Thrown whenever a bad parameter is
-     * detected.
+     * @throws Exception
      */
     @RequestMapping(value = {""}, method = {RequestMethod.POST})
     public ModelAndView handleForm(HttpServletRequest request, HttpServletResponse response)
-            throws BadParameterException {
+            throws Exception {
         try {
             // prevents other clients from accessing the database whenever the form is submitted
             RequestLock.lock();
-            DefaultSetting oldSetting = MinterService.getCurrentSetting();
+            DefaultSetting oldSetting = MinterService.getCurrentSetting(DEFAULT_SETTING_PATH);
             DefaultSetting newSetting;
 
             Logger.info("in handleForm");
@@ -162,14 +169,14 @@ public class MinterController {
                         random);
             }
 
-            MinterService.updateCurrentSetting(newSetting);
+            MinterService.updateCurrentSetting(DEFAULT_SETTING_PATH, newSetting);
         }
         finally {
             // unlocks RequestLock and gives access to longest waiting thread            
             RequestLock.unlock();
             Logger.warn("Request to update default settings finished, UNLOCKING MINTER");
         }
-        
+
         // redirect to the administration panel located at http://[domain]/
         ModelAndView mav = new ModelAndView();
         mav.setViewName("redirect:Minter");
@@ -204,7 +211,7 @@ public class MinterController {
 
             // override default settings where applicable
             DefaultSetting tempSetting = overrideDefaultSetting(parameters,
-                    MinterService.getCurrentSetting());
+                    MinterService.getCurrentSetting(DEFAULT_SETTING_PATH));
 
             // create the set of ids
             Set<Pid> idList = MinterService.mint(requestedAmount, tempSetting);
@@ -233,13 +240,14 @@ public class MinterController {
      * Maps to the admin panel on the home page.
      *
      * @return name of the index page
+     * @throws Exception
      */
     @RequestMapping(value = {""}, method = {RequestMethod.GET})
-    public ModelAndView displayIndex() {
+    public ModelAndView displayIndex() throws Exception {
         ModelAndView model = new ModelAndView();
 
         // retrieve default values stored in the database
-        DefaultSetting defaultSetting = MinterService.getCurrentSetting();
+        DefaultSetting defaultSetting = MinterService.getCurrentSetting(DEFAULT_SETTING_PATH);
 
         // add the values to the settings page so that they can be displayed 
         Logger.info("index page called");
@@ -348,7 +356,7 @@ public class MinterController {
                 : entity.getCharMap();
 
         TokenType tokenType = (parameters.containsKey("tokenType"))
-                ? getValidTokenType(parameters.get("tokenType"))
+                ? TokenType.valueOf(parameters.get("tokenType"))
                 : entity.getTokenType();
 
         boolean isAuto = (parameters.containsKey("auto"))
@@ -480,37 +488,4 @@ public class MinterController {
         }
         return prefix;
     }
-
-    /**
-     * Attempts to convert a string into an equivalent enum TokenType.
-     *
-     * @param tokenType Designates what characters are contained in the id's
-     * root.
-     * @return Returns the enum type if succesful, throws BadParameterException
-     * otherwise.
-     * @throws BadParameterException thrown whenever a malformed or invalid
-     * parameter is passed
-     */
-    protected TokenType getValidTokenType(String tokenType) throws BadParameterException {
-        tokenType = tokenType.toUpperCase();
-        switch (tokenType) {
-            case "DIGIT":
-                return TokenType.DIGIT;
-            case "LOWERCASE":
-                return TokenType.LOWERCASE;
-            case "UPPERCASE":
-                return TokenType.UPPERCASE;
-            case "MIXEDCASE":
-                return TokenType.MIXEDCASE;
-            case "LOWER_EXTENDED":
-                return TokenType.LOWER_EXTENDED;
-            case "UPPER_EXTENDED":
-                return TokenType.UPPER_EXTENDED;
-            case "MIXED_EXTENDED":
-                return TokenType.MIXED_EXTENDED;
-            default:
-                throw new BadParameterException(tokenType, "TokenType");
-        }
-    }
-
 }

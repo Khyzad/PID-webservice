@@ -9,6 +9,7 @@ import com.hida.model.Pid;
 import com.hida.model.PidTest;
 import com.hida.model.TokenType;
 import com.hida.service.MinterService;
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -167,8 +168,9 @@ public class MinterControllerTest {
         request.setParameter("charmapping", charMapping);
 
         // return originalSetting whenever CurrentSetting is called
-        when(MinterServiceDao.getCurrentSetting()).thenReturn(originalSetting);
-        doNothing().when(MinterServiceDao).updateCurrentSetting(originalSetting);
+        when(MinterServiceDao.getCurrentSetting(any(String.class))).thenReturn(originalSetting);
+        doNothing().when(MinterServiceDao).
+                updateCurrentSetting(any(String.class), any(DefaultSetting.class));
         
         ModelAndView mav = Controller.handleForm(request, response);
 
@@ -196,13 +198,13 @@ public class MinterControllerTest {
         tempSetting.setPrefix(map.get("prefix"));
         tempSetting.setRootLength(Integer.parseInt(map.get("rootLength")));
         tempSetting.setCharMap(map.get("charMap"));
-        tempSetting.setTokenType(Controller.getValidTokenType(map.get("tokenType")));
+        tempSetting.setTokenType(TokenType.valueOf(map.get("tokenType")));
         tempSetting.setAuto(Boolean.getBoolean(map.get("auto")));
         tempSetting.setRandom(Boolean.getBoolean(map.get("random")));
         tempSetting.setSansVowels(Boolean.getBoolean(map.get("sansVowels")));
 
         // return originalSetting when getCurrentSetting is called and a sample Pid set 
-        when(MinterServiceDao.getCurrentSetting()).thenReturn(originalSetting);
+        when(MinterServiceDao.getCurrentSetting(any(String.class))).thenReturn(originalSetting);
         when(MinterServiceDao.mint(anyInt(), any(DefaultSetting.class))).
                 thenReturn(getSampleSet(tempSetting));
        
@@ -248,7 +250,7 @@ public class MinterControllerTest {
         DefaultSetting setting = new DefaultSetting(prepend, prefix, tokenType, charMap,
                 rootLength, isAuto, isRandom, sansVowel);
 
-        when(MinterServiceDao.getCurrentSetting()).thenReturn(setting);
+        when(MinterServiceDao.getCurrentSetting(any(String.class))).thenReturn(setting);
         when(MinterServiceDao.mint(anyInt(), any(DefaultSetting.class))).
                 thenReturn(getSampleSet(setting));
 
@@ -287,7 +289,7 @@ public class MinterControllerTest {
 
         DefaultSetting setting = this.getSampleDefaultSetting();
 
-        when(MinterServiceDao.getCurrentSetting()).thenReturn(setting);
+        when(MinterServiceDao.getCurrentSetting(any(String.class))).thenReturn(setting);
         Controller.printPids(AMOUNT, Mav, parameters);
     }
 
@@ -297,14 +299,14 @@ public class MinterControllerTest {
      *
      * @throws Exception
      */
-    @Test(expectedExceptions = BadParameterException.class)
+    @Test(expectedExceptions = IllegalArgumentException.class)
     public void testBadParameterExceptionTokenType() throws Exception {
         Map<String, String> parameters = new HashMap<>();
-        parameters.put("tokenType", "digits");
+        parameters.put("tokenType", "digit");
 
         DefaultSetting setting = this.getSampleDefaultSetting();
 
-        when(MinterServiceDao.getCurrentSetting()).thenReturn(setting);
+        when(MinterServiceDao.getCurrentSetting(any(String.class))).thenReturn(setting);
         Controller.printPids(AMOUNT, Mav, parameters);
     }
 
@@ -321,7 +323,7 @@ public class MinterControllerTest {
 
         DefaultSetting setting = this.getSampleDefaultSetting();
 
-        when(MinterServiceDao.getCurrentSetting()).thenReturn(setting);
+        when(MinterServiceDao.getCurrentSetting(any(String.class))).thenReturn(setting);
         Controller.printPids(AMOUNT, Mav, parameters);
     }
 
@@ -337,7 +339,7 @@ public class MinterControllerTest {
 
         DefaultSetting setting = this.getSampleDefaultSetting();
 
-        when(MinterServiceDao.getCurrentSetting()).thenReturn(setting);
+        when(MinterServiceDao.getCurrentSetting(any(String.class))).thenReturn(setting);
         Controller.printPids(-1, Mav, parameters);
     }
 
@@ -354,7 +356,7 @@ public class MinterControllerTest {
 
         DefaultSetting setting = this.getSampleDefaultSetting();
 
-        when(MinterServiceDao.getCurrentSetting()).thenReturn(setting);
+        when(MinterServiceDao.getCurrentSetting(any(String.class))).thenReturn(setting);
         Controller.printPids(AMOUNT, Mav, parameters);
     }
 
@@ -439,7 +441,7 @@ public class MinterControllerTest {
 
         map.put("prepend", PREPEND);
         map.put("prefix", "xyz");
-        map.put("tokenType", "lowercase");
+        map.put("tokenType", "LOWERCASE");
         map.put("charMap", "m");
         map.put("rootLength", "2");
         map.put("auto", "false");
@@ -447,5 +449,5 @@ public class MinterControllerTest {
         map.put("sansVowel", "false");
 
         return map;
-    }
+    }        
 }

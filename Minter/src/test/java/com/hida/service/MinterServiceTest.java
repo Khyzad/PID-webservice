@@ -1,6 +1,5 @@
 package com.hida.service;
 
-import com.hida.model.AutoId;
 import com.hida.model.AutoIdGenerator;
 import com.hida.repositories.DefaultSettingRepository;
 import com.hida.repositories.PidRepository;
@@ -34,6 +33,12 @@ import org.testng.annotations.Test;
  * @author lruffin
  */
 public class MinterServiceTest {
+    
+    /**
+     * Default setting values stored in resources folder
+     */
+    private final String TEST_READ_PATH = "src/test/resources/testReadDefaultSetting.properties";
+    private final String TEST_WRITE_PATH = "src/test/resources/testWriteDefaultSetting.properties";
 
     @Mock
     private DefaultSettingRepository DefaultSettingRepo;
@@ -263,11 +268,11 @@ public class MinterServiceTest {
      * after.
      */
     @Test
-    public void testGetCurrentSettingWithExistingDefaultSetting() {
+    public void testGetCurrentSettingWithExistingDefaultSetting() throws Exception {
         DefaultSetting defaultSetting = DefaultSettingList.get(0);
         when(DefaultSettingRepo.findCurrentDefaultSetting()).thenReturn(defaultSetting);
 
-        MinterService.getCurrentSetting();
+        MinterService.getCurrentSetting(this.TEST_READ_PATH);
         verify(DefaultSettingRepo, atLeastOnce()).findCurrentDefaultSetting();
     }
 
@@ -277,10 +282,10 @@ public class MinterServiceTest {
      * saved.
      */
     @Test
-    public void testGetCurrentSettingWithoutExistingDefaultSetting() {
+    public void testGetCurrentSettingWithoutExistingDefaultSetting() throws Exception {
         DefaultSetting defaultSetting = DefaultSettingList.get(0);
         when(DefaultSettingRepo.findCurrentDefaultSetting()).thenReturn(null);
-        DefaultSetting actualSetting = MinterService.getCurrentSetting();
+        DefaultSetting actualSetting = MinterService.getCurrentSetting(this.TEST_READ_PATH);
 
         Assert.assertEquals(actualSetting.getCharMap(), defaultSetting.getCharMap());
         Assert.assertEquals(actualSetting.getPrefix(), defaultSetting.getPrefix());
@@ -297,11 +302,11 @@ public class MinterServiceTest {
      * being properly updated.
      */
     @Test
-    public void testUpdateCurrentSetting() {
+    public void testUpdateCurrentSetting() throws Exception {
         DefaultSetting defaultSetting = DefaultSettingList.get(0);
         when(DefaultSettingRepo.findCurrentDefaultSetting()).thenReturn(defaultSetting);
 
-        MinterService.updateCurrentSetting(defaultSetting);
+        MinterService.updateCurrentSetting(this.TEST_WRITE_PATH, defaultSetting);
         verify(DefaultSettingRepo, atLeastOnce()).findCurrentDefaultSetting();
     }
 

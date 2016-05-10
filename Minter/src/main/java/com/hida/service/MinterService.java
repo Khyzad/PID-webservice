@@ -11,6 +11,12 @@ import com.hida.model.Pid;
 import com.hida.model.IdGenerator;
 import com.hida.model.NotEnoughPermutationsException;
 import com.hida.model.UsedSetting;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.Properties;
 import java.util.Set;
 import java.util.TreeSet;
 import org.slf4j.Logger;
@@ -292,10 +298,12 @@ public class MinterService {
      * Updates the CurrentDefaultSetting to match the values in the given
      * DefaultSetting.
      *
+     * @param filename
      * @param newSetting A DefaultSetting object that contains newly requested
      * values
+     * @throws IOException
      */
-    public void updateCurrentSetting(DefaultSetting newSetting) {
+    public void updateCurrentSetting(String filename, DefaultSetting newSetting) throws Exception {
         Logger.info("in updateCurrentSetting");
 
         CurrentDefaultSetting = DefaultSettingRepo.findCurrentDefaultSetting();
@@ -307,28 +315,24 @@ public class MinterService {
         CurrentDefaultSetting.setAuto(newSetting.isAuto());
         CurrentDefaultSetting.setRandom(newSetting.isRandom());
         CurrentDefaultSetting.setSansVowels(newSetting.isSansVowels());
+
+        // record Default Setting values into properties file
+        writeToPropertiesFile(filename, newSetting);
     }
 
     /**
      * Retrieves the CurrentSetting field from the database. If its null, then
      * it is given initial values.
      *
+     * @param filename
      * @return The currently used setting in the database
+     * @throws IOException thrown whenever properties file does not exist
      */
-    public DefaultSetting getCurrentSetting() {
+    public DefaultSetting getCurrentSetting(String filename) throws Exception {
         CurrentDefaultSetting = DefaultSettingRepo.findCurrentDefaultSetting();
         if (CurrentDefaultSetting == null) {
-
-            // create initial default values to be stored in the database
-            CurrentDefaultSetting = new DefaultSetting("", // prepend
-                    "", // prefix
-                    TokenType.DIGIT, // token type
-                    "ddddd", // charmap
-                    5, // rootlength
-                    true, // sans vowel
-                    true, // is auto
-                    true); // is random
-
+            // read default values stored in properties file and save it
+            CurrentDefaultSetting = readPropertiesFile(filename);
             DefaultSettingRepo.save(CurrentDefaultSetting);
         }
         return CurrentDefaultSetting;
@@ -338,4 +342,60 @@ public class MinterService {
         this.CurrentDefaultSetting = CurrentSetting;
     }
 
+    /**
+     * Read DefaultSetting.properties and return its values in the form of a
+     * DefaultSetting object
+     *
+     * @return DefaultSetting object with read values
+     * @throws IOException thrown whenever properties file does not exist
+     */
+    private DefaultSetting readPropertiesFile(String filename) throws IOException {
+        Properties prop = new Properties();
+        InputStream input = new FileInputStream(filename);      
+
+        DefaultSetting setting = new DefaultSetting();
+
+        // load a properties file
+        prop.load(input);
+
+        // get the property value, store it, and return it
+        setting.setPrepend(prop.getProperty("prepend"));
+        setting.setPrefix(prop.getProperty("prefix"));
+        setting.setCharMap(prop.getProperty("charMap"));
+        setting.setTokenType(TokenType.valueOf(prop.getProperty("tokenType")));
+        setting.setRootLength(Integer.parseInt(prop.getProperty("rootLength")));
+        setting.setSansVowels(Boolean.parseBoolean(prop.getProperty("sansVowel")));
+        setting.setAuto(Boolean.parseBoolean(prop.getProperty("auto")));
+        setting.setRandom(Boolean.parseBoolean(prop.getProperty("random")));
+
+        // close and return
+        input.close();
+        return setting;
+    }
+
+    /**
+     *
+     * @param setting
+     * @throws IOException
+     */
+    private void writeToPropertiesFile(String filename, DefaultSetting setting) 
+            throws IOException {
+        Properties prop = new Properties();
+        
+        OutputStream output = new FileOutputStream(filename);
+
+        // set the properties value
+        prop.setProperty("prepend", setting.getPrepend());
+        prop.setProperty("prefix", setting.getPrefix());
+        prop.setProperty("charMap", setting.getCharMap());
+        prop.setProperty("rootLength", setting.getRootLength() + "");
+        prop.setProperty("tokenType", setting.getTokenType() + "");
+        prop.setProperty("sansVowel", setting.isSansVowels() + "");
+        prop.setProperty("auto", setting.isAuto() + "");
+        prop.setProperty("random", setting.isRandom() + "");
+
+        // save and close
+        prop.store(output, "");
+        output.close();
+    }   
 }
