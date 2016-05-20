@@ -123,22 +123,22 @@ public class MinterController {
                     tokenType = TokenType.DIGIT;
                 }
                 else if (digitToken == null && lowerToken != null && upperToken == null) {
-                    tokenType = TokenType.LOWERCASE;
+                    tokenType = TokenType.LOWER_ALPHABET;
                 }
                 else if (digitToken == null && lowerToken == null && upperToken != null) {
-                    tokenType = TokenType.UPPERCASE;
+                    tokenType = TokenType.UPPER_ALPHABET;
                 }
                 else if (digitToken == null && lowerToken != null && upperToken != null) {
-                    tokenType = TokenType.MIXEDCASE;
+                    tokenType = TokenType.MIXED_ALPHABET;
                 }
                 else if (digitToken != null && lowerToken != null && upperToken == null) {
-                    tokenType = TokenType.LOWER_EXTENDED;
+                    tokenType = TokenType.LOWER_ALPHABET_EXTENDED;
                 }
                 else if (digitToken == null && lowerToken == null && upperToken != null) {
-                    tokenType = TokenType.UPPER_EXTENDED;
+                    tokenType = TokenType.UPPER_ALPHABET_EXTENDED;
                 }
                 else if (digitToken != null && lowerToken != null && upperToken != null) {
-                    tokenType = TokenType.MIXED_EXTENDED;
+                    tokenType = TokenType.MIXED_ALPHABET_EXTENDED;
                 }
                 else {
                     throw new BadParameterException();

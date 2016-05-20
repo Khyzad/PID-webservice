@@ -21,12 +21,12 @@ public class AutoIdGenerator extends IdGenerator {
      *
      * <pre>
      * DIGIT: Digit values only.
-     * LOWERCASE: Lowercase letters only.
-     * UPPERCASE: Uppercase letters only.
-     * MIXEDCASE: Lowercase and Uppercase letters only.
-     * LOWER_EXTENDED: Digit values and Lowercase letters only.
-     * UPPER_EXTENDED: Digits and Uppercase letters only
-     * MIXED_EXTENDED: All characters specified by previous tokens
+     * LOWER_ALPHABET: Lowercase letters only.
+     * UPPER_ALPHABET: Uppercase letters only.
+     * MIXED_ALPHABET: Lowercase and Uppercase letters only.
+     * LOWER_ALPHABET_EXTENDED: Digit values and Lowercase letters only.
+     * UPPER_ALPHABET_EXTENDED: Digits and Uppercase letters only
+     * MIXED_ALPHABET_EXTENDED: All characters specified by previous tokens
      * </pre>
      *
      */
@@ -38,8 +38,8 @@ public class AutoIdGenerator extends IdGenerator {
     private int RootLength;
 
     /**
-     * Default constructor. Aside from TokenType, there are no restrictions placed
-     * on the parameters and can be used however one sees fit. 
+     * Default constructor. Aside from TokenType, there are no restrictions
+     * placed on the parameters and can be used however one sees fit.
      *
      * @param prefix A sequence of characters that appear in the beginning of
      * PIDs
@@ -55,23 +55,23 @@ public class AutoIdGenerator extends IdGenerator {
         // assign base map the appropriate values
         this.BaseMap.put(TokenType.DIGIT, DIGIT_TOKEN);
         if (sansVowel) {
-            this.BaseMap.put(TokenType.LOWERCASE, SANS_VOWEL_TOKEN);
-            this.BaseMap.put(TokenType.UPPERCASE, SANS_VOWEL_TOKEN.toUpperCase());
-            this.BaseMap.put(TokenType.MIXEDCASE,
+            this.BaseMap.put(TokenType.LOWER_ALPHABET, SANS_VOWEL_TOKEN);
+            this.BaseMap.put(TokenType.UPPER_ALPHABET, SANS_VOWEL_TOKEN.toUpperCase());
+            this.BaseMap.put(TokenType.MIXED_ALPHABET,
                     SANS_VOWEL_TOKEN + SANS_VOWEL_TOKEN.toUpperCase());
-            this.BaseMap.put(TokenType.LOWER_EXTENDED, DIGIT_TOKEN + SANS_VOWEL_TOKEN);
-            this.BaseMap.put(TokenType.UPPER_EXTENDED,
+            this.BaseMap.put(TokenType.LOWER_ALPHABET_EXTENDED, DIGIT_TOKEN + SANS_VOWEL_TOKEN);
+            this.BaseMap.put(TokenType.UPPER_ALPHABET_EXTENDED,
                     DIGIT_TOKEN + SANS_VOWEL_TOKEN.toUpperCase());
-            this.BaseMap.put(TokenType.MIXED_EXTENDED,
+            this.BaseMap.put(TokenType.MIXED_ALPHABET_EXTENDED,
                     DIGIT_TOKEN + SANS_VOWEL_TOKEN + SANS_VOWEL_TOKEN.toUpperCase());
         }
         else {
-            this.BaseMap.put(TokenType.LOWERCASE, VOWEL_TOKEN);
-            this.BaseMap.put(TokenType.UPPERCASE, VOWEL_TOKEN.toUpperCase());
-            this.BaseMap.put(TokenType.MIXEDCASE, VOWEL_TOKEN + VOWEL_TOKEN.toUpperCase());
-            this.BaseMap.put(TokenType.LOWER_EXTENDED, DIGIT_TOKEN + VOWEL_TOKEN);
-            this.BaseMap.put(TokenType.UPPER_EXTENDED, DIGIT_TOKEN + VOWEL_TOKEN.toUpperCase());
-            this.BaseMap.put(TokenType.MIXED_EXTENDED,
+            this.BaseMap.put(TokenType.LOWER_ALPHABET, VOWEL_TOKEN);
+            this.BaseMap.put(TokenType.UPPER_ALPHABET, VOWEL_TOKEN.toUpperCase());
+            this.BaseMap.put(TokenType.MIXED_ALPHABET, VOWEL_TOKEN + VOWEL_TOKEN.toUpperCase());
+            this.BaseMap.put(TokenType.LOWER_ALPHABET_EXTENDED, DIGIT_TOKEN + VOWEL_TOKEN);
+            this.BaseMap.put(TokenType.UPPER_ALPHABET_EXTENDED, DIGIT_TOKEN + VOWEL_TOKEN.toUpperCase());
+            this.BaseMap.put(TokenType.MIXED_ALPHABET_EXTENDED,
                     DIGIT_TOKEN + VOWEL_TOKEN + VOWEL_TOKEN.toUpperCase());
         }
     }
@@ -155,18 +155,18 @@ public class AutoIdGenerator extends IdGenerator {
             case DIGIT:
                 base = 10;
                 break;
-            case LOWERCASE:
-            case UPPERCASE:
+            case LOWER_ALPHABET:
+            case UPPER_ALPHABET:
                 base = (SansVowel) ? 20 : 26;
                 break;
-            case MIXEDCASE:
+            case MIXED_ALPHABET:
                 base = (SansVowel) ? 40 : 52;
                 break;
-            case LOWER_EXTENDED:
-            case UPPER_EXTENDED:
+            case LOWER_ALPHABET_EXTENDED:
+            case UPPER_ALPHABET_EXTENDED:
                 base = (SansVowel) ? 30 : 36;
                 break;
-            case MIXED_EXTENDED:
+            case MIXED_ALPHABET_EXTENDED:
                 base = (SansVowel) ? 50 : 62;
                 break;
         }

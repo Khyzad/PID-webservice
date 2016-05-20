@@ -24,19 +24,19 @@ public class AutoIdGeneratorTest {
     public Object[][] sansVowelParameters() {
         return new Object[][]{
             {"", true, TokenType.DIGIT, 1, 10},
-            {"", true, TokenType.LOWERCASE, 1, 20},
-            {"", true, TokenType.UPPERCASE, 1, 20},
-            {"", true, TokenType.MIXEDCASE, 1, 40},
-            {"", true, TokenType.LOWER_EXTENDED, 1, 30},
-            {"", true, TokenType.UPPER_EXTENDED, 1, 30},
-            {"", true, TokenType.MIXED_EXTENDED, 1, 50},
+            {"", true, TokenType.LOWER_ALPHABET, 1, 20},
+            {"", true, TokenType.UPPER_ALPHABET, 1, 20},
+            {"", true, TokenType.MIXED_ALPHABET, 1, 40},
+            {"", true, TokenType.LOWER_ALPHABET_EXTENDED, 1, 30},
+            {"", true, TokenType.UPPER_ALPHABET_EXTENDED, 1, 30},
+            {"", true, TokenType.MIXED_ALPHABET_EXTENDED, 1, 50},
             {"", false, TokenType.DIGIT, 1, 10},
-            {"", false, TokenType.LOWERCASE, 1, 26},
-            {"", false, TokenType.UPPERCASE, 1, 26},
-            {"", false, TokenType.MIXEDCASE, 1, 52},
-            {"", false, TokenType.LOWER_EXTENDED, 1, 36},
-            {"", false, TokenType.UPPER_EXTENDED, 1, 36},
-            {"", false, TokenType.MIXED_EXTENDED, 1, 62}
+            {"", false, TokenType.LOWER_ALPHABET, 1, 26},
+            {"", false, TokenType.UPPER_ALPHABET, 1, 26},
+            {"", false, TokenType.MIXED_ALPHABET, 1, 52},
+            {"", false, TokenType.LOWER_ALPHABET_EXTENDED, 1, 36},
+            {"", false, TokenType.UPPER_ALPHABET_EXTENDED, 1, 36},
+            {"", false, TokenType.MIXED_ALPHABET_EXTENDED, 1, 62}
         };
     }
 

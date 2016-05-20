@@ -136,15 +136,15 @@ public class PidTest {
         switch (tokenType) {
             case DIGIT:
                 return "([\\d]*)";
-            case LOWERCASE:
+            case LOWER_ALPHABET:
                 return (sansVowel) ? "([^aeiouyA-Z\\W\\d]*)" : "([a-z]*)";
-            case UPPERCASE:
+            case UPPER_ALPHABET:
                 return (sansVowel) ? "([^a-zAEIOUY\\W\\d]*)" : "([A-Z]*)";
-            case MIXEDCASE:
+            case MIXED_ALPHABET:
                 return (sansVowel) ? "([^aeiouyAEIOUY\\W\\d]*)" : "([a-zA-Z]*)";
-            case LOWER_EXTENDED:
+            case LOWER_ALPHABET_EXTENDED:
                 return (sansVowel) ? "([^aeiouyA-Z\\W]*)" : "([a-z\\d]*)";
-            case UPPER_EXTENDED:
+            case UPPER_ALPHABET_EXTENDED:
                 return (sansVowel) ? "([^a-zAEIOUY\\W]*)" : "([A-Z\\d]*)";
             default:
                 return (sansVowel) ? "([^aeiouyAEIOUY\\W]*)" : "(^[a-zA-z\\d]*)";

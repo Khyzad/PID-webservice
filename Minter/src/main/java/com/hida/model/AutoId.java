@@ -28,7 +28,7 @@ public class AutoId extends Pid {
      */
     public AutoId(AutoId id) {
         super(id);
-        this.TokenMap = id.getTokenMap();     
+        this.TokenMap = id.getTokenMap();
         this.Name = findName();
     }
 
@@ -77,7 +77,7 @@ public class AutoId extends Pid {
 
         return !overflow;
     }
-    
+
     /**
      * Creates the name of the id based on the indices contained in the BaseMap
      * and the characters in the TokenMap
@@ -97,11 +97,10 @@ public class AutoId extends Pid {
         return Name;
     }
 
-    
     @Override
     public String getName() {
         return Name;
-    }   
+    }
 
     public String getTokenMap() {
         return TokenMap;

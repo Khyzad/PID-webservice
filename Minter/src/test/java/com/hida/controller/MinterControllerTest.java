@@ -88,19 +88,19 @@ public class MinterControllerTest {
     private Object[][] parameters() {
         return new Object[][]{
             {PREPEND, "abc", TokenType.DIGIT, "d", 1, true, true, true},
-            {PREPEND, "abc", TokenType.LOWERCASE, "d", 1, true, true, true},
-            {PREPEND, "abc", TokenType.UPPERCASE, "d", 1, true, true, true},
-            {PREPEND, "abc", TokenType.MIXEDCASE, "d", 1, true, true, true},
-            {PREPEND, "abc", TokenType.LOWER_EXTENDED, "d", 1, true, true, true},
-            {PREPEND, "abc", TokenType.UPPER_EXTENDED, "d", 1, true, true, true},
-            {PREPEND, "abc", TokenType.MIXED_EXTENDED, "d", 1, true, true, true},
+            {PREPEND, "abc", TokenType.LOWER_ALPHABET, "d", 1, true, true, true},
+            {PREPEND, "abc", TokenType.UPPER_ALPHABET, "d", 1, true, true, true},
+            {PREPEND, "abc", TokenType.MIXED_ALPHABET, "d", 1, true, true, true},
+            {PREPEND, "abc", TokenType.LOWER_ALPHABET_EXTENDED, "d", 1, true, true, true},
+            {PREPEND, "abc", TokenType.UPPER_ALPHABET_EXTENDED, "d", 1, true, true, true},
+            {PREPEND, "abc", TokenType.MIXED_ALPHABET_EXTENDED, "d", 1, true, true, true},
             {PREPEND, "abc", TokenType.DIGIT, "d", 1, true, true, false},
-            {PREPEND, "abc", TokenType.LOWERCASE, "d", 1, true, true, false},
-            {PREPEND, "abc", TokenType.UPPERCASE, "d", 1, true, true, false},
-            {PREPEND, "abc", TokenType.MIXEDCASE, "d", 1, true, true, false},
-            {PREPEND, "abc", TokenType.LOWER_EXTENDED, "d", 1, true, true, false},
-            {PREPEND, "abc", TokenType.UPPER_EXTENDED, "d", 1, true, true, false},
-            {PREPEND, "abc", TokenType.MIXED_EXTENDED, "d", 1, true, true, false},
+            {PREPEND, "abc", TokenType.LOWER_ALPHABET, "d", 1, true, true, false},
+            {PREPEND, "abc", TokenType.UPPER_ALPHABET, "d", 1, true, true, false},
+            {PREPEND, "abc", TokenType.MIXED_ALPHABET, "d", 1, true, true, false},
+            {PREPEND, "abc", TokenType.LOWER_ALPHABET_EXTENDED, "d", 1, true, true, false},
+            {PREPEND, "abc", TokenType.UPPER_ALPHABET_EXTENDED, "d", 1, true, true, false},
+            {PREPEND, "abc", TokenType.MIXED_ALPHABET_EXTENDED, "d", 1, true, true, false},
             {PREPEND, "abc", TokenType.DIGIT, "d", 1, false, true, false},
             {PREPEND, "abc", TokenType.DIGIT, "l", 1, false, true, false},
             {PREPEND, "abc", TokenType.DIGIT, "u", 1, false, true, false},
@@ -391,7 +391,7 @@ public class MinterControllerTest {
     private DefaultSetting getSampleDefaultSetting() {
         DefaultSetting setting = new DefaultSetting("", // prepend
                 "", // prefix
-                TokenType.MIXEDCASE, // tokentype
+                TokenType.MIXED_ALPHABET, // tokentype
                 "mmm", // charmap
                 3, // rootlength
                 true, // sansvowel

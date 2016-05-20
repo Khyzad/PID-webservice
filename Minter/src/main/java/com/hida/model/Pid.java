@@ -63,7 +63,7 @@ public abstract class Pid implements Comparable<Pid> {
     public Pid(int[] baseMap, String Prefix) {
         this.BaseMap = Arrays.copyOf(baseMap, baseMap.length);
         this.Prefix = Prefix;
-    }
+    }        
 
     public abstract boolean incrementId();
 

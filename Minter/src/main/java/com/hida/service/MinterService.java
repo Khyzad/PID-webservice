@@ -298,12 +298,12 @@ public class MinterService {
      * Updates the CurrentDefaultSetting to match the values in the given
      * DefaultSetting.
      *
-     * @param filename
+     * @param filePath T
      * @param newSetting A DefaultSetting object that contains newly requested
      * values
      * @throws IOException
      */
-    public void updateCurrentSetting(String filename, DefaultSetting newSetting) throws Exception {
+    public void updateCurrentSetting(String filePath, DefaultSetting newSetting) throws Exception {
         Logger.info("in updateCurrentSetting");
 
         CurrentDefaultSetting = DefaultSettingRepo.findCurrentDefaultSetting();
@@ -317,22 +317,22 @@ public class MinterService {
         CurrentDefaultSetting.setSansVowels(newSetting.isSansVowels());
 
         // record Default Setting values into properties file
-        writeToPropertiesFile(filename, newSetting);
+        writeToPropertiesFile(filePath, newSetting);
     }
 
     /**
      * Retrieves the CurrentSetting field from the database. If its null, then
      * it is given initial values.
      *
-     * @param filename
+     * @param filePath
      * @return The currently used setting in the database
      * @throws IOException thrown whenever properties file does not exist
      */
-    public DefaultSetting getCurrentSetting(String filename) throws Exception {
+    public DefaultSetting getCurrentSetting(String filePath) throws Exception {
         CurrentDefaultSetting = DefaultSettingRepo.findCurrentDefaultSetting();
         if (CurrentDefaultSetting == null) {
             // read default values stored in properties file and save it
-            CurrentDefaultSetting = readPropertiesFile(filename);
+            CurrentDefaultSetting = readPropertiesFile(filePath);
             DefaultSettingRepo.save(CurrentDefaultSetting);
         }
         return CurrentDefaultSetting;
