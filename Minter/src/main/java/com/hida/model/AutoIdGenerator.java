@@ -175,6 +175,53 @@ public class AutoIdGenerator extends IdGenerator {
         return ((long) Math.pow(base, RootLength));
     }
 
+    /**
+     * Increments a value of a PID. If the maximum limit is reached the values
+     * will wrap around.
+     *
+     * @param pid The pid to increment
+     */
+    @Override
+    public void incrementPid(Pid pid) {
+        int range = TokenType.getCharacters().length() - 1;
+        boolean overflow = true;
+
+        // increment the values in a pid's basemap
+        for (int k = 0; k <= range && overflow; k++) {
+            // record value of current index
+            int value = pid.getBaseMap()[range - k];
+
+            // if the last value is reached then wrap around
+            if (value == range) {
+                pid.getBaseMap()[range - k] = 0;
+            }
+            // otherwise increment the value at the current index and break the loop
+            else {
+                pid.getBaseMap()[range - k]++;
+                overflow = false;
+            }
+        }
+
+        // assign a new name to the Pid based on its base map
+        assignName(pid);
+    }
+
+    /**
+     * Creates and sets a new name for a pid based on its indices contained in
+     * the BaseMap and the characters in the TokenType. This should be called
+     * whenever the values in a Pid's BaseMap has been changed.
+     *
+     * @param pid The pid that needs a new name.
+     */
+    @Override
+    protected void assignName(Pid pid) {
+        String Name = "";
+        for (int i = 0; i < pid.getBaseMap().length; i++) {
+            Name += TokenType.getCharacters().charAt(pid.getBaseMap()[i]);
+        }
+        pid.setName(this.getPrefix() + Name);
+    }
+
     /* getters and setters */
     public TokenType getTokenType() {
         return TokenType;

@@ -29,10 +29,12 @@ public class CustomIdGenerator extends IdGenerator {
      */
     private String CharMap;
 
+    private final String[] TokenMap;   
+
     /**
      * Instantiates an Id Generator that creates Pids primarily based on a
-     * charMap. The only valid charMap characters are regex("[dlume]+"). No 
-     * restrictions are placed on the other parameters. 
+     * charMap. The only valid charMap characters are regex("[dlume]+"). No
+     * restrictions are placed on the other parameters.
      *
      * @param prefix A sequence of characters that appear in the beginning of
      * PIDs
@@ -42,7 +44,10 @@ public class CustomIdGenerator extends IdGenerator {
     public CustomIdGenerator(String prefix, boolean sansVowel, String charMap) {
         super(prefix, sansVowel);
         this.CharMap = charMap;
+        this.TokenMap = new String[charMap.length()];
+        this.SansVowel = sansVowel;
 
+        initializeTokenMap();
         // assign base map the appropriate values
         if (sansVowel) {
             this.BaseMap.put("d", DIGIT_TOKEN);
@@ -168,6 +173,84 @@ public class CustomIdGenerator extends IdGenerator {
         return baseTokenMapArray;
     }
 
+    /**
+     * Initializes TokenMap to contain a String of characters at each index to
+     * designate the possible values that can be assigned to each index of a
+     * Pid's BaseMap.
+     */
+    private void initializeTokenMap() {
+        for (int i = 0; i < TokenMap.length; i++) {
+            // get char
+            char c = CharMap.charAt(i);
+
+            // assign each index a string of characters
+            if (c == 'd') {
+                TokenMap[i] = TokenType.DIGIT.getCharacters();
+            }
+            else if (c == 'l') {
+                TokenMap[i] = (SansVowel) ? TokenType.LOWER_CONSONANTS.getCharacters()
+                        : TokenType.LOWER_ALPHABET.getCharacters();
+            }
+            else if (c == 'u') {
+                TokenMap[i] = (SansVowel) ? TokenType.UPPER_CONSONANTS.getCharacters()
+                        : TokenType.UPPER_ALPHABET.getCharacters();
+            }
+            else if (c == 'm') {
+                TokenMap[i] = (SansVowel) ? TokenType.MIXED_CONSONANTS.getCharacters()
+                        : TokenType.MIXED_ALPHABET.getCharacters();
+            }
+            else {
+                TokenMap[i] = (SansVowel) ? TokenType.MIXED_CONSONANTS_EXTENDED.getCharacters()
+                        : TokenType.MIXED_ALPHABET_EXTENDED.getCharacters();
+            }
+        }
+    }
+
+    /**
+     * Increments a value of a PID. If the maximum limit is reached the values
+     * will wrap around.
+     *
+     * @param pid The pid to increment
+     */
+    @Override
+    public void incrementPid(Pid pid) {
+        boolean overflow = true;
+
+        int lastIndex = pid.getBaseMap().length - 1;
+        // increment the values in a pid's basemap
+        for (int i = lastIndex; overflow && i >= 0; i--) {
+
+            // if the last value is reached then wrap around
+            if (pid.getBaseMap()[i] == TokenMap[i].length() - 1) {
+                pid.getBaseMap()[i] = 0;
+            }
+            // otherwise increment the value at the current index and break the loop
+            else {
+                pid.getBaseMap()[i]++;
+                overflow = false;
+            }
+        }
+
+        // assign a new name to the Pid based on its base map
+        assignName(pid);
+    }
+
+    /**
+     * Creates and sets a new name for a pid based on its indices contained in
+     * the BaseMap and the characters in the TokenType. This should be called
+     * whenever the values in a Pid's BaseMap has been changed.
+     *
+     * @param pid The pid that needs a new name.
+     */
+    @Override
+    protected void assignName(Pid pid) {
+        String Name = "";
+        for (int i = 0; i < pid.getBaseMap().length; i++) {
+            Name += TokenMap[i].charAt(pid.getBaseMap()[i]);
+        }
+        pid.setName(this.getPrefix() + Name);
+    }
+
     /* getters and setters */
     public String getCharMap() {
         return CharMap;
@@ -175,5 +258,6 @@ public class CustomIdGenerator extends IdGenerator {
 
     public void setCharMap(String CharMap) {
         this.CharMap = CharMap;
-    }
+    }        
+    
 }
