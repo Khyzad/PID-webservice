@@ -126,26 +126,7 @@ public class AutoIdGenerator extends IdGenerator {
     @Override
     public long calculatePermutations() {
         // get the base of each character
-        int base = 0;
-        switch (TokenType) {
-            case DIGIT:
-                base = 10;
-                break;
-            case LOWER_ALPHABET:
-            case UPPER_ALPHABET:
-                base = (SansVowel) ? 20 : 26;
-                break;
-            case MIXED_ALPHABET:
-                base = (SansVowel) ? 40 : 52;
-                break;
-            case LOWER_ALPHABET_EXTENDED:
-            case UPPER_ALPHABET_EXTENDED:
-                base = (SansVowel) ? 30 : 36;
-                break;
-            case MIXED_ALPHABET_EXTENDED:
-                base = (SansVowel) ? 50 : 62;
-                break;
-        }
+        int base = TokenType.getCharacters().length();
 
         // raise it to the power of how ever long the rootLength is
         return ((long) Math.pow(base, RootLength));
