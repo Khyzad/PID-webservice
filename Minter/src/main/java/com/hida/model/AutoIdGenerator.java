@@ -2,7 +2,6 @@ package com.hida.model;
 
 import static com.hida.model.IdGenerator.Rng;
 import static com.hida.model.IdGenerator.Logger;
-import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -51,29 +50,6 @@ public class AutoIdGenerator extends IdGenerator {
         super(prefix, sansVowel);
         this.TokenType = tokenType;
         this.RootLength = rootLength;
-
-        // assign base map the appropriate values
-        this.BaseMap.put(TokenType.DIGIT, DIGIT_TOKEN);
-        if (sansVowel) {
-            this.BaseMap.put(TokenType.LOWER_ALPHABET, SANS_VOWEL_TOKEN);
-            this.BaseMap.put(TokenType.UPPER_ALPHABET, SANS_VOWEL_TOKEN.toUpperCase());
-            this.BaseMap.put(TokenType.MIXED_ALPHABET,
-                    SANS_VOWEL_TOKEN + SANS_VOWEL_TOKEN.toUpperCase());
-            this.BaseMap.put(TokenType.LOWER_ALPHABET_EXTENDED, DIGIT_TOKEN + SANS_VOWEL_TOKEN);
-            this.BaseMap.put(TokenType.UPPER_ALPHABET_EXTENDED,
-                    DIGIT_TOKEN + SANS_VOWEL_TOKEN.toUpperCase());
-            this.BaseMap.put(TokenType.MIXED_ALPHABET_EXTENDED,
-                    DIGIT_TOKEN + SANS_VOWEL_TOKEN + SANS_VOWEL_TOKEN.toUpperCase());
-        }
-        else {
-            this.BaseMap.put(TokenType.LOWER_ALPHABET, VOWEL_TOKEN);
-            this.BaseMap.put(TokenType.UPPER_ALPHABET, VOWEL_TOKEN.toUpperCase());
-            this.BaseMap.put(TokenType.MIXED_ALPHABET, VOWEL_TOKEN + VOWEL_TOKEN.toUpperCase());
-            this.BaseMap.put(TokenType.LOWER_ALPHABET_EXTENDED, DIGIT_TOKEN + VOWEL_TOKEN);
-            this.BaseMap.put(TokenType.UPPER_ALPHABET_EXTENDED, DIGIT_TOKEN + VOWEL_TOKEN.toUpperCase());
-            this.BaseMap.put(TokenType.MIXED_ALPHABET_EXTENDED,
-                    DIGIT_TOKEN + VOWEL_TOKEN + VOWEL_TOKEN.toUpperCase());
-        }
     }
 
     /**
@@ -91,15 +67,15 @@ public class AutoIdGenerator extends IdGenerator {
         }
 
         // generate ids
-        String tokenMap = BaseMap.get(TokenType);
-        Set<Pid> tempIdList = new LinkedHashSet();
+        String map = TokenType.getCharacters();
+        Set<Pid> tempIdList = new TreeSet<>();
 
         for (int i = 0; i < amount; i++) {
             int[] tempIdBaseMap = new int[RootLength];
             for (int j = 0; j < RootLength; j++) {
-                tempIdBaseMap[j] = Rng.nextInt(tokenMap.length());
+                tempIdBaseMap[j] = Rng.nextInt(map.length());
             }
-            Pid currentId = new AutoId(Prefix, tempIdBaseMap, tokenMap);
+            Pid currentId = new AutoId(Prefix, tempIdBaseMap, map);
             Logger.trace("Generated Auto Random ID: " + currentId);
 
             while (tempIdList.contains(currentId)) {
@@ -125,11 +101,11 @@ public class AutoIdGenerator extends IdGenerator {
         }
 
         // generate ids
-        String tokenMap = BaseMap.get(TokenType);
-        Set<Pid> idSet = new TreeSet();
+        String map = TokenType.getCharacters();
+        Set<Pid> idSet = new TreeSet<>();
 
         int[] previousIdBaseMap = new int[RootLength];
-        AutoId currentId = new AutoId(Prefix, previousIdBaseMap, tokenMap);
+        AutoId currentId = new AutoId(Prefix, previousIdBaseMap, map);
         for (int i = 0; i < amount; i++) {
             AutoId nextId = new AutoId(currentId);
             idSet.add(currentId);

@@ -38,15 +38,7 @@ public abstract class IdGenerator {
     /**
      * Logger; logfile to be stored in resource folder
      */
-    protected static final Logger Logger = LoggerFactory.getLogger(IdGenerator.class);
-
-    /**
-     * Contains the mappings for either tokens or the charMaps. The AutoMinter
-     * constructor will assign token mappings. The CustomMinter constructor will
-     * assign character mappings. The values will depend on whether or sansVowel
-     * specified in the constructor.
-     */
-    protected final HashMap<Object, String> BaseMap = new HashMap<>();
+    protected static final Logger Logger = LoggerFactory.getLogger(IdGenerator.class);   
 
     /**
      * The string that will be at the front of every id
