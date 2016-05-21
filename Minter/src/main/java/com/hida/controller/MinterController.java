@@ -36,10 +36,7 @@ import org.springframework.web.servlet.ModelAndView;
 @RestController
 @RequestMapping("/Minter")
 public class MinterController {
-    
-    
-    
-    
+
     /**
      * Default setting values stored in resources folder
      */
@@ -86,7 +83,7 @@ public class MinterController {
             String prefix = request.getParameter("idprefix");
             String isAuto = request.getParameter("mintType");
             String isRandom = request.getParameter("mintOrder");
-            String sansVowels = request.getParameter("vowels");
+            String includeVowels = request.getParameter("vowels");
             String rootLength = request.getParameter("idlength");
             String digitToken;
             String lowerToken;
@@ -95,7 +92,7 @@ public class MinterController {
 
             boolean auto = isAuto.equals("auto");
             boolean random = isRandom.equals("random");
-            boolean vowels = sansVowels == null;
+            boolean sansVowel = includeVowels == null;
 
             // assign a non-null value to prepend, prefix, and rootLength
             if (prepend == null) {
@@ -118,27 +115,33 @@ public class MinterController {
 
                 TokenType tokenType;
 
-                // gets the tokenmap value
+                // gets the token value
                 if (digitToken != null && lowerToken == null && upperToken == null) {
                     tokenType = TokenType.DIGIT;
                 }
                 else if (digitToken == null && lowerToken != null && upperToken == null) {
-                    tokenType = TokenType.LOWER_ALPHABET;
+                    tokenType = (sansVowel) ? TokenType.LOWER_CONSONANTS 
+                            : TokenType.LOWER_ALPHABET;
                 }
                 else if (digitToken == null && lowerToken == null && upperToken != null) {
-                    tokenType = TokenType.UPPER_ALPHABET;
+                    tokenType = (sansVowel) ? TokenType.UPPER_CONSONANTS 
+                            : TokenType.UPPER_ALPHABET;
                 }
                 else if (digitToken == null && lowerToken != null && upperToken != null) {
-                    tokenType = TokenType.MIXED_ALPHABET;
+                    tokenType = (sansVowel) ? TokenType.MIXED_CONSONANTS 
+                            : TokenType.MIXED_ALPHABET;
                 }
                 else if (digitToken != null && lowerToken != null && upperToken == null) {
-                    tokenType = TokenType.LOWER_ALPHABET_EXTENDED;
+                    tokenType = (sansVowel) ? TokenType.LOWER_CONSONANTS_EXTENDED
+                            : TokenType.LOWER_ALPHABET_EXTENDED;
                 }
                 else if (digitToken == null && lowerToken == null && upperToken != null) {
-                    tokenType = TokenType.UPPER_ALPHABET_EXTENDED;
+                    tokenType = (sansVowel) ? TokenType.UPPER_CONSONANTS_EXTENDED
+                            : TokenType.UPPER_ALPHABET_EXTENDED;
                 }
                 else if (digitToken != null && lowerToken != null && upperToken != null) {
-                    tokenType = TokenType.MIXED_ALPHABET_EXTENDED;
+                    tokenType = (sansVowel) ? TokenType.MIXED_CONSONANTS_EXTENDED
+                            : TokenType.MIXED_ALPHABET_EXTENDED;
                 }
                 else {
                     throw new BadParameterException();
@@ -150,7 +153,7 @@ public class MinterController {
                         tokenType,
                         oldSetting.getCharMap(),
                         length,
-                        vowels,
+                        sansVowel,
                         auto,
                         random);
             }
@@ -164,7 +167,7 @@ public class MinterController {
                         oldSetting.getTokenType(),
                         charMap,
                         oldSetting.getRootLength(),
-                        vowels,
+                        sansVowel,
                         auto,
                         random);
             }
