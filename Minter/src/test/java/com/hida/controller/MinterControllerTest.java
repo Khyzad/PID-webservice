@@ -9,7 +9,6 @@ import com.hida.model.Pid;
 import com.hida.model.PidTest;
 import com.hida.model.TokenType;
 import com.hida.service.MinterService;
-import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -88,12 +87,12 @@ public class MinterControllerTest {
     private Object[][] parameters() {
         return new Object[][]{
             {PREPEND, "abc", TokenType.DIGIT, "d", 1, true, true, true},
-            {PREPEND, "abc", TokenType.LOWER_ALPHABET, "d", 1, true, true, true},
-            {PREPEND, "abc", TokenType.UPPER_ALPHABET, "d", 1, true, true, true},
-            {PREPEND, "abc", TokenType.MIXED_ALPHABET, "d", 1, true, true, true},
-            {PREPEND, "abc", TokenType.LOWER_ALPHABET_EXTENDED, "d", 1, true, true, true},
-            {PREPEND, "abc", TokenType.UPPER_ALPHABET_EXTENDED, "d", 1, true, true, true},
-            {PREPEND, "abc", TokenType.MIXED_ALPHABET_EXTENDED, "d", 1, true, true, true},
+            {PREPEND, "abc", TokenType.LOWER_CONSONANTS, "d", 1, true, true, true},
+            {PREPEND, "abc", TokenType.UPPER_CONSONANTS, "d", 1, true, true, true},
+            {PREPEND, "abc", TokenType.MIXED_CONSONANTS, "d", 1, true, true, true},
+            {PREPEND, "abc", TokenType.LOWER_CONSONANTS_EXTENDED, "d", 1, true, true, true},
+            {PREPEND, "abc", TokenType.UPPER_CONSONANTS_EXTENDED, "d", 1, true, true, true},
+            {PREPEND, "abc", TokenType.MIXED_CONSONANTS_EXTENDED, "d", 1, true, true, true},
             {PREPEND, "abc", TokenType.DIGIT, "d", 1, true, true, false},
             {PREPEND, "abc", TokenType.LOWER_ALPHABET, "d", 1, true, true, false},
             {PREPEND, "abc", TokenType.UPPER_ALPHABET, "d", 1, true, true, false},
