@@ -42,10 +42,20 @@ public class PidTest {
     public void testTokenType(String name, Setting setting) {
         String prefix = setting.getPrefix();
         TokenType tokenType = setting.getTokenType();
-        boolean sansVowel = setting.isSansVowels();
-
-        boolean matchesToken = containsCorrectCharacters(prefix, name, tokenType, sansVowel);
-        Assert.assertEquals(name + ", testing tokenType: " + tokenType, true, matchesToken);
+        String rootName = name.replace(prefix,"");
+        
+        // check to see if each character in the rootName is contained by the TokenType
+        boolean contains = true;        
+        for(int i = 0; i < rootName.length() && contains; i++){
+            char c = rootName.charAt(i);
+            
+            // if the name doesn't contain the character, then contains is false
+            if(!tokenType.getCharacters().contains(c + "")){
+                contains = false;
+            }
+        }
+        
+        Assert.assertEquals(name + ", testing tokenType: " + tokenType, true, contains);
     }
 
     /**
