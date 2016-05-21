@@ -68,22 +68,24 @@ public class AutoIdGenerator extends IdGenerator {
 
         // generate ids
         String map = TokenType.getCharacters();
-        Set<Pid> tempIdList = new TreeSet<>();
+        Set<Pid> pidSet = new TreeSet<>();
 
         for (int i = 0; i < amount; i++) {
             int[] tempIdBaseMap = new int[RootLength];
             for (int j = 0; j < RootLength; j++) {
                 tempIdBaseMap[j] = Rng.nextInt(map.length());
             }
-            Pid currentId = new AutoId(Prefix, tempIdBaseMap, map);
+            Pid currentId = new Pid(tempIdBaseMap, Prefix);
+            this.assignName(currentId);
+            
             Logger.trace("Generated Auto Random ID: " + currentId);
 
-            while (tempIdList.contains(currentId)) {
-                currentId.incrementId();
+            while (pidSet.contains(currentId)) {                
+                this.incrementPid(currentId);
             }
-            tempIdList.add(currentId);
+            pidSet.add(currentId);
         }
-        return tempIdList;
+        return pidSet;
     }
 
     /**
@@ -100,21 +102,22 @@ public class AutoIdGenerator extends IdGenerator {
             throw new NotEnoughPermutationsException(total, amount);
         }
 
-        // generate ids
-        String map = TokenType.getCharacters();
-        Set<Pid> idSet = new TreeSet<>();
-
+        // declare an empty array to start from and a set to hold all Pids
+        Set<Pid> pidSet = new TreeSet<>();
         int[] previousIdBaseMap = new int[RootLength];
-        AutoId currentId = new AutoId(Prefix, previousIdBaseMap, map);
+        
+        // generate Pids
+        Pid currentId = new Pid(previousIdBaseMap, Prefix);
+        this.assignName(currentId);
         for (int i = 0; i < amount; i++) {
-            AutoId nextId = new AutoId(currentId);
-            idSet.add(currentId);
-            Logger.trace("Generated Auto Sequential ID: " + currentId);
-            nextId.incrementId();
-            currentId = new AutoId(nextId);
+            Pid nextId = new Pid(currentId);
+            pidSet.add(currentId);
+            Logger.trace("Generated Auto Sequential ID: " + currentId);            
+            this.incrementPid(nextId);
+            currentId = new Pid(nextId);
         }
 
-        return idSet;
+        return pidSet;
     }
 
     /**
@@ -140,21 +143,22 @@ public class AutoIdGenerator extends IdGenerator {
      */
     @Override
     public void incrementPid(Pid pid) {
-        int range = TokenType.getCharacters().length() - 1;
-        boolean overflow = true;
-
+        int tokenMapRange = TokenType.getCharacters().length() - 1;
+        int baseMapRange = pid.getBaseMap().length - 1;
+        boolean overflow = true;       
+        
         // increment the values in a pid's basemap
-        for (int k = 0; k <= range && overflow; k++) {
+        for (int k = 0; k <= baseMapRange && overflow; k++) {
             // record value of current index
-            int value = pid.getBaseMap()[range - k];
+            int value = pid.getBaseMap()[baseMapRange - k];
 
             // if the last value is reached then wrap around
-            if (value == range) {
-                pid.getBaseMap()[range - k] = 0;
+            if (value == tokenMapRange) {
+                pid.getBaseMap()[baseMapRange - k] = 0;
             }
             // otherwise increment the value at the current index and break the loop
             else {
-                pid.getBaseMap()[range - k]++;
+                pid.getBaseMap()[baseMapRange - k]++;
                 overflow = false;
             }
         }

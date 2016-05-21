@@ -62,22 +62,23 @@ public class CustomIdGenerator extends IdGenerator {
         if (total < amount) {
             throw new NotEnoughPermutationsException();
         }
-        // generate ids
-        
-        Set<Pid> tempIdList = new TreeSet<>();
+        // generate ids        
+        Set<Pid> pidSet = new TreeSet<>();
 
         for (int i = 0; i < amount; i++) {
             int[] tempIdBaseMap = new int[CharMap.length()];
             for (int j = 0; j < CharMap.length(); j++) {
                 tempIdBaseMap[j] = Rng.nextInt(TokenMap[j].length());
             }
-            Pid currentId = new CustomId(Prefix, tempIdBaseMap, TokenMap);
+            Pid currentId = new Pid(tempIdBaseMap, Prefix);
+            this.assignName(currentId);
+            
             Logger.trace("Generated Custom Random ID: " + currentId);
-            while (!tempIdList.add(currentId)) {
-                currentId.incrementId();
+            while (!pidSet.add(currentId)) {                
+                this.incrementPid(currentId);
             }
         }
-        return tempIdList;
+        return pidSet;
     }
 
     /**
@@ -95,18 +96,19 @@ public class CustomIdGenerator extends IdGenerator {
         }
 
         // generate ids
-        Set<Pid> idSet = new TreeSet<>();
+        Set<Pid> pidSet = new TreeSet<>();
 
         int[] previousIdBaseMap = new int[CharMap.length()];
-        CustomId currentId = new CustomId(Prefix, previousIdBaseMap, TokenMap);        
+        Pid currentId = new Pid(previousIdBaseMap, Prefix); 
+        this.assignName(currentId);
         for (int i = 0; i < amount; i++) {
-            CustomId nextId = new CustomId(currentId);
-            idSet.add(currentId);
-            Logger.trace("Generated Custom Sequential ID: " + currentId);
-            nextId.incrementId();
-            currentId = new CustomId(nextId);
+            Pid nextId = new Pid(currentId);
+            pidSet.add(currentId);
+            Logger.trace("Generated Custom Sequential ID: " + currentId);            
+            this.incrementPid(nextId);
+            currentId = new Pid(nextId);
         }
-        return idSet;
+        return pidSet;
     }
 
     /**
