@@ -1,7 +1,10 @@
 # Maven
 target/
 
-# PURL specific 
+# Minter specific
+testReadDefaultSetting.properties
+
+# Resolver specific 
 doc/
 
 # Eclipse
