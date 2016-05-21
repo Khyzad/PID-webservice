@@ -1,8 +1,6 @@
 package com.hida.repositories;
 
 import com.hida.configuration.RepositoryConfiguration;
-import com.hida.model.AutoId;
-import com.hida.model.CustomId;
 import com.hida.model.Pid;
 import org.junit.After;
 import org.junit.Test;
@@ -36,6 +34,7 @@ public class PidRepositoryTest {
      */
     @Test
     public void testFindAllPids() {
+        /*
         Pid autoSample = getSampleAutoId();
         Pid customSample = getSampleCustomId();
 
@@ -45,62 +44,28 @@ public class PidRepositoryTest {
         long size = PidRepo.count();
 
         Assert.assertEquals(size, 2);
+        */
     }
-
-    /**
-     * Tests to see if AutoIds with the same name can be added to the database.
-     */
+    
     @Test
-    public void testUniqueAutoId() {
-        Pid autoSample1 = getSampleAutoId();
-        Pid autoSample2 = getSampleAutoId();
-
-        PidRepo.save(autoSample1);
-        PidRepo.save(autoSample2);
-
-        long size = PidRepo.count();
-
-        Assert.assertEquals(size, 1);
+    public void testUniqeness(){
+        Assert.fail("unimplemented");
     }
-
-    /**
-     * Tests to see if CustomIds with the same name can be added to the
-     * database.
-     */
+    
     @Test
-    public void testUniqueCustomId() {
-        Pid customSample1 = getSampleCustomId();
-        Pid customSample2 = getSampleCustomId();
-
-        PidRepo.save(customSample1);
-        PidRepo.save(customSample2);
-
-        long size = PidRepo.count();
-
-        Assert.assertEquals(size, 1);
+    public void testSaveAndDelete(){
+        Assert.fail("unimplemented");
     }
-
-    /**
-     * returns a sample AutoId.
-     *
-     * @return
-     */
-    private Pid getSampleAutoId() {
-        Pid sample = new AutoId("", new int[1], "a");
-        sample.getName();
-
-        return sample;
-    }
-
-    /**
-     * Returns a sample CustomId.
-     *
-     * @return
-     */
-    private Pid getSampleCustomId() {
-        Pid sample = new CustomId("", new int[1], new String[]{"b"});
-        sample.getName();
-
+    
+    @Test
+    public void testFindByName(){
+        Assert.fail("unimplemented");
+    }      
+    
+    private Pid getSamplePid(){
+        Pid sample = new Pid(new int[] {1}, "");
+        sample.setName("a");
+        
         return sample;
     }
 
