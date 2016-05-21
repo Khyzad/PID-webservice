@@ -2,7 +2,7 @@
 target/
 
 # Minter specific
-testReadDefaultSetting.properties
+testWriteDefaultSetting.properties
 
 # Resolver specific 
 doc/
