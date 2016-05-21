@@ -441,7 +441,7 @@ public class MinterControllerTest {
 
         map.put("prepend", PREPEND);
         map.put("prefix", "xyz");
-        map.put("tokenType", "LOWERCASE");
+        map.put("tokenType", "LOWER_ALPHABET");
         map.put("charMap", "m");
         map.put("rootLength", "2");
         map.put("auto", "false");

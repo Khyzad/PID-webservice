@@ -360,7 +360,7 @@ public class MinterController {
 
         TokenType tokenType = (parameters.containsKey("tokenType"))
                 ? TokenType.valueOf(parameters.get("tokenType"))
-                : entity.getTokenType();
+                : entity.getTokenType();        
 
         boolean isAuto = (parameters.containsKey("auto"))
                 ? convertBoolean(parameters.get("auto"), "auto")
