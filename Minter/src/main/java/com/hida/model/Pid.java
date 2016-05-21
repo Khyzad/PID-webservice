@@ -4,8 +4,6 @@ import java.util.Arrays;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.Inheritance;
-import javax.persistence.InheritanceType;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
@@ -21,9 +19,8 @@ import javax.persistence.Transient;
  * @author lruffin
  */
 @Entity
-@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @Table(name = "PIDS")
-public abstract class Pid implements Comparable<Pid> {
+public class Pid implements Comparable<Pid> {
 
     @Id
     @Column(name = "NAME", updatable = false, nullable = false)
@@ -50,6 +47,7 @@ public abstract class Pid implements Comparable<Pid> {
     public Pid(Pid id) {
         this.Prefix = id.Prefix;
         this.BaseMap = Arrays.copyOf(id.getBaseMap(), id.getBaseMap().length);
+        this.Name = id.Name;
     }
 
     /**
@@ -63,9 +61,7 @@ public abstract class Pid implements Comparable<Pid> {
     public Pid(int[] baseMap, String Prefix) {
         this.BaseMap = Arrays.copyOf(baseMap, baseMap.length);
         this.Prefix = Prefix;
-    }        
-
-    public abstract boolean incrementId();
+    }            
 
     @Override
     public int hashCode() {

@@ -201,8 +201,8 @@ public class MinterService {
                     Logger.error("Total number of Permutations Exceeded: Total Permutation Count="
                             + totalPermutations);
                     throw new NotEnoughPermutationsException(uniqueIdCounter, amount);
-                }
-                currentId.incrementId();
+                }                
+                Generator.incrementPid(currentId);
                 counter++;
             }
             // unique ids are added to list and uniqueIdCounter is incremented.
