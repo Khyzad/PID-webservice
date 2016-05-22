@@ -61,7 +61,7 @@ public class Pid implements Comparable<Pid> {
     public Pid(int[] baseMap, String Prefix) {
         this.BaseMap = Arrays.copyOf(baseMap, baseMap.length);
         this.Prefix = Prefix;
-    }            
+    }
 
     @Override
     public int hashCode() {
@@ -97,35 +97,39 @@ public class Pid implements Comparable<Pid> {
      * invoked, the two id's will be compared by their Names.
      *
      * @param t second Pid being compared.
-     * @return ordering is as follows: [0-9] < [a-z] < [A-Z] 
+     * @return ordering is as follows: [0-9] < [a-z] < [A-Z]
      */
     @Override
     public int compareTo(Pid t) {
         String name1 = this.Name;
         String name2 = t.Name;
         if (name1.length() < name2.length()) {
-                return -1;
-            }
-            else if (name1.length() > name2.length()) {
-                return 1;
-            }
-            else {
-                for (int i = 0; i < name1.length(); i++) {
-                    char c1 = name1.charAt(i);
-                    char c2 = name2.charAt(i);
-                    if (Character.isDigit(c1) && Character.isLetter(c2)
-                            || Character.isLowerCase(c1) && Character.isUpperCase(c2)
-                            || c1 < c2) {
-                        return -1;
-                    }
-                    else if ((Character.isLetter(c1) && Character.isDigit(c2))
-                            || Character.isUpperCase(c1) && Character.isLowerCase(c2)
-                            || c1 > c2) {
-                        return 1;
-                    }
+            return -1;
+        }
+        else if (name1.length() > name2.length()) {
+            return 1;
+        }
+        else {
+            for (int i = 0; i < name1.length(); i++) {
+                char c1 = name1.charAt(i);
+                char c2 = name2.charAt(i);
+                if ((Character.isDigit(c1) && Character.isLetter(c2))
+                        || (Character.isLowerCase(c1) && Character.isUpperCase(c2))) {
+                    return -1;
                 }
-                return 0;
-            }        
+                else if ((Character.isLetter(c1) && Character.isDigit(c2))
+                        || (Character.isUpperCase(c1) && Character.isLowerCase(c2))) {
+                    return 1;
+                }
+                else if (c1 < c2) {
+                    return -1;
+                }
+                else if (c1 > c2) {
+                    return 1;
+                }
+            }
+            return 0;
+        }
     }
 
     /* getters and setters */
@@ -161,8 +165,8 @@ public class Pid implements Comparable<Pid> {
      */
     public void setBaseMap(int[] baseMap) {
         this.BaseMap = baseMap;
-    }      
-    
+    }
+
     public String getPrefix() {
         return Prefix;
     }
