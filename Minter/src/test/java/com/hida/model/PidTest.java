@@ -98,23 +98,7 @@ public class PidTest {
      */
     public void testOrder(Pid previous, Pid next) {        
         Assert.assertEquals(-1, previous.compareTo(next));
-    }
-
-    /**
-     * Checks to see if the Pid matches the given parameters
-     *
-     * @param prefix A sequence of characters that appear in the beginning of
-     * PIDs
-     * @param name Unique identifier of a Pid
-     * @param tokenType An enum used to configure PIDS
-     * @param sansVowel Dictates whether or not vowels are allowed
-     * @return True if the Pid matches the parameters, false otherwise
-     */
-    private boolean containsCorrectCharacters(String prefix, String name, TokenType tokenType,
-            boolean sansVowel) {
-        String regex = retrieveRegex(tokenType, sansVowel);
-        return name.matches(String.format("^(%s)%s$", prefix, regex));
-    }
+    }   
 
     /**
      * Checks to see if the Pid matches the given parameters
@@ -131,36 +115,7 @@ public class PidTest {
         String regex = retrieveRegex(charMap, sansVowel);
         return name.matches(String.format("^(%s)%s$", prefix, regex));
     }
-
-    /**
-     * Returns an equivalent regular expression that'll map that maps to a
-     * specific TokenType
-     *
-     * @param tokenType Designates what characters are contained in the id's
-     * root
-     * @param sansVowel Dictates whether or not vowels are allowed
-     * @return a regular expression
-     */
-    private String retrieveRegex(TokenType tokenType, boolean sansVowel) {
-
-        switch (tokenType) {
-            case DIGIT:
-                return "([\\d]*)";
-            case LOWER_ALPHABET:
-                return (sansVowel) ? "([^aeiouyA-Z\\W\\d]*)" : "([a-z]*)";
-            case UPPER_ALPHABET:
-                return (sansVowel) ? "([^a-zAEIOUY\\W\\d]*)" : "([A-Z]*)";
-            case MIXED_ALPHABET:
-                return (sansVowel) ? "([^aeiouyAEIOUY\\W\\d]*)" : "([a-zA-Z]*)";
-            case LOWER_ALPHABET_EXTENDED:
-                return (sansVowel) ? "([^aeiouyA-Z\\W]*)" : "([a-z\\d]*)";
-            case UPPER_ALPHABET_EXTENDED:
-                return (sansVowel) ? "([^a-zAEIOUY\\W]*)" : "([A-Z\\d]*)";
-            default:
-                return (sansVowel) ? "([^aeiouyAEIOUY\\W]*)" : "(^[a-zA-z\\d]*)";
-        }
-    }
-
+    
     /**
      * Returns an equivalent regular expression that'll map that maps to a
      * specific TokenType
