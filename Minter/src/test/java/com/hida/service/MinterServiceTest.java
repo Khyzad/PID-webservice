@@ -341,7 +341,7 @@ public class MinterServiceTest {
      * Create a sample set of Pid
      */
     private void initializePidSet() {
-        AutoIdGenerator gen = new AutoIdGenerator("", true, TokenType.DIGIT, 1);
+        AutoIdGenerator gen = new AutoIdGenerator("", TokenType.DIGIT, 1);
         PidSet = gen.sequentialMint(10);        
     }
 

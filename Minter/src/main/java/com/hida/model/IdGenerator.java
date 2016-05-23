@@ -18,22 +18,7 @@ public abstract class IdGenerator {
      * Creates and new random number generator to aid in the production of
      * non-deterministic ids.
      */
-    protected static final SecureRandom Rng = new SecureRandom();
-
-    /**
-     * Contains the range of all the digits
-     */
-    protected final static String DIGIT_TOKEN = "0123456789";
-
-    /**
-     * Contains the range of the English alphabet without vowels and y.
-     */
-    protected final static String SANS_VOWEL_TOKEN = "bcdfghjklmnpqrstvwxz";
-
-    /**
-     * Contains the range of the English alphabet with vowels and y.
-     */
-    protected final static String VOWEL_TOKEN = "abcdefghijklmnopqrstuvwxyz";
+    protected static final SecureRandom Rng = new SecureRandom();   
 
     /**
      * Logger; logfile to be stored in resource folder
@@ -43,23 +28,15 @@ public abstract class IdGenerator {
     /**
      * The string that will be at the front of every id
      */
-    protected String Prefix;
-
-    /**
-     * A variable that will affect whether or not vowels have the possibility of
-     * being included in each id.
-     */
-    protected boolean SansVowel;
+    protected String Prefix;   
 
     /**
      * missing javadoc
      *
      * @param prefix
-     * @param sansVowel
      */
-    public IdGenerator(String prefix, boolean sansVowel) {
+    public IdGenerator(String prefix) {
         this.Prefix = prefix;
-        this.SansVowel = sansVowel;
     }
 
     public abstract Set<Pid> randomMint(long amount);
@@ -122,13 +99,5 @@ public abstract class IdGenerator {
 
     public void setPrefix(String Prefix) {
         this.Prefix = Prefix;
-    }
-
-    public boolean isSansVowel() {
-        return SansVowel;
-    }
-
-    public void setSansVowel(boolean SansVowel) {
-        this.SansVowel = SansVowel;
-    }
+    }   
 }

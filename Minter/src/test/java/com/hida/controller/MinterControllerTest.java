@@ -409,7 +409,6 @@ public class MinterControllerTest {
         IdGenerator generator;
         if (setting.isAuto()) {
             generator = new AutoIdGenerator(setting.getPrefix(),
-                    setting.isSansVowels(),
                     setting.getTokenType(),
                     setting.getRootLength());
         }

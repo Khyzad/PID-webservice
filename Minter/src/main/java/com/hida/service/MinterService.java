@@ -103,7 +103,6 @@ public class MinterService {
         if (CurrentDefaultSetting.isAuto()) {
             Generator = new AutoIdGenerator(
                     CurrentDefaultSetting.getPrefix(),
-                    CurrentDefaultSetting.isSansVowels(),
                     CurrentDefaultSetting.getTokenType(),
                     CurrentDefaultSetting.getRootLength());
 

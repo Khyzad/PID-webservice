@@ -14,20 +14,7 @@ import java.util.TreeSet;
 public class AutoIdGenerator extends IdGenerator {
 
     /**
-     * Designates what characters are contained in the id's root. There are 7
-     * types of token maps, each describing a range of possible characters in
-     * the id. This range is further affected by the variable SansVowel.
-     *
-     * <pre>
-     * DIGIT: Digit values only.
-     * LOWER_ALPHABET: Lowercase letters only.
-     * UPPER_ALPHABET: Uppercase letters only.
-     * MIXED_ALPHABET: Lowercase and Uppercase letters only.
-     * LOWER_ALPHABET_EXTENDED: Digit values and Lowercase letters only.
-     * UPPER_ALPHABET_EXTENDED: Digits and Uppercase letters only
-     * MIXED_ALPHABET_EXTENDED: All characters specified by previous tokens
-     * </pre>
-     *
+     * Designates what characters are contained in the id's root name.
      */
     private TokenType TokenType;
 
@@ -42,12 +29,11 @@ public class AutoIdGenerator extends IdGenerator {
      *
      * @param prefix A sequence of characters that appear in the beginning of
      * PIDs
-     * @param sansVowel Dictates whether or not vowels are allowed
      * @param tokenType An enum used to configure PIDS
      * @param rootLength Designates the length of the id's root
      */
-    public AutoIdGenerator(String prefix, boolean sansVowel, TokenType tokenType, int rootLength) {
-        super(prefix, sansVowel);
+    public AutoIdGenerator(String prefix, TokenType tokenType, int rootLength) {
+        super(prefix);
         this.TokenType = tokenType;
         this.RootLength = rootLength;
     }

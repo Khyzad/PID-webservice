@@ -435,7 +435,7 @@ public class MinterController {
         for (Pid id : set) {
             arrayBuilder.add(factory.createObjectBuilder()
                     .add("id", counter)
-                    .add("name", prepend + id.toString()));
+                    .add("name", prepend + id.getName()));
             counter++;
         }
         jsonArray = arrayBuilder.build();

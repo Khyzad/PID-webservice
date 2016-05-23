@@ -88,7 +88,7 @@ public class AutoIdGeneratorTest {
             int rootLength, int amount) {
         // store parameters in a setting object
         Setting setting = new Setting(prefix, tokenType, null, rootLength, sansVowel);
-        IdGenerator generator = new AutoIdGenerator(prefix, sansVowel, tokenType, rootLength);
+        IdGenerator generator = new AutoIdGenerator(prefix, tokenType, rootLength);
         Set<Pid> sequentialSet = generator.sequentialMint(amount);
                        
         Pid prev = null;
@@ -125,7 +125,7 @@ public class AutoIdGeneratorTest {
             int rootLength, int amount) {
         // store parameters in a setting object
         Setting setting = new Setting(prefix, tokenType, null, rootLength, sansVowel);
-        IdGenerator generator = new AutoIdGenerator(prefix, sansVowel, tokenType, rootLength);
+        IdGenerator generator = new AutoIdGenerator(prefix, tokenType, rootLength);
         Set<Pid> randomSet = generator.randomMint(amount);
 
         for (Pid id : randomSet) {
@@ -150,7 +150,7 @@ public class AutoIdGeneratorTest {
             int rootLength, int amount) {
         // store parameters in a setting object
         Setting setting = new Setting(prefix, tokenType, null, rootLength, sansVowel);
-        IdGenerator generator = new AutoIdGenerator(prefix, sansVowel, tokenType, rootLength);
+        IdGenerator generator = new AutoIdGenerator(prefix, tokenType, rootLength);
         Set<Pid> sequentialSet = generator.sequentialMint(amount);
 
         Pid prev = null;
@@ -187,7 +187,7 @@ public class AutoIdGeneratorTest {
 
         // store parameters in a setting object
         Setting setting = new Setting(prefix, tokenType, null, rootLength, sansVowel);
-        IdGenerator generator = new AutoIdGenerator(prefix, sansVowel, tokenType, rootLength);
+        IdGenerator generator = new AutoIdGenerator(prefix, tokenType, rootLength);
         Set<Pid> randomSet = generator.randomMint(amount);
 
         for (Pid id : randomSet) {
@@ -215,7 +215,7 @@ public class AutoIdGeneratorTest {
         Setting setting = new Setting(prefix, tokenType, null, rootLength, sansVowel);
 
         // create a new minter and create a set
-        AutoIdGenerator minter = new AutoIdGenerator(prefix, sansVowel, tokenType, rootLength);
+        AutoIdGenerator minter = new AutoIdGenerator(prefix, tokenType, rootLength);
         Set<Pid> sequentialSet = minter.sequentialMint(amount);
 
         Pid prev = null;
@@ -253,7 +253,7 @@ public class AutoIdGeneratorTest {
         Setting setting = new Setting(prefix, tokenType, null, rootLength, sansVowel);
 
         // create a new minter and create a set
-        AutoIdGenerator minter = new AutoIdGenerator(prefix, sansVowel, tokenType, rootLength);
+        AutoIdGenerator minter = new AutoIdGenerator(prefix, tokenType, rootLength);
         Set<Pid> randomSet = minter.randomMint(amount);
 
         for (Pid id : randomSet) {
@@ -270,7 +270,7 @@ public class AutoIdGeneratorTest {
      */
     @Test(expectedExceptions = NotEnoughPermutationsException.class)
     public void testSequentialNotEnoughPermutationException() {
-        IdGenerator minter = new AutoIdGenerator("", true, TokenType.DIGIT, 5);
+        IdGenerator minter = new AutoIdGenerator("", TokenType.DIGIT, 5);
         long total = minter.calculatePermutations();
 
         Set<Pid> sequentialSet = minter.randomMint(total + 1);
@@ -282,7 +282,7 @@ public class AutoIdGeneratorTest {
      */
     @Test(expectedExceptions = NotEnoughPermutationsException.class)
     public void testRandomNotEnoughPermutationException() {
-        IdGenerator minter = new AutoIdGenerator("", true, TokenType.DIGIT, 5);
+        IdGenerator minter = new AutoIdGenerator("", TokenType.DIGIT, 5);
         long total = minter.calculatePermutations();
 
         Set<Pid> randomSet = minter.randomMint(total + 1);
@@ -294,7 +294,7 @@ public class AutoIdGeneratorTest {
      */
     @Test
     public void testRandomMintNegativeAmount() {
-        IdGenerator minter = new AutoIdGenerator("", true, TokenType.DIGIT, 5);
+        IdGenerator minter = new AutoIdGenerator("", TokenType.DIGIT, 5);
 
         Set<Pid> randomSet = minter.randomMint(-1);
         Assert.assertEquals(randomSet.isEmpty(), true);
@@ -306,7 +306,7 @@ public class AutoIdGeneratorTest {
      */
     @Test
     public void testSequentialMintNegativeAmount() {
-        IdGenerator minter = new AutoIdGenerator("", true, TokenType.DIGIT, 5);
+        IdGenerator minter = new AutoIdGenerator("", TokenType.DIGIT, 5);
         long total = minter.calculatePermutations();
 
         Set<Pid> sequentialSet = minter.sequentialMint(-1);
@@ -318,7 +318,7 @@ public class AutoIdGeneratorTest {
      */
     @Test
     public void testRandomMintZeroAmount() {
-        IdGenerator minter = new AutoIdGenerator("", true, TokenType.DIGIT, 5);
+        IdGenerator minter = new AutoIdGenerator("", TokenType.DIGIT, 5);
 
         Set<Pid> randomSet = minter.randomMint(0);
         Assert.assertEquals(randomSet.isEmpty(), true);
@@ -329,7 +329,7 @@ public class AutoIdGeneratorTest {
      */
     @Test
     public void testSequentialMintZeroAmount() {
-        IdGenerator minter = new AutoIdGenerator("", true, TokenType.DIGIT, 5);
+        IdGenerator minter = new AutoIdGenerator("", TokenType.DIGIT, 5);
 
         Set<Pid> sequentialSet = minter.sequentialMint(0);
         Assert.assertEquals(sequentialSet.isEmpty(), true);
