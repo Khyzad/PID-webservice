@@ -42,19 +42,19 @@ public class PidTest {
     public void testTokenType(String name, Setting setting) {
         String prefix = setting.getPrefix();
         TokenType tokenType = setting.getTokenType();
-        String rootName = name.replace(prefix,"");
-        
+        String rootName = name.replace(prefix, "");
+
         // check to see if each character in the rootName is contained by the TokenType
-        boolean contains = true;        
-        for(int i = 0; i < rootName.length() && contains; i++){
+        boolean contains = true;
+        for (int i = 0; i < rootName.length() && contains; i++) {
             char c = rootName.charAt(i);
-            
+
             // if the name doesn't contain the character, then contains is false
-            if(!tokenType.getCharacters().contains(c + "")){
+            if (!tokenType.getCharacters().contains(c + "")) {
                 contains = false;
             }
         }
-        
+
         Assert.assertEquals(name + ", testing tokenType: " + tokenType, true, contains);
     }
 
@@ -83,10 +83,44 @@ public class PidTest {
     public void testCharMap(String name, Setting setting) {
         String prefix = setting.getPrefix();
         String charMap = setting.getCharMap();
-        boolean sansVowel = setting.isSansVowels();
+        String rootName = name.replace(prefix, "");
 
-        boolean matchesToken = containsCorrectCharacters(prefix, name, sansVowel, charMap);
-        Assert.assertEquals(name + ", testing charMap: " + charMap, true, matchesToken);
+        boolean sansVowel = setting.isSansVowels();
+        boolean contains = true;
+
+        for (int i = 0; i < charMap.length() && contains; i++) {
+            char c = rootName.charAt(i);
+            switch (c) {
+                case 'd':
+                    contains = TokenType.DIGIT.getCharacters().contains(c + "");
+                    break;
+                case 'l':
+                    contains = (sansVowel)
+                            ? TokenType.LOWER_CONSONANTS.getCharacters().contains(c + "")
+                            : TokenType.LOWER_ALPHABET.getCharacters().contains(c + "");
+                    break;
+                case 'u':
+                    contains = (sansVowel)
+                            ? TokenType.UPPER_CONSONANTS.getCharacters().contains(c + "")
+                            : TokenType.UPPER_ALPHABET.getCharacters().contains(c + "");
+                    break;
+                case 'm':
+                    contains = (sansVowel)
+                            ? TokenType.MIXED_CONSONANTS.getCharacters().contains(c + "")
+                            : TokenType.MIXED_ALPHABET.getCharacters().contains(c + "");
+                    break;
+                case 'e':
+                    contains = (sansVowel)
+                            ? TokenType.MIXED_CONSONANTS_EXTENDED.getCharacters().contains(c + "")
+                            : TokenType.MIXED_ALPHABET_EXTENDED.getCharacters().contains(c + "");
+                    break;
+                default:
+                    contains = false;
+                    break;
+            }
+        }
+
+        Assert.assertEquals(name + ", testing charMap: " + charMap, true, contains);
     }
 
     /**
@@ -96,54 +130,7 @@ public class PidTest {
      * @param previous The previous name
      * @param next The next name
      */
-    public void testOrder(Pid previous, Pid next) {        
+    public void testOrder(Pid previous, Pid next) {
         Assert.assertEquals(-1, previous.compareTo(next));
-    }   
-
-    /**
-     * Checks to see if the Pid matches the given parameters
-     *
-     * @param prefix A sequence of characters that appear in the beginning of
-     * PIDs
-     * @param name Unique identifier of a Pid
-     * @param tokenType An enum used to configure PIDS
-     * @param sansVowel Dictates whether or not vowels are allowed
-     * @return True if the Pid matches the parameters, false otherwise
-     */
-    private boolean containsCorrectCharacters(String prefix, String name, boolean sansVowel,
-            String charMap) {
-        String regex = retrieveRegex(charMap, sansVowel);
-        return name.matches(String.format("^(%s)%s$", prefix, regex));
-    }
-    
-    /**
-     * Returns an equivalent regular expression that'll map that maps to a
-     * specific TokenType
-     *
-     * @param charMap Designates what characters are contained in the id's root
-     * @param sansVowel Dictates whether or not vowels are allowed
-     * @return a regular expression
-     */
-    private String retrieveRegex(String charMap, boolean sansVowel) {
-        String regex = "";
-        for (int i = 0; i < charMap.length(); i++) {
-            char key = charMap.charAt(i);
-            if (key == 'd') {
-                regex += "[\\d]";
-            }
-            else if (key == 'l') {
-                regex += (sansVowel) ? "[^aeiouyA-Z\\W\\d]" : "[a-z]";
-            }
-            else if (key == 'u') {
-                regex += (sansVowel) ? "[^a-zAEIOUY\\W\\d]" : "[A-Z]";
-            }
-            else if (key == 'm') {
-                regex += (sansVowel) ? "[^aeiouyAEIOUY\\W\\d]" : "[a-zA-Z]";
-            }
-            else if (key == 'e') {
-                regex += (sansVowel) ? "[^aeiouyAEIOUY\\W]" : "[a-zA-z\\d]";
-            }
-        }
-        return regex;
     }      
 }
