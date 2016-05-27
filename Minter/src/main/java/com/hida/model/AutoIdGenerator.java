@@ -64,12 +64,12 @@ public class AutoIdGenerator extends IdGenerator {
             Pid currentId = new Pid(tempIdBaseMap, Prefix);
             this.assignName(currentId);
             
-            LOGGER.trace("Generated Auto Random ID: {}", currentId);
-
-            while (pidSet.contains(currentId)) {                
+            
+            // increment the Pid until a unique value has been found
+            while (!pidSet.add(currentId)) {                
                 this.incrementPid(currentId);
             }
-            pidSet.add(currentId);
+            LOGGER.trace("Generated Auto Random ID: {}", currentId);
         }
         return pidSet;
     }

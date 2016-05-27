@@ -83,10 +83,11 @@ public class CustomIdGenerator extends IdGenerator {
             Pid currentId = new Pid(tempIdBaseMap, Prefix);
             this.assignName(currentId);
             
-            LOGGER.trace("Generated Custom Random ID: {}", currentId);
+            // increment the Pid until a unique value has been found
             while (!pidSet.add(currentId)) {                
                 this.incrementPid(currentId);
             }
+            LOGGER.trace("Generated Custom Random ID: {}", currentId);
         }
         return pidSet;
     }
