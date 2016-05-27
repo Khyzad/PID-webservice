@@ -24,7 +24,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -45,7 +47,7 @@ public class MinterController {
     /* 
      * Logger; logfile to be stored in resource folder    
      */
-    private static final Logger Logger = LoggerFactory.getLogger(MinterController.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MinterController.class);
 
     /**
      * A fair lock used to synchronize access to the minter service.
@@ -77,7 +79,7 @@ public class MinterController {
             DefaultSetting oldSetting = MinterService.getCurrentSetting(DEFAULT_SETTING_PATH);
             DefaultSetting newSetting;
 
-            Logger.info("in handleForm");
+            LOGGER.info("in handleForm");
             String prepend = request.getParameter("prepend");
             String prefix = request.getParameter("idprefix");
             String isAuto = request.getParameter("mintType");
@@ -130,7 +132,7 @@ public class MinterController {
                     tokenType = (sansVowel) ? TokenType.LOWER_CONSONANTS_EXTENDED
                             : TokenType.LOWER_ALPHABET_EXTENDED;
                 }
-                else if (digitToken == null && lowerToken == null && upperToken != null) {
+                else if (digitToken != null && lowerToken == null && upperToken != null) {
                     tokenType = (sansVowel) ? TokenType.UPPER_CONSONANTS_EXTENDED
                             : TokenType.UPPER_ALPHABET_EXTENDED;
                 }
@@ -172,12 +174,12 @@ public class MinterController {
         finally {
             // unlocks RequestLock and gives access to longest waiting thread            
             RequestLock.unlock();
-            Logger.warn("Request to update default settings finished, UNLOCKING MINTER");
+            LOGGER.warn("Request to update default settings finished, UNLOCKING MINTER");
         }
 
         // redirect to the administration panel located at http://[domain]/
         ModelAndView mav = new ModelAndView();
-        mav.setViewName("redirect:Minter/administration");
+        mav.setViewName("redirect:administration");
         return mav;
     }
 
@@ -201,7 +203,7 @@ public class MinterController {
         RequestLock.lock();
 
         try {
-            Logger.info("Request to Minter made, LOCKING MINTER");
+            LOGGER.info("Request to Minter made, LOCKING MINTER");
 
             // validate amount
             validateAmount(requestedAmount);
@@ -215,16 +217,15 @@ public class MinterController {
 
             // convert the set of ids into a json array
             String message = convertSetToJson(idList, tempSetting.getPrepend());
-            Logger.info("Message from Minter: " + message);
+            LOGGER.info("Message from Minter: " + message);
 
             // print list of ids to screen
-            Logger.debug(message);
             mav.addObject("message", message);
         }
         finally {
             // unlocks RequestLock and gives access to longest waiting thread            
             RequestLock.unlock();
-            Logger.info("Request to Minter Finished, UNLOCKING MINTER");
+            LOGGER.info("Request to Minter Finished, UNLOCKING MINTER");
         }
         mav.setViewName("mint");
 
@@ -246,7 +247,7 @@ public class MinterController {
         DefaultSetting defaultSetting = MinterService.getCurrentSetting(DEFAULT_SETTING_PATH);
 
         // add the values to the settings page so that they can be displayed 
-        Logger.info("index page called");
+        LOGGER.info("index page called");
         model.addObject("prepend", defaultSetting.getPrepend());
         model.addObject("prefix", defaultSetting.getPrefix());
         model.addObject("charMap", defaultSetting.getCharMap());
@@ -280,9 +281,10 @@ public class MinterController {
      * @param exception NotEnoughPermutationsException.
      * @return The view of the error message in json format.
      */
+    @ResponseStatus(code = HttpStatus.BAD_REQUEST)
     @ExceptionHandler(NotEnoughPermutationsException.class)
     public ModelAndView handlePermutationError(HttpServletRequest req, Exception exception) {
-        Logger.error("Request: " + req.getRequestURL()
+        LOGGER.error("Request: " + req.getRequestURL()
                 + " raised " + exception
                 + " with message " + exception.getMessage());
 
@@ -302,14 +304,15 @@ public class MinterController {
      * @param exception BadParameterException.
      * @return The view of the error message in json format.
      */
+    @ResponseStatus(code = HttpStatus.BAD_REQUEST)
     @ExceptionHandler(BadParameterException.class)
     public ModelAndView handleBadParameterError(HttpServletRequest req, Exception exception) {
-        Logger.error("Request: " + req.getRequestURL() + " raised " + exception);
+        LOGGER.error("Request: " + req.getRequestURL() + " raised " + exception);
         ModelAndView mav = new ModelAndView();
         mav.addObject("status", 400);
         mav.addObject("exception", exception.getClass().getSimpleName());
         mav.addObject("message", exception.getMessage());
-        Logger.error("Error with bad parameter: " + exception.getMessage());
+        LOGGER.error("Error with bad parameter: " + exception.getMessage());
 
         mav.setViewName("error");
         return mav;
@@ -322,13 +325,14 @@ public class MinterController {
      * @param exception the caught exception
      * @return The view of the error message
      */
+    @ResponseStatus(code = HttpStatus.BAD_REQUEST)
     @ExceptionHandler(Exception.class)
     public ModelAndView handleGeneralError(HttpServletRequest req, Exception exception) {
         ModelAndView mav = new ModelAndView();
         mav.addObject("status", 500);
         mav.addObject("exception", exception.getClass().getSimpleName());
         mav.addObject("message", exception.getMessage());
-        Logger.error("General Error: " + exception.getMessage());
+        LOGGER.error("General Error: " + exception.getMessage());
 
         mav.setViewName("error");
         return mav;
