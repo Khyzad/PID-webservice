@@ -83,7 +83,7 @@ public class CustomIdGenerator extends IdGenerator {
             Pid currentId = new Pid(tempIdBaseMap, Prefix);
             this.assignName(currentId);
             
-            LOGGER.trace("Generated Custom Random ID: " + currentId);
+            LOGGER.trace("Generated Custom Random ID: {}", currentId);
             while (!pidSet.add(currentId)) {                
                 this.incrementPid(currentId);
             }
@@ -114,7 +114,7 @@ public class CustomIdGenerator extends IdGenerator {
         for (int i = 0; i < amount; i++) {
             Pid nextId = new Pid(currentId);
             pidSet.add(currentId);
-            LOGGER.trace("Generated Custom Sequential ID: " + currentId);            
+            LOGGER.trace("Generated Custom Sequential ID: {}", currentId);            
             this.incrementPid(nextId);
             currentId = new Pid(nextId);
         }
