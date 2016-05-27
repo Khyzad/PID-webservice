@@ -88,7 +88,7 @@ public abstract class IdGenerator {
      * or 'e'.
      */
     public final boolean isValidCharMap(String charMap) {
-        return charMap.matches("^[dlume]*$");
+        return charMap.matches("^[dlume]+$");
     }
 
     /* typical getter and setter methods */
