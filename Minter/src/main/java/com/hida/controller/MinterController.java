@@ -262,15 +262,12 @@ public class MinterController {
     }
     
     /**
-     * Maps to the index
+     * Maps to the root of the application
      * @return 
      */
     @RequestMapping(value = {""}, method = {RequestMethod.GET})
-    public ModelAndView displayIndex(){
-        ModelAndView mav = new ModelAndView();
-        
-        mav.setViewName("index");
-        return mav;
+    public String displayIndex(){        
+        return "";
     }
 
     /**
