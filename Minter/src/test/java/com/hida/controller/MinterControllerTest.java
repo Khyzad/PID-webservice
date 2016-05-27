@@ -53,7 +53,7 @@ public class MinterControllerTest {
     private final String PREPEND = "http://digitalarchives.hawaii.gov/70111/";
     private final int AMOUNT = 5;
 
-    private static final Logger Logger = LoggerFactory.getLogger(MinterControllerTest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MinterControllerTest.class);
 
     @BeforeClass
     public void setUpClass() throws Exception {
@@ -260,7 +260,7 @@ public class MinterControllerTest {
 
         // create Json objects to extract Json array
         String message = (String) Mav.getModel().get("message");;
-        Logger.debug(message);
+        LOGGER.debug(message);
         JSONArray testJsonArray = new JSONArray(message);
 
         // test the pid and ensure that they match the used setting
