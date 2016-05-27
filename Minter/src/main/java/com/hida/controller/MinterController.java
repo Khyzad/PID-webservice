@@ -195,13 +195,17 @@ public class MinterController {
      * @throws Exception catches all sorts of exceptions that may be thrown by
      * any methods
      */
-    @RequestMapping(value = {"/mint/{requestedAmount}"}, method = {RequestMethod.GET})
-    public ModelAndView mintPids(@PathVariable long requestedAmount, ModelAndView mav,
+    @ResponseStatus(code = HttpStatus.CREATED)
+    @RequestMapping(value = {"/mint/{requestedAmount}"}, 
+            method = {RequestMethod.GET}, 
+            produces = "application/json")
+    public Set<Pid> mintPids(@PathVariable long requestedAmount, ModelAndView mav,
             @RequestParam Map<String, String> parameters) throws Exception {
 
         // ensure that only one thread access the minter at any given time
         RequestLock.lock();
 
+        Set<Pid> pidSet;
         try {
             LOGGER.info("Request to Minter made, LOCKING MINTER");
 
@@ -213,10 +217,10 @@ public class MinterController {
                     MinterService.getCurrentSetting(DEFAULT_SETTING_PATH));
 
             // create the set of ids
-            Set<Pid> idList = MinterService.mint(requestedAmount, tempSetting);
-
+            pidSet = MinterService.mint(requestedAmount, tempSetting);
+            
             // convert the set of ids into a json array
-            String message = convertSetToJson(idList, tempSetting.getPrepend());
+            String message = convertSetToJson(pidSet, tempSetting.getPrepend());
             LOGGER.info("Message from Minter: " + message);
 
             // print list of ids to screen
@@ -230,7 +234,7 @@ public class MinterController {
         mav.setViewName("mint");
 
         // return to mint       
-        return mav;
+        return pidSet;
     }
 
     /**

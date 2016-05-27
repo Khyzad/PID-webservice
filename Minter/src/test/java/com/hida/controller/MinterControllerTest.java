@@ -207,9 +207,7 @@ public class MinterControllerTest {
         when(MinterServiceDao.mint(anyInt(), any(DefaultSetting.class))).
                 thenReturn(getSampleSet(tempSetting));
        
-        // check to see if the correct html page is returned
-        String viewName = Controller.mintPids(AMOUNT, Mav, map).getViewName();
-        Assert.assertEquals("mint", viewName);
+        Controller.mintPids(AMOUNT, Mav, map);
 
         // create Json objects to extract Json array
         String message = (String) Mav.getModel().get("message");
@@ -252,12 +250,10 @@ public class MinterControllerTest {
         when(MinterServiceDao.getCurrentSetting(any(String.class))).thenReturn(setting);
         when(MinterServiceDao.mint(anyInt(), any(DefaultSetting.class))).
                 thenReturn(getSampleSet(setting));
-
-        // check to see if the correct html page is returned
-        String viewName = 
-                Controller.mintPids(AMOUNT, Mav, new HashMap<String, String>()).getViewName();
-        Assert.assertEquals("mint", viewName);
-
+                
+        
+        Controller.mintPids(AMOUNT, Mav, new HashMap<String, String>());
+                
         // create Json objects to extract Json array
         String message = (String) Mav.getModel().get("message");;
         LOGGER.debug(message);
