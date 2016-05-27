@@ -1,7 +1,7 @@
 package com.hida.model;
 
 import static com.hida.model.IdGenerator.Rng;
-import static com.hida.model.IdGenerator.Logger;
+import static com.hida.model.IdGenerator.LOGGER;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -83,7 +83,7 @@ public class CustomIdGenerator extends IdGenerator {
             Pid currentId = new Pid(tempIdBaseMap, Prefix);
             this.assignName(currentId);
             
-            Logger.trace("Generated Custom Random ID: " + currentId);
+            LOGGER.trace("Generated Custom Random ID: " + currentId);
             while (!pidSet.add(currentId)) {                
                 this.incrementPid(currentId);
             }
@@ -114,7 +114,7 @@ public class CustomIdGenerator extends IdGenerator {
         for (int i = 0; i < amount; i++) {
             Pid nextId = new Pid(currentId);
             pidSet.add(currentId);
-            Logger.trace("Generated Custom Sequential ID: " + currentId);            
+            LOGGER.trace("Generated Custom Sequential ID: " + currentId);            
             this.incrementPid(nextId);
             currentId = new Pid(nextId);
         }

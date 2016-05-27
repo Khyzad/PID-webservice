@@ -1,7 +1,6 @@
 package com.hida.model;
 
 import java.security.SecureRandom;
-import java.util.HashMap;
 import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,9 +20,9 @@ public abstract class IdGenerator {
     protected static final SecureRandom Rng = new SecureRandom();   
 
     /**
-     * Logger; logfile to be stored in resource folder
+     * LOGGER; logfile to be stored in resource folder
      */
-    protected static final Logger Logger = LoggerFactory.getLogger(IdGenerator.class);   
+    protected static final Logger LOGGER = LoggerFactory.getLogger(IdGenerator.class);   
 
     /**
      * The string that will be at the front of every id

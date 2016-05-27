@@ -38,7 +38,7 @@ public class MinterService {
     /**
      * Logger; logfile to be stored in resource folder
      */
-    private static final Logger Logger = LoggerFactory.getLogger(MinterService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MinterService.class);
 
     @Autowired
     private PidRepository PidRepo;
@@ -73,7 +73,7 @@ public class MinterService {
      * @return The amount of permutations remaining
      */
     private long getRemainingPermutations() {
-        Logger.info("in getRemainingPerumtations");
+        LOGGER.info("in getRemainingPerumtations");
         long totalPermutations = Generator.calculatePermutations();
         long amountCreated = getAmountCreated();
 
@@ -99,21 +99,21 @@ public class MinterService {
      * Creates a generator to be used in accordance to the setting
      */
     private void createGenerator() {
-        Logger.info("in createGenerator");
+        LOGGER.info("in createGenerator");
         if (CurrentDefaultSetting.isAuto()) {
             Generator = new AutoIdGenerator(
                     CurrentDefaultSetting.getPrefix(),
                     CurrentDefaultSetting.getTokenType(),
                     CurrentDefaultSetting.getRootLength());
 
-            Logger.info("AutoGenerator created");
+            LOGGER.info("AutoGenerator created");
         }
         else {
             Generator = new CustomIdGenerator(
                     CurrentDefaultSetting.getPrefix(),
                     CurrentDefaultSetting.isSansVowels(),
                     CurrentDefaultSetting.getCharMap());
-            Logger.info("CustomIdGenerator created");
+            LOGGER.info("CustomIdGenerator created");
         }
     }
 
@@ -125,7 +125,7 @@ public class MinterService {
      * @return
      */
     public Set<Pid> mint(long amount, DefaultSetting setting) {
-        Logger.info("in mint");
+        LOGGER.info("in mint");
 
         // store the desired setting values 
         this.CurrentDefaultSetting = setting;
@@ -141,12 +141,12 @@ public class MinterService {
 
         // determine if its possible to create the requested amount of ids
         if (remaining < amount) {
-            Logger.error("Not enough remaining Permutations, "
+            LOGGER.error("Not enough remaining Permutations, "
                     + "Requested Amount=" + amount + " --> "
                     + "Amount Remaining=" + remaining);
             throw new NotEnoughPermutationsException(remaining, amount);
         }
-        Logger.info("request is valid");
+        LOGGER.info("request is valid");
 
         /* 
          if the current setting is random, have the generator return a random set,
@@ -176,7 +176,7 @@ public class MinterService {
      * @return A set of unique ids database.
      */
     private Set<Pid> rollIdSet(Set<Pid> set, long totalPermutations, long amount) {
-        Logger.info("in rollIdSet");
+        LOGGER.info("in rollIdSet");
         // Used to count the number of unique ids. Size methods aren't used because int is returned
         long uniqueIdCounter = 0;
 
@@ -197,7 +197,7 @@ public class MinterService {
                  NotEnoughPermutationsException is thrown stating remaining number of ids.
                  */
                 if (counter > totalPermutations) {
-                    Logger.error("Total number of Permutations Exceeded: Total Permutation Count="
+                    LOGGER.error("Total number of Permutations Exceeded: Total Permutation Count="
                             + totalPermutations);
                     throw new NotEnoughPermutationsException(uniqueIdCounter, amount);
                 }                
@@ -225,13 +225,13 @@ public class MinterService {
      * @param rootLength Designates the length of the id's root.
      */
     private void addIdList(Set<Pid> list, long amountCreated) {
-        Logger.info("in addIdlIst");
+        LOGGER.info("in addIdlIst");
 
         for (Pid pid : list) {
             PidRepo.save(pid);
         }
 
-        Logger.info("DatabaseUpdated with new pids");
+        LOGGER.info("DatabaseUpdated with new pids");
         // update table format
         recordSettings(amountCreated);
 
@@ -244,7 +244,7 @@ public class MinterService {
      * @return Returns a UsedSetting entity if found, null otherwise
      */
     private UsedSetting findUsedSetting() {
-        Logger.info("in findUsedSetting");
+        LOGGER.info("in findUsedSetting");
 
         return UsedSettingRepo.findUsedSetting(CurrentDefaultSetting.getPrefix(),
                 CurrentDefaultSetting.getTokenType(),
@@ -260,7 +260,7 @@ public class MinterService {
      * @param amount The number of PIDs that were created
      */
     private void recordSettings(long amount) {
-        Logger.info("in recordSettings");
+        LOGGER.info("in recordSettings");
 
         UsedSetting entity = findUsedSetting();
 
@@ -288,7 +288,7 @@ public class MinterService {
      * otherwise
      */
     private boolean isValidId(Pid pid) {
-        Logger.info("in isValidId");
+        LOGGER.info("in isValidId");
         Pid entity = this.PidRepo.findOne(pid.getName());
         return entity == null;
     }
@@ -303,7 +303,7 @@ public class MinterService {
      * @throws IOException
      */
     public void updateCurrentSetting(String filePath, DefaultSetting newSetting) throws Exception {
-        Logger.info("in updateCurrentSetting");
+        LOGGER.info("in updateCurrentSetting");
 
         CurrentDefaultSetting = DefaultSettingRepo.findCurrentDefaultSetting();
         CurrentDefaultSetting.setPrepend(newSetting.getPrepend());
