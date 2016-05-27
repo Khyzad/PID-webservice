@@ -173,7 +173,7 @@ public class MinterControllerTest {
         
         ModelAndView mav = Controller.handleForm(request, response);
 
-        Assert.assertEquals("redirect:Minter", mav.getViewName());
+        Assert.assertEquals("redirect:administration", mav.getViewName());
     }
 
     /**
