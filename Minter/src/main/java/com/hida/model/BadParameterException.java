@@ -19,17 +19,7 @@ public class BadParameterException extends Exception {
     public BadParameterException(Object parameter, String parameterType){        
         Parameter = parameter ;
         ParameterType = parameterType;
-    }
-    
-    /**
-     * Constructs an instance of <code>BadParameterException</code> with the
-     * specified detail message.
-     *
-     * @param msg the detail message.
-     */
-    public BadParameterException(String msg) {
-        super(msg);
-    }
+    }        
     
     @Override
     public String getMessage(){
