@@ -5,9 +5,9 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 
 /**
- * A POJO representing a type of setting that records the values of the
- * IdGenerators used to create Pids and the current default values of all the
- * parameters.
+ * A type of Setting that references the default values that could be used to
+ * create a set of Pids. These default values can be overridden and only one
+ * DefaultSetting object is persisted in the database at any given time. 
  *
  * @author lruffin
  */
@@ -45,7 +45,7 @@ public class DefaultSetting extends Setting {
         this.Auto = Auto;
         this.Random = Random;
 
-    }     
+    }
 
     /**
      * No-arg constructor used by Hibernate

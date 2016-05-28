@@ -1,10 +1,8 @@
 package com.hida.model;
 
 /**
- * An Enum created to hold define the tokens used by the Minter class. Enums are
- * inherently serializable and, as such, do not need to implement Serializable.
- * All Enums will have the have a serialVersionUID of 0L and will therefore not
- * need to be specified.
+ * A group of objects that uniquely identifies a sequence of possible and valid
+ * characters that can be found in the name of a Pid.
  *
  * @author lruffin
  */

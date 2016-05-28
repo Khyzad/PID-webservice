@@ -6,7 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * An abstract Id generator that all potential Pid generators should extend. 
+ * An abstract Id generator That 
  *
  * @author Brittany Cruz
  * @author lruffin

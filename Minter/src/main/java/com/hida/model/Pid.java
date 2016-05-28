@@ -8,13 +8,8 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 
 /**
- * An object used to model every Pid. By definition, each Pid will have a unique
- * name associated with it. However, to determine uniqueness, each newly created
- * Pid must be compared to previously existing Ids.
- *
- * Comparisons will be made by using Sets collection. Depending on which set is
- * used, the Comparable interface and an overridden equals and hashCode methods
- * were overridden to accommodate.
+ * A Pid (persistent identifier) is an object that is used to hold a unique
+ * sequence of characters to reference other objects in a given domain.
  *
  * @author lruffin
  */

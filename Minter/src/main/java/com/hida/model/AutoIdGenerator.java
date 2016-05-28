@@ -6,8 +6,10 @@ import java.util.Set;
 import java.util.TreeSet;
 
 /**
- * An Id Generator that creates Pids primarily based on tokenType and
- * rootLength.
+ * An Id Generator that creates Pids. For each Pid, their entire name will be
+ * uniformly determined by the possible characters provided by a single
+ * TokenType.
+ *
  *
  * @author lruffin
  */
@@ -63,10 +65,9 @@ public class AutoIdGenerator extends IdGenerator {
             }
             Pid currentId = new Pid(tempIdBaseMap, Prefix);
             this.assignName(currentId);
-            
-            
+
             // increment the Pid until a unique value has been found
-            while (!pidSet.add(currentId)) {                
+            while (!pidSet.add(currentId)) {
                 this.incrementPid(currentId);
             }
             LOGGER.trace("Generated Auto Random ID: {}", currentId);
@@ -91,14 +92,14 @@ public class AutoIdGenerator extends IdGenerator {
         // declare an empty array to start from and a set to hold all Pids
         Set<Pid> pidSet = new TreeSet<>();
         int[] previousIdBaseMap = new int[RootLength];
-        
+
         // generate Pids
         Pid currentId = new Pid(previousIdBaseMap, Prefix);
         this.assignName(currentId);
         for (int i = 0; i < amount; i++) {
             Pid nextId = new Pid(currentId);
             pidSet.add(currentId);
-            LOGGER.trace("Generated Auto Sequential ID: {}", currentId);            
+            LOGGER.trace("Generated Auto Sequential ID: {}", currentId);
             this.incrementPid(nextId);
             currentId = new Pid(nextId);
         }
@@ -131,8 +132,8 @@ public class AutoIdGenerator extends IdGenerator {
     public void incrementPid(Pid pid) {
         int tokenMapRange = TokenType.getCharacters().length() - 1;
         int baseMapRange = pid.getBaseMap().length - 1;
-        boolean overflow = true;       
-        
+        boolean overflow = true;
+
         // increment the values in a pid's basemap
         for (int k = 0; k <= baseMapRange && overflow; k++) {
             // record value of current index

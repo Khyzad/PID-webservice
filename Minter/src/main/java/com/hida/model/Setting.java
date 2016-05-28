@@ -10,8 +10,7 @@ import javax.persistence.MappedSuperclass;
 import javax.validation.constraints.NotNull;
 
 /**
- * A POJO that contain all the fields and properties that should be recorded by
- * Hibernate.
+ * An object that references a list of values that are used to create a Pid.
  *
  * @author lruffin
  */

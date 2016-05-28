@@ -5,8 +5,9 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 
 /**
- * A POJO representing a type of setting that records the amount of Pids that
- * were created using the values provided in the constructor.
+ * A type of Setting that references the exact values that were used to
+ * create a set of Pids while recording the number of Pids that were created
+ * using these values.
  *
  * @author lruffin
  */
