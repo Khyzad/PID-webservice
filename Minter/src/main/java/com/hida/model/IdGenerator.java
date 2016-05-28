@@ -53,7 +53,7 @@ public abstract class IdGenerator {
      * @return true if it contains numbers and letters and does not exceed 20
      * characters.
      */
-    public final boolean isValidPrefix(String prefix) {
+    public static final boolean isValidPrefix(String prefix) {
         return prefix.matches("^[0-9a-zA-Z]*$") && prefix.length() <= 20;
     }
 
@@ -63,7 +63,7 @@ public abstract class IdGenerator {
      * @param amount The amount of ids requested.
      * @return True if amount is non-negative.
      */
-    public final boolean isValidAmount(long amount) {
+    public static final boolean isValidAmount(long amount) {
         return amount >= 0;
     }
 
@@ -73,7 +73,7 @@ public abstract class IdGenerator {
      * @param rootLength Designates the length of the id's root.
      * @return True if rootLength is non-negative and less than or equal to 10.
      */
-    public final boolean isValidRootLength(long rootLength) {
+    public static final boolean isValidRootLength(long rootLength) {
         return rootLength >= 0 && rootLength <= 10;
     }
 
@@ -85,7 +85,7 @@ public abstract class IdGenerator {
      * @return True if charMap only contains the characters: 'd', 'l', 'u', 'm',
      * or 'e'.
      */
-    public final boolean isValidCharMap(String charMap) {
+    public static final boolean isValidCharMap(String charMap) {
         return charMap.matches("^[dlume]+$");
     }
 

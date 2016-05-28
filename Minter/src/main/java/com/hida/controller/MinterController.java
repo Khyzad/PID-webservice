@@ -2,6 +2,7 @@ package com.hida.controller;
 
 import com.hida.model.BadParameterException;
 import com.hida.model.DefaultSetting;
+import com.hida.model.IdGenerator;
 import com.hida.model.Pid;
 import com.hida.model.TokenType;
 import com.hida.service.MinterService;
@@ -255,7 +256,7 @@ public class MinterController {
     @RequestMapping(value = {""}, method = {RequestMethod.GET})
     public String displayIndex() {
         return "";
-    }   
+    }
 
     /**
      * Handles any exception that may be caught within the program
@@ -299,7 +300,7 @@ public class MinterController {
                 : entity.getPrefix();
 
         int rootLength = (parameters.containsKey("rootLength"))
-                ? Integer.parseInt(parameters.get("rootLength"))
+                ? validateRootLength(Integer.parseInt(parameters.get("rootLength")))
                 : entity.getRootLength();
 
         String charMap = (parameters.containsKey("charMap"))
@@ -354,7 +355,7 @@ public class MinterController {
         else {
             throw new BadParameterException(parameter, parameterType);
         }
-    }   
+    }
 
     /**
      * Checks to see if a given charMap is valid. A valid CharMap follows the
@@ -366,7 +367,7 @@ public class MinterController {
      * detected.
      */
     private String validateCharMap(String charMap) throws BadParameterException {
-        if (!charMap.matches("[dlume]+")) {
+        if (!IdGenerator.isValidCharMap(charMap)) {
             throw new BadParameterException(charMap, "charMap");
         }
         return charMap;
@@ -381,9 +382,23 @@ public class MinterController {
      * detected.
      */
     private void validateAmount(long amount) throws BadParameterException {
-        if (amount < 0) {
+        if (!IdGenerator.isValidAmount(amount)) {
             throw new BadParameterException(amount, "amount");
         }
+    }
+
+    /**
+     * Checks to see if the rootLength is valid. A valid amount is greater than
+     * 0 and less than 11. 
+     * @param rootLength
+     * @return
+     * @throws BadParameterException 
+     */
+    private int validateRootLength(int rootLength) throws BadParameterException {
+        if (!IdGenerator.isValidRootLength(rootLength)) {
+            throw new BadParameterException(rootLength, "rootLength");
+        }
+        return rootLength;
     }
 
     /**
@@ -397,7 +412,7 @@ public class MinterController {
      * detected.
      */
     private String validatePrefix(String prefix) throws BadParameterException {
-        if (!prefix.matches("[a-zA-z0-9]*")) {
+        if (!IdGenerator.isValidPrefix(prefix)) {
             throw new BadParameterException(prefix, "prefix");
         }
         return prefix;
