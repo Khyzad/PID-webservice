@@ -1,11 +1,9 @@
 package com.hida.model;
 
-import java.util.Arrays;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 
 /**
  * A Pid (persistent identifier) is an object that is used to hold a unique
@@ -19,18 +17,16 @@ public class Pid implements Comparable<Pid> {
 
     @Id
     @Column(name = "NAME", updatable = false, nullable = false)
-    protected String Name;
-
-    @Transient
-    protected int[] BaseMap;
-
-    @Transient
-    protected String Prefix;
+    private String Name;
 
     /**
      * A no-arg constructor to be used by Hibernate
      */
     public Pid() {
+    }
+
+    public Pid(String Name) {
+        this.Name = Name;
     }
 
     /**
@@ -39,52 +35,8 @@ public class Pid implements Comparable<Pid> {
      *
      * @param id The Id to copy from.
      */
-    public Pid(Pid id) {
-        this.Prefix = id.Prefix;
-        this.BaseMap = Arrays.copyOf(id.getBaseMap(), id.getBaseMap().length);
+    public Pid(Pid id) {        
         this.Name = id.Name;
-    }
-
-    /**
-     * Recommended, default constructor
-     *
-     * @param baseMap An array of integers that contain the indices described by
-     * tokenMap
-     * @param Prefix A sequence of characters that appear in the beginning of
-     * PIDs
-     */
-    public Pid(int[] baseMap, String Prefix) {
-        this.BaseMap = Arrays.copyOf(baseMap, baseMap.length);
-        this.Prefix = Prefix;
-    }
-
-    @Override
-    public int hashCode() {
-        // arbitrarily chosen prime numbers
-        final int prime1 = 37;
-        final int prime2 = 257;
-
-        int hash = prime1 * prime2 + Arrays.hashCode(this.BaseMap);
-        return hash;
-    }
-
-    /**
-     * Overridden so that id's can be identified solely by its baseName.
-     *
-     * @param obj the Object this id is being compared to
-     * @return true if the two Objects are the same.
-     */
-    @Override
-    public boolean equals(Object obj) {
-        if (obj == null) {
-            return false;
-        }
-        if (!(obj instanceof Pid)) {
-            return false;
-        }
-        final Pid paramId = (Pid) obj;
-
-        return Arrays.equals(this.BaseMap, paramId.BaseMap);
     }
 
     /**
@@ -127,6 +79,28 @@ public class Pid implements Comparable<Pid> {
         }
     }
 
+    /**
+     * Updates this Pid's name by replacing a character located at index i with
+     * character c.
+     *
+     * @param i index
+     * @param c character
+     */
+    public void replace(int i, char c) {
+        String newName = "";
+
+        for (int j = 0; j < Name.length(); j++) {
+            if (j == i) {
+                newName += c;
+            }
+            else {
+                newName += Name.charAt(j);
+            }
+        }
+
+        Name = newName;
+    }
+
     /* getters and setters */
     public String getName() {
         return Name;
@@ -134,39 +108,5 @@ public class Pid implements Comparable<Pid> {
 
     public void setName(String Name) {
         this.Name = Name;
-    }
-
-    /**
-     * The BaseMap is the numerical representation of this Pid's name. Used in
-     * conjunction with TokenMap to return the string representation of this
-     * id's name in its toString method.
-     *
-     * @return The array used to create the name
-     */
-    public int[] getBaseMap() {
-        return BaseMap;
-    }
-
-    /**
-     * The BaseMap is the numerical representation of this Pid's name. Used in
-     * conjunction with TokenMap to return the string representation of this
-     * id's name in its toString method.
-     *
-     * Be warned that the array must have a unique address for it to work with
-     * Sets. The length of the array must be equal to TokenMap, otherwise an
-     * IndexOutOfBounds error will be thrown in the getRootName method.
-     *
-     * @param baseMap The new array to replace the name.
-     */
-    public void setBaseMap(int[] baseMap) {
-        this.BaseMap = baseMap;
-    }
-
-    public String getPrefix() {
-        return Prefix;
-    }
-
-    public void setPrefix(String Prefix) {
-        this.Prefix = Prefix;
     }
 }
