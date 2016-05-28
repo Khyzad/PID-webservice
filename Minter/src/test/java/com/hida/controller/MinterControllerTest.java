@@ -215,25 +215,17 @@ public class MinterControllerTest {
         tempSetting.setRandom(Boolean.getBoolean(map.get("random")));
         tempSetting.setSansVowels(Boolean.getBoolean(map.get("sansVowels")));
 
+        Set<Pid> sampleSet = getSampleSet(tempSetting);
+        
         // return originalSetting when getCurrentSetting is called and a sample Pid set 
         when(MinterServiceDao.getCurrentSetting(any(String.class))).thenReturn(originalSetting);
         when(MinterServiceDao.mint(anyInt(), any(DefaultSetting.class))).
                 thenReturn(getSampleSet(tempSetting));
        
-        Controller.mintPids(AMOUNT, map);
-
-        // create Json objects to extract Json array
-        String message = (String) Mav.getModel().get("message");
-        JSONArray testJsonArray = new JSONArray(message);
-
-        // test the pid and ensure that they match the used setting
-        for (int i = 0; i < AMOUNT; i++) {
-            JSONObject object = testJsonArray.getJSONObject(i);
-            int id = object.getInt("id");
-            String name = object.getString("name");
-            Assert.assertEquals(id, i);
-            testPid(name, tempSetting);
-        }
+        Set<Pid> pidSet = Controller.mintPids(AMOUNT, map);                        
+        
+        Assert.assertEquals(sampleSet.size(), pidSet.size());
+        
     }
 
     /**
@@ -260,26 +252,16 @@ public class MinterControllerTest {
         DefaultSetting setting = new DefaultSetting(prepend, prefix, tokenType, charMap,
                 rootLength, isAuto, isRandom, sansVowel);
 
+        Set<Pid> sampleSet = getSampleSet(setting);
+        
         when(MinterServiceDao.getCurrentSetting(any(String.class))).thenReturn(setting);
         when(MinterServiceDao.mint(anyInt(), any(DefaultSetting.class))).
-                thenReturn(getSampleSet(setting));
+                thenReturn(sampleSet);
                 
         
-        Controller.mintPids(AMOUNT, new HashMap<String, String>());
-                
-        // create Json objects to extract Json array
-        String message = (String) Mav.getModel().get("message");;
-        LOGGER.debug(message);
-        JSONArray testJsonArray = new JSONArray(message);
-
-        // test the pid and ensure that they match the used setting
-        for (int i = 0; i < testJsonArray.length(); i++) {
-            JSONObject object = testJsonArray.getJSONObject(i);
-            int id = object.getInt("id");
-            String name = object.getString("name");
-            Assert.assertEquals(id, i);
-            testPid(name, setting);
-        }
+        Set<Pid> pidSet = Controller.mintPids(AMOUNT, new HashMap<String, String>());                        
+        
+        Assert.assertEquals(sampleSet.size(), pidSet.size());
     }
 
     /**
