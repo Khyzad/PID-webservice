@@ -172,7 +172,17 @@ public class MinterControllerTest {
                 updateCurrentSetting(any(String.class), any(DefaultSetting.class));
 
         // call the method to test
-        Controller.handleForm(request, response);
+        Controller.handleForm("prepend",
+                "idprefix",
+                "mintType",
+                "mintOrder",
+                true,
+                5,                
+                "charmapping",                
+                false,                
+                true,                
+                true,                
+                request, response);
         
         // get and test the url of the destination
         String viewName = response.getHeader("Location");        
@@ -210,7 +220,7 @@ public class MinterControllerTest {
         when(MinterServiceDao.mint(anyInt(), any(DefaultSetting.class))).
                 thenReturn(getSampleSet(tempSetting));
        
-        Controller.mintPids(AMOUNT, Mav, map);
+        Controller.mintPids(AMOUNT, map);
 
         // create Json objects to extract Json array
         String message = (String) Mav.getModel().get("message");
@@ -255,7 +265,7 @@ public class MinterControllerTest {
                 thenReturn(getSampleSet(setting));
                 
         
-        Controller.mintPids(AMOUNT, Mav, new HashMap<String, String>());
+        Controller.mintPids(AMOUNT, new HashMap<String, String>());
                 
         // create Json objects to extract Json array
         String message = (String) Mav.getModel().get("message");;
@@ -288,7 +298,7 @@ public class MinterControllerTest {
         DefaultSetting setting = this.getSampleDefaultSetting();
 
         when(MinterServiceDao.getCurrentSetting(any(String.class))).thenReturn(setting);
-        Controller.mintPids(AMOUNT, Mav, parameters);
+        Controller.mintPids(AMOUNT, parameters);
     }
 
     /**
@@ -305,7 +315,7 @@ public class MinterControllerTest {
         DefaultSetting setting = this.getSampleDefaultSetting();
 
         when(MinterServiceDao.getCurrentSetting(any(String.class))).thenReturn(setting);
-        Controller.mintPids(AMOUNT, Mav, parameters);
+        Controller.mintPids(AMOUNT, parameters);
     }
 
     /**
@@ -322,7 +332,7 @@ public class MinterControllerTest {
         DefaultSetting setting = this.getSampleDefaultSetting();
 
         when(MinterServiceDao.getCurrentSetting(any(String.class))).thenReturn(setting);
-        Controller.mintPids(AMOUNT, Mav, parameters);
+        Controller.mintPids(AMOUNT, parameters);
     }
 
     /**
@@ -338,7 +348,7 @@ public class MinterControllerTest {
         DefaultSetting setting = this.getSampleDefaultSetting();
 
         when(MinterServiceDao.getCurrentSetting(any(String.class))).thenReturn(setting);
-        Controller.mintPids(-1, Mav, parameters);
+        Controller.mintPids(-1, parameters);
     }
 
     /**
@@ -355,7 +365,7 @@ public class MinterControllerTest {
         DefaultSetting setting = this.getSampleDefaultSetting();
 
         when(MinterServiceDao.getCurrentSetting(any(String.class))).thenReturn(setting);
-        Controller.mintPids(AMOUNT, Mav, parameters);
+        Controller.mintPids(AMOUNT, parameters);
     }
 
     /**
