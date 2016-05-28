@@ -46,8 +46,6 @@ public abstract class IdGenerator {
     
     public abstract void incrementPid(Pid pid);
     
-    protected abstract void assignName(Pid pid);
-
     /**
      * Checks whether or not the prefix is valid.
      *
