@@ -27,44 +27,57 @@ public class PidRepositoryTest {
     @Autowired
     public void setPidRepository(PidRepository PidRepo) {
         this.PidRepo = PidRepo;
-    }
-
+    }   
+    
     /**
-     * Tests to see if all the Pids can be listed and returned.
+     * A test that ensures that Pids with the same name cannot be added to the
+     * database
      */
     @Test
-    public void testFindAllPids() {
-        /*
-        Pid autoSample = getSampleAutoId();
-        Pid customSample = getSampleCustomId();
-
-        PidRepo.save(autoSample);
-        PidRepo.save(customSample);
-
-        long size = PidRepo.count();
-
-        Assert.assertEquals(size, 2);
-        */
-    }
-    
-    @Test
     public void testUniqeness(){
-        Assert.fail("unimplemented");
+        Pid pid1 = getSamplePid();
+        Pid pid2 = getSamplePid();
+        
+        PidRepo.save(pid1);
+        PidRepo.save(pid2);
+        
+        long sizeBefore = PidRepo.count();        
+        Assert.assertEquals(sizeBefore, 1);
     }
     
+    /**
+     * Tests the save and delete function
+     */
     @Test
     public void testSaveAndDelete(){
-        Assert.fail("unimplemented");
+        Pid pid = getSamplePid();
+        
+        PidRepo.save(pid);
+        
+        long sizeBefore = PidRepo.count();        
+        Assert.assertEquals(sizeBefore, 1);
+        
+        PidRepo.delete(pid);
+        
+        long sizeAfter = PidRepo.count();        
+        Assert.assertEquals(sizeAfter, 0);
     }
     
+    /**
+     * Test to see if a Pid can be located by its Name
+     */
     @Test
     public void testFindByName(){
-        Assert.fail("unimplemented");
+        Pid pid = getSamplePid();
+        
+        PidRepo.save(pid);
+        
+        Pid entity = PidRepo.findOne(pid.getName());
+        Assert.assertNotNull(entity);
     }      
     
     private Pid getSamplePid(){
-        Pid sample = new Pid(new int[] {1}, "");
-        sample.setName("a");
+        Pid sample = new Pid("a");
         
         return sample;
     }
