@@ -2,27 +2,20 @@ package com.hida.controller;
 
 import com.hida.model.BadParameterException;
 import com.hida.model.DefaultSetting;
-import com.hida.model.NotEnoughPermutationsException;
 import com.hida.model.Pid;
 import com.hida.model.TokenType;
 import com.hida.service.MinterService;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.util.concurrent.locks.ReentrantLock;
-import javax.json.Json;
-import javax.json.JsonArray;
-import javax.json.JsonArrayBuilder;
-import javax.json.JsonBuilderFactory;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -215,10 +208,6 @@ public class MinterController {
 
             // create the set of ids
             pidSet = MinterService.mint(requestedAmount, tempSetting);
-
-            // convert the set of ids into a json array
-            String message = convertSetToJson(pidSet, tempSetting.getPrepend());
-            LOGGER.info("Message from Minter: " + message);
         }
         finally {
             // unlocks RequestLock and gives access to longest waiting thread            
@@ -266,52 +255,7 @@ public class MinterController {
     @RequestMapping(value = {""}, method = {RequestMethod.GET})
     public String displayIndex() {
         return "";
-    }
-
-    /**
-     * Returns a view that displays the error message of
-     * NotEnoughPermutationsException.
-     *
-     * @param req The HTTP request.
-     * @param exception NotEnoughPermutationsException.
-     * @return The view of the error message in json format.
-     */
-    @ResponseStatus(code = HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(NotEnoughPermutationsException.class)
-    public ModelAndView handlePermutationError(HttpServletRequest req, Exception exception) {
-        LOGGER.error("Request: " + req.getRequestURL()
-                + " raised " + exception
-                + " with message " + exception.getMessage());
-
-        ModelAndView mav = new ModelAndView();
-        mav.addObject("status", 400);
-        mav.addObject("exception", exception.getClass().getSimpleName());
-        mav.addObject("message", exception.getMessage());
-        mav.setViewName("error");
-        return mav;
-
-    }
-
-    /**
-     * Returns a view that displays the error message of BadParameterException.
-     *
-     * @param req The HTTP request.
-     * @param exception BadParameterException.
-     * @return The view of the error message in json format.
-     */
-    @ResponseStatus(code = HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(BadParameterException.class)
-    public ModelAndView handleBadParameterError(HttpServletRequest req, Exception exception) {
-        LOGGER.error("Request: " + req.getRequestURL() + " raised " + exception);
-        ModelAndView mav = new ModelAndView();
-        mav.addObject("status", 400);
-        mav.addObject("exception", exception.getClass().getSimpleName());
-        mav.addObject("message", exception.getMessage());
-        LOGGER.error("Error with bad parameter: " + exception.getMessage());
-
-        mav.setViewName("error");
-        return mav;
-    }
+    }   
 
     /**
      * Handles any exception that may be caught within the program
@@ -410,41 +354,7 @@ public class MinterController {
         else {
             throw new BadParameterException(parameter, parameterType);
         }
-    }
-
-    /**
-     * Create a JSON array containing the given set of PIDs.
-     *
-     * @param set A set of ids to display into JSON
-     * @param prepend A value to attach to the beginning of every id. Typically
-     * used to determine the format of the id. For example, ARK or DOI.
-     * @return A reference a String that contains Json set of ids
-     * @throws IOException Thrown by Jackson's IO framework
-     */
-    private String convertSetToJson(Set<Pid> set, String prepend) throws IOException {
-        // Javax objects to create JSON strings
-        JsonBuilderFactory factory = Json.createBuilderFactory(null);
-        JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
-        JsonArray jsonArray;
-
-        // convert the set of ids into a json array
-        int counter = 0;
-        for (Pid id : set) {
-            arrayBuilder.add(factory.createObjectBuilder()
-                    .add("id", counter)
-                    .add("name", prepend + id.getName()));
-            counter++;
-        }
-        jsonArray = arrayBuilder.build();
-
-        // Jackson objects to format JSON strings
-        ObjectMapper mapper = new ObjectMapper();
-        Object formattedJson = mapper.readValue(jsonArray.toString(), Object.class);
-        String jsonString = mapper.writerWithDefaultPrettyPrinter().
-                writeValueAsString(formattedJson);
-
-        return jsonString;
-    }
+    }   
 
     /**
      * Checks to see if a given charMap is valid. A valid CharMap follows the
