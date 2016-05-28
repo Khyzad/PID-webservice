@@ -156,10 +156,10 @@ public class MinterService {
                 : Generator.sequentialMint(amount);
 
         // check ids and increment them appropriately
-        set = rollIdSet(set, total, amount);
+        set = rollPidSet(set, total, amount);
 
         // add the set of ids to the id table in the database and their formats
-        addIdList(set, amount);
+        addPidSet(set, amount);
 
         // return the set of ids
         return set;
@@ -175,7 +175,7 @@ public class MinterService {
      * @param amount the amount of ids to be created.
      * @return A set of unique ids database.
      */
-    private Set<Pid> rollIdSet(Set<Pid> set, long totalPermutations, long amount) {
+    private Set<Pid> rollPidSet(Set<Pid> set, long totalPermutations, long amount) {
         LOGGER.info("in rollIdSet");
         // Used to count the number of unique ids. Size methods aren't used because int is returned
         long uniqueIdCounter = 0;
@@ -224,7 +224,7 @@ public class MinterService {
      * @param sansVowel Designates whether or not the id's root contains vowels.
      * @param rootLength Designates the length of the id's root.
      */
-    private void addIdList(Set<Pid> list, long amountCreated) {
+    private void addPidSet(Set<Pid> list, long amountCreated) {
         LOGGER.info("in addIdlIst");
 
         for (Pid pid : list) {
