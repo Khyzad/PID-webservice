@@ -67,18 +67,17 @@ public class MinterController {
      * @param request HTTP request from the administration panel
      * @param response HTTP response that redirects to the administration panel
      * after updating the new settings.
-     * @return The name of the page to redirect.
      * @throws Exception
      */
     @RequestMapping(value = {"/administration"}, method = {RequestMethod.POST})
-    public ModelAndView handleForm(HttpServletRequest request, HttpServletResponse response)
+    public void handleForm(HttpServletRequest request, HttpServletResponse response)
             throws Exception {
         RequestLock.lock();
         try {
             // prevents other clients from accessing the database whenever the form is submitted            
             DefaultSetting oldSetting = MinterService.getCurrentSetting(DEFAULT_SETTING_PATH);
-            DefaultSetting newSetting;
-
+            DefaultSetting newSetting;           
+            
             LOGGER.info("in handleForm");
             String prepend = request.getParameter("prepend");
             String prefix = request.getParameter("idprefix");
@@ -177,10 +176,8 @@ public class MinterController {
             LOGGER.warn("Request to update default settings finished, UNLOCKING MINTER");
         }
 
-        // redirect to the administration panel located at http://[domain]/
-        ModelAndView mav = new ModelAndView();
-        mav.setViewName("redirect:administration");
-        return mav;
+        // redirect to the administration panel      
+        response.sendRedirect("administration");
     }
 
     /**

@@ -12,7 +12,6 @@ import com.hida.service.MinterService;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import javax.servlet.http.HttpServletResponse;
 import junit.framework.Assert;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -24,12 +23,12 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
-import org.mockito.Mockito;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.mock.web.MockHttpServletResponse;
 import org.testng.annotations.DataProvider;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -146,13 +145,14 @@ public class MinterControllerTest {
      * @throws Exception
      */
     @Test(dataProvider = "request parameters")
-    public void testDisplayIndex(String prepend, String idprefix, String mintType,
+    public void testHandleForm(String prepend, String idprefix, String mintType,
             String mintOrder, String vowels, String idLength, String digits,
             String lowercase, String uppercase, String charMapping) throws Exception {
+        
         // create a DefaultSetting object and create mock request and response object
         DefaultSetting originalSetting = getSampleDefaultSetting();
         MockHttpServletRequest request = new MockHttpServletRequest();
-        HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
+        MockHttpServletResponse response = new MockHttpServletResponse();
 
         // assign values to the mock request object
         request.setParameter("prepend", prepend);
@@ -170,10 +170,13 @@ public class MinterControllerTest {
         when(MinterServiceDao.getCurrentSetting(any(String.class))).thenReturn(originalSetting);
         doNothing().when(MinterServiceDao).
                 updateCurrentSetting(any(String.class), any(DefaultSetting.class));
-        
-        ModelAndView mav = Controller.handleForm(request, response);
 
-        Assert.assertEquals("redirect:administration", mav.getViewName());
+        // call the method to test
+        Controller.handleForm(request, response);
+        
+        // get and test the url of the destination
+        String viewName = response.getHeader("Location");        
+        Assert.assertEquals("administration", viewName);
     }
 
     /**
