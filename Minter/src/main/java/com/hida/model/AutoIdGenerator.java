@@ -54,24 +54,29 @@ public class AutoIdGenerator extends IdGenerator {
             throw new NotEnoughPermutationsException(total, amount);
         }
 
-        // generate ids
+        // store sequence of characters provided by TokenType
         String map = TokenType.getCharacters();
+
+        // create a set to contain Pids
         Set<Pid> pidSet = new TreeSet<>();
 
         for (int i = 0; i < amount; i++) {
-            int[] tempIdBaseMap = new int[RootLength];
+            // create a name based off the token and the randomly generated numbers
+            String name = Prefix;
             for (int j = 0; j < RootLength; j++) {
-                tempIdBaseMap[j] = Rng.nextInt(map.length());
+                int randomNumber = Rng.nextInt(map.length());
+                name += map.charAt(randomNumber);
             }
-            Pid currentId = new Pid(tempIdBaseMap, Prefix);
-            this.assignName(currentId);
 
-            // increment the Pid until a unique value has been found
-            while (!pidSet.add(currentId)) {
-                this.incrementPid(currentId);
+            // create pid and add it to the set
+            Pid pid = new Pid(name);
+            while (!pidSet.add(pid)) {
+                this.incrementPid(pid);
             }
-            LOGGER.trace("Generated Auto Random ID: {}", currentId);
+
+            LOGGER.trace("Generated Auto Random ID: {}", pid);
         }
+
         return pidSet;
     }
 
@@ -89,19 +94,25 @@ public class AutoIdGenerator extends IdGenerator {
             throw new NotEnoughPermutationsException(total, amount);
         }
 
-        // declare an empty array to start from and a set to hold all Pids
+        // create a set to contain Pids
         Set<Pid> pidSet = new TreeSet<>();
-        int[] previousIdBaseMap = new int[RootLength];
 
-        // generate Pids
-        Pid currentId = new Pid(previousIdBaseMap, Prefix);
-        this.assignName(currentId);
+        // create a base Pid using the first character of the TokenType 
+        char firstChar = TokenType.getCharacters().charAt(0);
+        String baseName = String.format("%0" + RootLength + "d", 0).replace('0', firstChar);
+        Pid basePid = new Pid(Prefix + baseName);
+
         for (int i = 0; i < amount; i++) {
-            Pid nextId = new Pid(currentId);
-            pidSet.add(currentId);
-            LOGGER.trace("Generated Auto Sequential ID: {}", currentId);
-            this.incrementPid(nextId);
-            currentId = new Pid(nextId);
+
+            // copy the Name of basePid into a new Pid instance
+            Pid pid = new Pid(basePid);
+
+            // add the pid to the set
+            pidSet.add(pid);
+
+            // increment the base Pid
+            this.incrementPid(basePid);
+            LOGGER.trace("Generated Custom Sequential ID: {}", pid);
         }
 
         return pidSet;
@@ -130,44 +141,30 @@ public class AutoIdGenerator extends IdGenerator {
      */
     @Override
     public void incrementPid(Pid pid) {
-        int tokenMapRange = TokenType.getCharacters().length() - 1;
-        int baseMapRange = pid.getBaseMap().length - 1;
+        String name = pid.getName();
+        String map = TokenType.getCharacters();
+        int lastIndex = name.length() - 1;
+        int prefixLength = Prefix.length();
+        char lastChar = map.charAt(map.length() - 1);
+        char firstChar = map.charAt(0);
         boolean overflow = true;
 
-        // increment the values in a pid's basemap
-        for (int k = 0; k <= baseMapRange && overflow; k++) {
-            // record value of current index
-            int value = pid.getBaseMap()[baseMapRange - k];
+        // continue until overflow is false or last value of the rootName is reached
+        for (int i = 0; i <= lastIndex - prefixLength && overflow; i++) {
+            int offset = lastIndex - i;
+            char c = name.charAt(offset);
 
-            // if the last value is reached then wrap around
-            if (value == tokenMapRange) {
-                pid.getBaseMap()[baseMapRange - k] = 0;
+            if (c == lastChar) {
+                pid.replace(offset, firstChar);
             }
-            // otherwise increment the value at the current index and break the loop
             else {
-                pid.getBaseMap()[baseMapRange - k]++;
+                int position = map.indexOf(c);
+                char nextChar = map.charAt(position + 1);
+
+                pid.replace(offset, nextChar);
                 overflow = false;
             }
         }
-
-        // assign a new name to the Pid based on its base map
-        assignName(pid);
-    }
-
-    /**
-     * Creates and sets a new name for a pid based on its indices contained in
-     * the BaseMap and the characters in the TokenType. This should be called
-     * whenever the values in a Pid's BaseMap has been changed.
-     *
-     * @param pid The pid that needs a new name.
-     */
-    @Override
-    protected void assignName(Pid pid) {
-        String Name = "";
-        for (int i = 0; i < pid.getBaseMap().length; i++) {
-            Name += TokenType.getCharacters().charAt(pid.getBaseMap()[i]);
-        }
-        pid.setName(this.getPrefix() + Name);
     }
 
     /* getters and setters */
