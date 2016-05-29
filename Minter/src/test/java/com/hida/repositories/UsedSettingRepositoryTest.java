@@ -3,49 +3,68 @@ package com.hida.repositories;
 import com.hida.configuration.RepositoryConfiguration;
 import com.hida.model.TokenType;
 import com.hida.model.UsedSetting;
-import org.junit.After;
-import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.IntegrationTest;
 import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
+import org.springframework.test.context.support.DirtiesContextTestExecutionListener;
+import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
+import org.springframework.test.context.web.WebAppConfiguration;
 import org.testng.Assert;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.Test;
 
 /**
- * Tests the functionality of UsedSettingDaoImpl.
+ * Tests the functionality of UsedSettingRepository.
  *
  * @author lruffin
  */
-@RunWith(SpringJUnit4ClassRunner.class)
+@WebAppConfiguration
+@IntegrationTest
 @SpringApplicationConfiguration(classes = {RepositoryConfiguration.class})
 @TestPropertySource(locations = "classpath:testConfig.properties")
-public class UsedSettingRepositoryTest {
-        
-    private UsedSettingRepository UsedSettingRepo;
+@TestExecutionListeners(inheritListeners = false, listeners = {
+       DependencyInjectionTestExecutionListener.class,
+       DirtiesContextTestExecutionListener.class })
+public class UsedSettingRepositoryTest extends AbstractTestNGSpringContextTests {
     
     @Autowired
-    public void setUsedSettingRepository(UsedSettingRepository UsedSettingRepository) {
-        this.UsedSettingRepo = UsedSettingRepository;
-    }   
+    private UsedSettingRepository UsedSettingRepo;        
 
     /**
      * Tests the functionality of UsedSettingDao save.
      */
     @Test
-    public void testSaveAndFindByIdTest() {
+    public void testSaveAndDelete() {
         final UsedSetting setting = getSampleUsedSetting();
         
         UsedSettingRepo.save(setting);
         UsedSetting entity = UsedSettingRepo.findOne(setting.getId());
         Assert.assertNotNull(entity);
+        
+        UsedSettingRepo.delete(entity);
+        long size = UsedSettingRepo.count();
+        
+        Assert.assertEquals(0, size);
     }   
+    
+    @Test
+    public void testFindById(){
+        UsedSetting setting = getSampleUsedSetting();
+        setting.setId(1);
+        UsedSettingRepo.save(setting);
+        
+        UsedSetting entity = UsedSettingRepo.findOne(setting.getId());
+        Assert.assertNotNull(entity);
+    }
     
     /**
      * Attempts to find a UsedSetting by the fields. 
      */
     @Test
-    public void testSaveAndfindByUsedSetting() {
+    public void testSaveAndFindByUsedSetting() {
         UsedSetting sampleSetting = getSampleUsedSetting();
         UsedSettingRepo.save(sampleSetting);
         
@@ -76,7 +95,7 @@ public class UsedSettingRepositoryTest {
     /**
      * Deletes all entries in the in-memory database after each test
      */
-    @After
+    @AfterMethod
     public void tearDown() {
         UsedSettingRepo.deleteAll();
     }

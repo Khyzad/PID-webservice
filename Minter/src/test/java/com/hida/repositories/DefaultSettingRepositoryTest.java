@@ -3,40 +3,44 @@ package com.hida.repositories;
 import com.hida.configuration.RepositoryConfiguration;
 import com.hida.model.DefaultSetting;
 import com.hida.model.TokenType;
-import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.IntegrationTest;
 import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
+import org.springframework.test.context.support.DirtiesContextTestExecutionListener;
+import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
+import org.springframework.test.context.web.WebAppConfiguration;
 import org.testng.Assert;
+import org.testng.annotations.Test;
 
 /**
- * Tests the functionality of DefaultSettingDaoImpl.
+ * Tests the functionality of DefaultSettingRepository.
  *
  * @author lruffin
  */
-@RunWith(SpringJUnit4ClassRunner.class)
+@WebAppConfiguration
+@IntegrationTest
 @SpringApplicationConfiguration(classes = {RepositoryConfiguration.class})
 @TestPropertySource(locations = "classpath:testConfig.properties")
-public class DefaultSettingRepositoryTest {
-       
-    private DefaultSettingRepository DefaultSettingRepo;
-    
+@TestExecutionListeners(inheritListeners = false, listeners = {
+    DependencyInjectionTestExecutionListener.class,
+    DirtiesContextTestExecutionListener.class})
+public class DefaultSettingRepositoryTest extends AbstractTestNGSpringContextTests {
+
     @Autowired
-    public void setDefaultSettingRepository(DefaultSettingRepository DefaultSettingRepo) {
-        this.DefaultSettingRepo = DefaultSettingRepo;
-    }   
+    private DefaultSettingRepository DefaultSettingRepo;
 
     /**
      * Tests to see if DefaultSettingDao can find an entity with an id of 1.
      */
     @Test
     public void testSaveAndFind() {
-        DefaultSetting sample = getSampleDefaultSetting();                        
+        DefaultSetting sample = getSampleDefaultSetting();
         DefaultSettingRepo.save(sample);
-                
-        DefaultSetting entity = DefaultSettingRepo.findCurrentDefaultSetting();                
+
+        DefaultSetting entity = DefaultSettingRepo.findCurrentDefaultSetting();
         Assert.assertNotNull(entity);
     }
 
@@ -56,5 +60,5 @@ public class DefaultSettingRepositoryTest {
                 true);
 
         return setting;
-    }        
+    }
 }
