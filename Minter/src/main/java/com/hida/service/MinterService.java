@@ -11,11 +11,13 @@ import com.hida.model.Pid;
 import com.hida.model.IdGenerator;
 import com.hida.model.NotEnoughPermutationsException;
 import com.hida.model.UsedSetting;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URL;
 import java.util.Properties;
 import java.util.Set;
 import java.util.TreeSet;
@@ -200,7 +202,7 @@ public class MinterService {
                     LOGGER.error("Total number of Permutations Exceeded: Total Permutation Count="
                             + totalPermutations);
                     throw new NotEnoughPermutationsException(uniqueIdCounter, amount);
-                }                
+                }
                 Generator.incrementPid(currentId);
                 counter++;
             }
@@ -350,8 +352,10 @@ public class MinterService {
      */
     private DefaultSetting readPropertiesFile(String filename) throws IOException {
         Properties prop = new Properties();
-        InputStream input = new FileInputStream(filename);      
+        ClassLoader loader = Thread.currentThread().getContextClassLoader();
+        InputStream input = loader.getResourceAsStream(filename);
 
+        
         DefaultSetting setting = new DefaultSetting();
 
         // load a properties file
@@ -377,12 +381,14 @@ public class MinterService {
      * @param setting
      * @throws IOException
      */
-    private void writeToPropertiesFile(String filename, DefaultSetting setting) 
-            throws IOException {
+    private void writeToPropertiesFile(String filename, DefaultSetting setting)
+            throws Exception {
         Properties prop = new Properties();
+        ClassLoader loader = Thread.currentThread().getContextClassLoader();        
+        URL url = loader.getResource(filename);       
+        File file = new File(url.toURI());
+        OutputStream output = new FileOutputStream(file);
         
-        OutputStream output = new FileOutputStream(filename);
-
         // set the properties value
         prop.setProperty("prepend", setting.getPrepend());
         prop.setProperty("prefix", setting.getPrefix());
@@ -396,5 +402,5 @@ public class MinterService {
         // save and close
         prop.store(output, "");
         output.close();
-    }   
+    }
 }

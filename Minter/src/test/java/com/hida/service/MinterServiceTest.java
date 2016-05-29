@@ -37,8 +37,8 @@ public class MinterServiceTest {
     /**
      * Default setting values stored in resources folder
      */
-    private final String TEST_READ_PATH = "src/test/resources/testReadDefaultSetting.properties";
-    private final String TEST_WRITE_PATH = "src/test/resources/testWriteDefaultSetting.properties";
+    private final String TEST_READ_PATH = "testReadDefaultSetting.properties";
+    private final String TEST_WRITE_PATH = "testWriteDefaultSetting.properties";
 
     @Mock
     private DefaultSettingRepository DefaultSettingRepo;

@@ -37,7 +37,7 @@ public class MinterController {
     /**
      * Default setting values stored in resources folder
      */
-    private final String DEFAULT_SETTING_PATH = "src/main/resources/DefaultSetting.properties";
+    private final String DEFAULT_SETTING_PATH = "DefaultSetting.properties";
 
     /* 
      * Logger; logfile to be stored in resource folder    
