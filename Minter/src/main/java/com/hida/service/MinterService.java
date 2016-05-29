@@ -355,7 +355,6 @@ public class MinterService {
         ClassLoader loader = Thread.currentThread().getContextClassLoader();
         InputStream input = loader.getResourceAsStream(filename);
 
-        
         DefaultSetting setting = new DefaultSetting();
 
         // load a properties file
@@ -377,18 +376,21 @@ public class MinterService {
     }
 
     /**
+     * Writes to DefaultSetting.properties, updating its key-value pairs using
+     * the values stored in the setting parameter. If the file does not exist it
+     * is created.
      *
-     * @param setting
-     * @throws IOException
+     * @param setting The setting whose value needs to be stored
+     * @throws Exception
      */
     private void writeToPropertiesFile(String filename, DefaultSetting setting)
             throws Exception {
         Properties prop = new Properties();
-        ClassLoader loader = Thread.currentThread().getContextClassLoader();        
-        URL url = loader.getResource(filename);       
+        ClassLoader loader = Thread.currentThread().getContextClassLoader();
+        URL url = loader.getResource(filename);
         File file = new File(url.toURI());
         OutputStream output = new FileOutputStream(file);
-        
+
         // set the properties value
         prop.setProperty("prepend", setting.getPrepend());
         prop.setProperty("prefix", setting.getPrefix());
