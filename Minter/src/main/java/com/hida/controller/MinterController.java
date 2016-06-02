@@ -216,7 +216,7 @@ public class MinterController {
             LOGGER.info("Request to Minter Finished, UNLOCKING MINTER");
         }
 
-        // return to mint       
+        // return the generated set of Pids  
         return pidSet;
     }
 
@@ -334,7 +334,7 @@ public class MinterController {
     }
 
     /**
-     * This method is used to check to see whether or not the given parameter is
+     * This method is used to check whether or not the given parameter is
      * explicitly equivalent to "true" or "false" and returns them respectively.
      *
      * @param parameter the given string to convert.
@@ -358,8 +358,7 @@ public class MinterController {
     }
 
     /**
-     * Checks to see if a given charMap is valid. A valid CharMap follows the
-     * regular expression [dlume]*
+     * Asserts the validity of a CharMap using the minter service.
      *
      * @param charMap A sequence of characters used to configure PIDs
      * @return Returns the given charMap if nothing wrong was detected
@@ -374,8 +373,8 @@ public class MinterController {
     }
 
     /**
-     * Checks to see if the amount is valid. A valid amount is greater than or
-     * equal to 0.
+     * Asserts the validity of an amount using the minter service. A valid
+     * amount is greater than or equal to 0.
      *
      * @param amount The number of PIDs to be created
      * @throws BadParameterException Thrown whenever a bad parameter is
@@ -388,11 +387,11 @@ public class MinterController {
     }
 
     /**
-     * Checks to see if the rootLength is valid. A valid amount is greater than
-     * 0 and less than 11. 
+     * Asserts the validity of a rootLength is valid. 
+     *
      * @param rootLength
      * @return
-     * @throws BadParameterException 
+     * @throws BadParameterException
      */
     private int validateRootLength(int rootLength) throws BadParameterException {
         if (!IdGenerator.isValidRootLength(rootLength)) {
@@ -402,8 +401,7 @@ public class MinterController {
     }
 
     /**
-     * Checks to see if the prefix is valid. A valid prefix follows the regular
-     * expression [a-zA-z0-9]*
+     * Asserts the validity of prefix is valid.
      *
      * @param prefix A sequence of characters that appear in the beginning of
      * PIDs
