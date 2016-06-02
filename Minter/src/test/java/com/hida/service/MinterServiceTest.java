@@ -9,8 +9,13 @@ import com.hida.model.NotEnoughPermutationsException;
 import com.hida.model.Pid;
 import com.hida.model.TokenType;
 import com.hida.model.UsedSetting;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Properties;
 import java.util.Set;
 import java.util.TreeSet;
 import org.mockito.Mock;
@@ -23,6 +28,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.mockito.MockitoAnnotations;
 import org.testng.Assert;
+import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -33,12 +39,11 @@ import org.testng.annotations.Test;
  * @author lruffin
  */
 public class MinterServiceTest {
-    
+
     /**
      * Default setting values stored in resources folder
      */
-    private final String TEST_READ_PATH = "testReadDefaultSetting.properties";
-    private final String TEST_WRITE_PATH = "testWriteDefaultSetting.properties";
+    private final String TEST_FILE = "testDefaultSetting.properties";
 
     @Mock
     private DefaultSettingRepository DefaultSettingRepo;
@@ -272,7 +277,7 @@ public class MinterServiceTest {
         DefaultSetting defaultSetting = DefaultSettingList.get(0);
         when(DefaultSettingRepo.findCurrentDefaultSetting()).thenReturn(defaultSetting);
 
-        MinterService.getCurrentSetting(this.TEST_READ_PATH);
+        MinterService.getCurrentSetting(this.TEST_FILE);
         verify(DefaultSettingRepo, atLeastOnce()).findCurrentDefaultSetting();
     }
 
@@ -285,7 +290,7 @@ public class MinterServiceTest {
     public void testGetCurrentSettingWithoutExistingDefaultSetting() throws Exception {
         DefaultSetting defaultSetting = DefaultSettingList.get(0);
         when(DefaultSettingRepo.findCurrentDefaultSetting()).thenReturn(null);
-        DefaultSetting actualSetting = MinterService.getCurrentSetting(this.TEST_READ_PATH);
+        DefaultSetting actualSetting = MinterService.getCurrentSetting(this.TEST_FILE);
 
         Assert.assertEquals(actualSetting.getCharMap(), defaultSetting.getCharMap());
         Assert.assertEquals(actualSetting.getPrefix(), defaultSetting.getPrefix());
@@ -306,7 +311,7 @@ public class MinterServiceTest {
         DefaultSetting defaultSetting = DefaultSettingList.get(0);
         when(DefaultSettingRepo.findCurrentDefaultSetting()).thenReturn(defaultSetting);
 
-        MinterService.updateCurrentSetting(this.TEST_WRITE_PATH, defaultSetting);
+        MinterService.updateCurrentSetting(this.TEST_FILE, defaultSetting);
         verify(DefaultSettingRepo, atLeastOnce()).findCurrentDefaultSetting();
     }
 
@@ -342,7 +347,7 @@ public class MinterServiceTest {
      */
     private void initializePidSet() {
         AutoIdGenerator gen = new AutoIdGenerator("", TokenType.DIGIT, 1);
-        PidSet = gen.sequentialMint(10);        
+        PidSet = gen.sequentialMint(10);
     }
 
     /**
@@ -359,5 +364,34 @@ public class MinterServiceTest {
                 5); // amount
     }
 
-    
+    /**
+     * Set all the keys' values in testWriteDefaultProperties to null to ensure
+     * that the values are being changed during the updatedChangedSetting tests.
+     *
+     * @throws Exception
+     */
+    @AfterTest
+    private void resetTestReadDefaultProperties() throws Exception {
+        Properties prop = new Properties();
+        ClassLoader loader = Thread.currentThread().getContextClassLoader();
+        URL url = loader.getResource(TEST_FILE);
+        File file = new File(url.toURI());
+        OutputStream output = new FileOutputStream(file);
+
+        // set the properties value
+        prop.setProperty("prepend", "");
+        prop.setProperty("prefix", "");
+        prop.setProperty("charMap", "ddddd");
+        prop.setProperty("rootLength", "DIGIT");
+        prop.setProperty("tokenType", "5");
+        prop.setProperty("sansVowel", "true");
+        prop.setProperty("auto", "true");
+        prop.setProperty("random", "true");
+
+        // save and close
+        prop.store(output, "");
+        output.close();
+
+    }
+
 }
