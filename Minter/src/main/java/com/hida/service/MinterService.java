@@ -2,7 +2,7 @@ package com.hida.service;
 
 import com.hida.repositories.DefaultSettingRepository;
 import com.hida.repositories.PidRepository;
-import com.hida.model.TokenType;
+import com.hida.model.Token;
 import com.hida.repositories.UsedSettingRepository;
 import com.hida.model.AutoIdGenerator;
 import com.hida.model.CustomIdGenerator;
@@ -363,7 +363,7 @@ public class MinterService {
         setting.setPrepend(prop.getProperty("prepend"));
         setting.setPrefix(prop.getProperty("prefix"));
         setting.setCharMap(prop.getProperty("charMap"));
-        setting.setTokenType(TokenType.valueOf(prop.getProperty("tokenType")));
+        setting.setTokenType(Token.valueOf(prop.getProperty("tokenType")));
         setting.setRootLength(Integer.parseInt(prop.getProperty("rootLength")));
         setting.setSansVowels(Boolean.parseBoolean(prop.getProperty("sansVowel")));
         setting.setAuto(Boolean.parseBoolean(prop.getProperty("auto")));

@@ -29,7 +29,7 @@ public class UsedSetting extends Setting {
      * @param SansVowels Dictates whether or not vowels are allowed
      * @param Amount The number of PIDs to be created
      */
-    public UsedSetting(String Prefix, TokenType TokenType, String CharMap,
+    public UsedSetting(String Prefix, Token TokenType, String CharMap,
             int RootLength, boolean SansVowels, long Amount) {
         super(Prefix, TokenType, CharMap, RootLength, SansVowels);
         this.Amount = Amount;

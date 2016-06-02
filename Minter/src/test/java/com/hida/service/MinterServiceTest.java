@@ -7,7 +7,7 @@ import com.hida.repositories.UsedSettingRepository;
 import com.hida.model.DefaultSetting;
 import com.hida.model.NotEnoughPermutationsException;
 import com.hida.model.Pid;
-import com.hida.model.TokenType;
+import com.hida.model.Token;
 import com.hida.model.UsedSetting;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -110,7 +110,7 @@ public class MinterServiceTest {
 
         // assume the UsedSetting isn't persisted and pretend to persist it
         when(UsedSettingRepo.findUsedSetting(any(String.class),
-                any(TokenType.class),
+                any(Token.class),
                 any(String.class),
                 anyInt(),
                 anyBoolean())).thenReturn(null);
@@ -148,7 +148,7 @@ public class MinterServiceTest {
 
         // assume the UsedSetting isn't persisted and pretend to persist it        
         when(UsedSettingRepo.findUsedSetting(any(String.class),
-                any(TokenType.class),
+                any(Token.class),
                 any(String.class),
                 anyInt(),
                 anyBoolean())).thenReturn(usedSetting);
@@ -187,7 +187,7 @@ public class MinterServiceTest {
 
         // pretend to find and retrieve variable usedSetting
         when(UsedSettingRepo.findUsedSetting(any(String.class),
-                any(TokenType.class),
+                any(Token.class),
                 any(String.class),
                 anyInt(),
                 anyBoolean())).thenReturn(usedSetting);
@@ -221,7 +221,7 @@ public class MinterServiceTest {
 
         // assume that UsedSetting entity with the relevant parameters does not exist
         when(UsedSettingRepo.findUsedSetting(any(String.class),
-                any(TokenType.class),
+                any(Token.class),
                 any(String.class),
                 anyInt(),
                 anyBoolean())).thenReturn(null);
@@ -258,7 +258,7 @@ public class MinterServiceTest {
 
         // assume that UsedSetting entity with the relevant parameters does not exist
         when(UsedSettingRepo.findUsedSetting(any(String.class),
-                any(TokenType.class),
+                any(Token.class),
                 any(String.class),
                 anyInt(),
                 anyBoolean())).thenReturn(null);
@@ -321,7 +321,7 @@ public class MinterServiceTest {
     private void initializeDefaultSettingList() {
         DefaultSetting defaultSetting1 = new DefaultSetting("", // prepend
                 "", // prefix
-                TokenType.DIGIT, // token type
+                Token.DIGIT, // token type
                 "ddddd", // charmap
                 5, // rootlength
                 true, // sans vowel
@@ -332,7 +332,7 @@ public class MinterServiceTest {
 
         DefaultSetting defaultSetting2 = new DefaultSetting("", // prepend
                 "", // prefix
-                TokenType.DIGIT, // token type
+                Token.DIGIT, // token type
                 "d", // charmap
                 1, // rootlength
                 true, // sans vowel
@@ -346,7 +346,7 @@ public class MinterServiceTest {
      * Create a sample set of Pid
      */
     private void initializePidSet() {
-        AutoIdGenerator gen = new AutoIdGenerator("", TokenType.DIGIT, 1);
+        AutoIdGenerator gen = new AutoIdGenerator("", Token.DIGIT, 1);
         PidSet = gen.sequentialMint(10);
     }
 
@@ -357,7 +357,7 @@ public class MinterServiceTest {
      */
     private UsedSetting getSampleUsedSetting() {
         return new UsedSetting("", // prefix
-                TokenType.DIGIT, // tokentype
+                Token.DIGIT, // tokentype
                 "d", // charmap
                 1, // rootlength
                 true, //sans vowels

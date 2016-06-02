@@ -2,7 +2,7 @@ package com.hida.repositories;
 
 import com.hida.configuration.RepositoryConfiguration;
 import com.hida.model.DefaultSetting;
-import com.hida.model.TokenType;
+import com.hida.model.Token;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.IntegrationTest;
 import org.springframework.boot.test.SpringApplicationConfiguration;
@@ -52,7 +52,7 @@ public class DefaultSettingRepositoryTest extends AbstractTestNGSpringContextTes
     private DefaultSetting getSampleDefaultSetting() {
         DefaultSetting setting = new DefaultSetting("",
                 "",
-                TokenType.DIGIT,
+                Token.DIGIT,
                 "d",
                 1,
                 true,

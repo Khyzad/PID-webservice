@@ -1,7 +1,7 @@
 package com.hida.repositories;
 
 import com.hida.configuration.RepositoryConfiguration;
-import com.hida.model.TokenType;
+import com.hida.model.Token;
 import com.hida.model.UsedSetting;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.IntegrationTest;
@@ -83,7 +83,7 @@ public class UsedSettingRepositoryTest extends AbstractTestNGSpringContextTests 
      */
     private UsedSetting getSampleUsedSetting() {
         UsedSetting setting = new UsedSetting("",
-                TokenType.DIGIT,
+                Token.DIGIT,
                 "d",
                 1,
                 true,

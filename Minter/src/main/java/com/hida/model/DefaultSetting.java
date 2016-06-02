@@ -38,7 +38,7 @@ public class DefaultSetting extends Setting {
      * used
      * @param Random Determines if the PIDs are created randomly or sequentially
      */
-    public DefaultSetting(String Prepend, String Prefix, TokenType TokenType, String CharMap,
+    public DefaultSetting(String Prepend, String Prefix, Token TokenType, String CharMap,
             int RootLength, boolean SansVowels, boolean Auto, boolean Random) {
         super(Prefix, TokenType, CharMap, RootLength, SansVowels);
         this.Prepend = Prepend;

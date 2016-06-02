@@ -7,8 +7,8 @@ import java.util.TreeSet;
 
 /**
  * An Id Generator that creates Pids. For each Pid, their entire name will be
- * uniformly determined by the possible characters provided by a single
- * TokenType.
+ uniformly determined by the possible characters provided by a single
+ Token.
  *
  *
  * @author lruffin
@@ -18,7 +18,7 @@ public class AutoIdGenerator extends IdGenerator {
     /**
      * Designates what characters are contained in the id's root name.
      */
-    private TokenType TokenType;
+    private Token TokenType;
 
     /**
      * Designates the length of the id's root.
@@ -26,15 +26,15 @@ public class AutoIdGenerator extends IdGenerator {
     private int RootLength;
 
     /**
-     * Default constructor. Aside from TokenType, there are no restrictions
-     * placed on the parameters and can be used however one sees fit.
+     * Default constructor. Aside from Token, there are no restrictions
+ placed on the parameters and can be used however one sees fit.
      *
      * @param prefix A sequence of characters that appear in the beginning of
      * PIDs
      * @param tokenType An enum used to configure PIDS
      * @param rootLength Designates the length of the id's root
      */
-    public AutoIdGenerator(String prefix, TokenType tokenType, int rootLength) {
+    public AutoIdGenerator(String prefix, Token tokenType, int rootLength) {
         super(prefix);
         this.TokenType = tokenType;
         this.RootLength = rootLength;
@@ -54,7 +54,7 @@ public class AutoIdGenerator extends IdGenerator {
             throw new NotEnoughPermutationsException(total, amount);
         }
 
-        // store sequence of characters provided by TokenType
+        // store sequence of characters provided by Token
         String map = TokenType.getCharacters();
 
         // create a set to contain Pids
@@ -97,7 +97,7 @@ public class AutoIdGenerator extends IdGenerator {
         // create a set to contain Pids
         Set<Pid> pidSet = new TreeSet<>();
 
-        // create a base Pid using the first character of the TokenType 
+        // create a base Pid using the first character of the Token 
         char firstChar = TokenType.getCharacters().charAt(0);
         String baseName = String.format("%0" + RootLength + "d", 0).replace('0', firstChar);
         Pid basePid = new Pid(Prefix + baseName);
@@ -168,11 +168,11 @@ public class AutoIdGenerator extends IdGenerator {
     }
 
     /* getters and setters */
-    public TokenType getTokenType() {
+    public Token getTokenType() {
         return TokenType;
     }
 
-    public void setTokenType(TokenType TokenType) {
+    public void setTokenType(Token TokenType) {
         this.TokenType = TokenType;
     }
 

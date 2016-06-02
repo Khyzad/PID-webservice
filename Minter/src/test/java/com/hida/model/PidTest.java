@@ -41,10 +41,10 @@ public class PidTest {
      */
     public void testTokenType(String name, Setting setting) {
         String prefix = setting.getPrefix();
-        TokenType tokenType = setting.getTokenType();
+        Token tokenType = setting.getTokenType();
         String rootName = name.replace(prefix, "");
 
-        // check to see if each character in the rootName is contained by the TokenType
+        // check to see if each character in the rootName is contained by the Token
         boolean contains = true;
         for (int i = 0; i < rootName.length() && contains; i++) {
             char c = rootName.charAt(i);
@@ -93,27 +93,27 @@ public class PidTest {
             String c = rootName.charAt(i) + "";
             switch (mappedCharacter) {
                 case 'd':
-                    contains = TokenType.DIGIT.getCharacters().contains(c);
+                    contains = Token.DIGIT.getCharacters().contains(c);
                     break;
                 case 'l':
                     contains = (sansVowel)
-                            ? TokenType.LOWER_CONSONANTS.getCharacters().contains(c)
-                            : TokenType.LOWER_ALPHABET.getCharacters().contains(c);
+                            ? Token.LOWER_CONSONANTS.getCharacters().contains(c)
+                            : Token.LOWER_ALPHABET.getCharacters().contains(c);
                     break;
                 case 'u':
                     contains = (sansVowel)
-                            ? TokenType.UPPER_CONSONANTS.getCharacters().contains(c)
-                            : TokenType.UPPER_ALPHABET.getCharacters().contains(c);
+                            ? Token.UPPER_CONSONANTS.getCharacters().contains(c)
+                            : Token.UPPER_ALPHABET.getCharacters().contains(c);
                     break;
                 case 'm':
                     contains = (sansVowel)
-                            ? TokenType.MIXED_CONSONANTS.getCharacters().contains(c)
-                            : TokenType.MIXED_ALPHABET.getCharacters().contains(c);
+                            ? Token.MIXED_CONSONANTS.getCharacters().contains(c)
+                            : Token.MIXED_ALPHABET.getCharacters().contains(c);
                     break;
                 case 'e':
                     contains = (sansVowel)
-                            ? TokenType.MIXED_CONSONANTS_EXTENDED.getCharacters().contains(c)
-                            : TokenType.MIXED_ALPHABET_EXTENDED.getCharacters().contains(c);
+                            ? Token.MIXED_CONSONANTS_EXTENDED.getCharacters().contains(c)
+                            : Token.MIXED_ALPHABET_EXTENDED.getCharacters().contains(c);
                     break;
                 default:
                     contains = false;

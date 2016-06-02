@@ -4,7 +4,7 @@ import com.hida.model.BadParameterException;
 import com.hida.model.DefaultSetting;
 import com.hida.model.IdGenerator;
 import com.hida.model.Pid;
-import com.hida.model.TokenType;
+import com.hida.model.Token;
 import com.hida.service.MinterService;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -105,33 +105,33 @@ public class MinterController {
             // assign values based on which minter type was selected
             if (auto) {
                 // gets the token value
-                TokenType tokenType;
+                Token tokenType;
                 if (digits && !lowercase && !uppercase) {
-                    tokenType = TokenType.DIGIT;
+                    tokenType = Token.DIGIT;
                 }
                 else if (!digits && lowercase && !uppercase) {
-                    tokenType = (sansvowel) ? TokenType.LOWER_CONSONANTS
-                            : TokenType.LOWER_ALPHABET;
+                    tokenType = (sansvowel) ? Token.LOWER_CONSONANTS
+                            : Token.LOWER_ALPHABET;
                 }
                 else if (!digits && !lowercase && uppercase) {
-                    tokenType = (sansvowel) ? TokenType.UPPER_CONSONANTS
-                            : TokenType.UPPER_ALPHABET;
+                    tokenType = (sansvowel) ? Token.UPPER_CONSONANTS
+                            : Token.UPPER_ALPHABET;
                 }
                 else if (!digits && lowercase && uppercase) {
-                    tokenType = (sansvowel) ? TokenType.MIXED_CONSONANTS
-                            : TokenType.MIXED_ALPHABET;
+                    tokenType = (sansvowel) ? Token.MIXED_CONSONANTS
+                            : Token.MIXED_ALPHABET;
                 }
                 else if (digits && lowercase && !uppercase) {
-                    tokenType = (sansvowel) ? TokenType.LOWER_CONSONANTS_EXTENDED
-                            : TokenType.LOWER_ALPHABET_EXTENDED;
+                    tokenType = (sansvowel) ? Token.LOWER_CONSONANTS_EXTENDED
+                            : Token.LOWER_ALPHABET_EXTENDED;
                 }
                 else if (digits && !lowercase && uppercase) {
-                    tokenType = (sansvowel) ? TokenType.UPPER_CONSONANTS_EXTENDED
-                            : TokenType.UPPER_ALPHABET_EXTENDED;
+                    tokenType = (sansvowel) ? Token.UPPER_CONSONANTS_EXTENDED
+                            : Token.UPPER_ALPHABET_EXTENDED;
                 }
                 else if (digits && lowercase && uppercase) {
-                    tokenType = (sansvowel) ? TokenType.MIXED_CONSONANTS_EXTENDED
-                            : TokenType.MIXED_ALPHABET_EXTENDED;
+                    tokenType = (sansvowel) ? Token.MIXED_CONSONANTS_EXTENDED
+                            : Token.MIXED_ALPHABET_EXTENDED;
                 }
                 else {
                     throw new BadParameterException();
@@ -307,8 +307,8 @@ public class MinterController {
                 ? validateCharMap(parameters.get("charMap"))
                 : entity.getCharMap();
 
-        TokenType tokenType = (parameters.containsKey("tokenType"))
-                ? TokenType.valueOf(parameters.get("tokenType"))
+        Token tokenType = (parameters.containsKey("tokenType"))
+                ? Token.valueOf(parameters.get("tokenType"))
                 : entity.getTokenType();
 
         boolean isAuto = (parameters.containsKey("auto"))

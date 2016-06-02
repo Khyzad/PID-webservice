@@ -7,8 +7,8 @@ import java.util.TreeSet;
 
 /**
  * An Id Generator that creates Pids. For each Pid, every digit in their names
- * will be created using the possible characters provided by a character map.
- * Each digit in a character map references a different TokenType object.
+ will be created using the possible characters provided by a character map.
+ Each digit in a character map references a different Token object.
  *
  *
  * @author lruffin
@@ -113,7 +113,7 @@ public class CustomIdGenerator extends IdGenerator {
         // create a set to contain Pids
         Set<Pid> pidSet = new TreeSet<>();
 
-        // create a base Pid using the first character of the TokenType 
+        // create a base Pid using the first character of the Token 
         String baseName = "";
         for (int i = 0; i < CharMap.length(); i++) {
             String map = TokenMap[i];
@@ -174,23 +174,23 @@ public class CustomIdGenerator extends IdGenerator {
 
             // assign each index a string of characters
             if (c == 'd') {
-                TokenMap[i] = TokenType.DIGIT.getCharacters();
+                TokenMap[i] = Token.DIGIT.getCharacters();
             }
             else if (c == 'l') {
-                TokenMap[i] = (SansVowel) ? TokenType.LOWER_CONSONANTS.getCharacters()
-                        : TokenType.LOWER_ALPHABET.getCharacters();
+                TokenMap[i] = (SansVowel) ? Token.LOWER_CONSONANTS.getCharacters()
+                        : Token.LOWER_ALPHABET.getCharacters();
             }
             else if (c == 'u') {
-                TokenMap[i] = (SansVowel) ? TokenType.UPPER_CONSONANTS.getCharacters()
-                        : TokenType.UPPER_ALPHABET.getCharacters();
+                TokenMap[i] = (SansVowel) ? Token.UPPER_CONSONANTS.getCharacters()
+                        : Token.UPPER_ALPHABET.getCharacters();
             }
             else if (c == 'm') {
-                TokenMap[i] = (SansVowel) ? TokenType.MIXED_CONSONANTS.getCharacters()
-                        : TokenType.MIXED_ALPHABET.getCharacters();
+                TokenMap[i] = (SansVowel) ? Token.MIXED_CONSONANTS.getCharacters()
+                        : Token.MIXED_ALPHABET.getCharacters();
             }
             else {
-                TokenMap[i] = (SansVowel) ? TokenType.MIXED_CONSONANTS_EXTENDED.getCharacters()
-                        : TokenType.MIXED_ALPHABET_EXTENDED.getCharacters();
+                TokenMap[i] = (SansVowel) ? Token.MIXED_CONSONANTS_EXTENDED.getCharacters()
+                        : Token.MIXED_ALPHABET_EXTENDED.getCharacters();
             }
         }
     }

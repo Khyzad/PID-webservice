@@ -1,6 +1,6 @@
 package com.hida.repositories;
 
-import com.hida.model.TokenType;
+import com.hida.model.Token;
 import com.hida.model.UsedSetting;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -19,7 +19,7 @@ public interface UsedSettingRepository extends CrudRepository<UsedSetting, Integ
             + "s.RootLength = :rootLength and "
             + "s.SansVowels = :sansVowel")
     public UsedSetting findUsedSetting(@Param("prefix") String prefix,
-            @Param("tokenType") TokenType tokenType,
+            @Param("tokenType") Token tokenType,
             @Param("charMap") String charMap,
             @Param("rootLength") int rootLength,
             @Param("sansVowel") boolean sansVowel);

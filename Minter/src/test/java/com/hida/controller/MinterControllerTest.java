@@ -7,7 +7,7 @@ import com.hida.model.DefaultSetting;
 import com.hida.model.IdGenerator;
 import com.hida.model.Pid;
 import com.hida.model.PidTest;
-import com.hida.model.TokenType;
+import com.hida.model.Token;
 import com.hida.service.MinterService;
 import java.util.HashMap;
 import java.util.Map;
@@ -85,25 +85,25 @@ public class MinterControllerTest {
     @DataProvider(name = "parameters")
     private Object[][] parameters() {
         return new Object[][]{
-            {PREPEND, "abc", TokenType.DIGIT, "d", 1, true, true, true},
-            {PREPEND, "abc", TokenType.LOWER_CONSONANTS, "d", 1, true, true, true},
-            {PREPEND, "abc", TokenType.UPPER_CONSONANTS, "d", 1, true, true, true},
-            {PREPEND, "abc", TokenType.MIXED_CONSONANTS, "d", 1, true, true, true},
-            {PREPEND, "abc", TokenType.LOWER_CONSONANTS_EXTENDED, "d", 1, true, true, true},
-            {PREPEND, "abc", TokenType.UPPER_CONSONANTS_EXTENDED, "d", 1, true, true, true},
-            {PREPEND, "abc", TokenType.MIXED_CONSONANTS_EXTENDED, "d", 1, true, true, true},
-            {PREPEND, "abc", TokenType.DIGIT, "d", 1, true, true, false},
-            {PREPEND, "abc", TokenType.LOWER_ALPHABET, "d", 1, true, true, false},
-            {PREPEND, "abc", TokenType.UPPER_ALPHABET, "d", 1, true, true, false},
-            {PREPEND, "abc", TokenType.MIXED_ALPHABET, "d", 1, true, true, false},
-            {PREPEND, "abc", TokenType.LOWER_ALPHABET_EXTENDED, "d", 1, true, true, false},
-            {PREPEND, "abc", TokenType.UPPER_ALPHABET_EXTENDED, "d", 1, true, true, false},
-            {PREPEND, "abc", TokenType.MIXED_ALPHABET_EXTENDED, "d", 1, true, true, false},
-            {PREPEND, "abc", TokenType.DIGIT, "d", 1, false, true, false},
-            {PREPEND, "abc", TokenType.DIGIT, "l", 1, false, true, false},
-            {PREPEND, "abc", TokenType.DIGIT, "u", 1, false, true, false},
-            {PREPEND, "abc", TokenType.DIGIT, "m", 1, false, true, false},
-            {PREPEND, "abc", TokenType.DIGIT, "e", 1, false, true, false},};
+            {PREPEND, "abc", Token.DIGIT, "d", 1, true, true, true},
+            {PREPEND, "abc", Token.LOWER_CONSONANTS, "d", 1, true, true, true},
+            {PREPEND, "abc", Token.UPPER_CONSONANTS, "d", 1, true, true, true},
+            {PREPEND, "abc", Token.MIXED_CONSONANTS, "d", 1, true, true, true},
+            {PREPEND, "abc", Token.LOWER_CONSONANTS_EXTENDED, "d", 1, true, true, true},
+            {PREPEND, "abc", Token.UPPER_CONSONANTS_EXTENDED, "d", 1, true, true, true},
+            {PREPEND, "abc", Token.MIXED_CONSONANTS_EXTENDED, "d", 1, true, true, true},
+            {PREPEND, "abc", Token.DIGIT, "d", 1, true, true, false},
+            {PREPEND, "abc", Token.LOWER_ALPHABET, "d", 1, true, true, false},
+            {PREPEND, "abc", Token.UPPER_ALPHABET, "d", 1, true, true, false},
+            {PREPEND, "abc", Token.MIXED_ALPHABET, "d", 1, true, true, false},
+            {PREPEND, "abc", Token.LOWER_ALPHABET_EXTENDED, "d", 1, true, true, false},
+            {PREPEND, "abc", Token.UPPER_ALPHABET_EXTENDED, "d", 1, true, true, false},
+            {PREPEND, "abc", Token.MIXED_ALPHABET_EXTENDED, "d", 1, true, true, false},
+            {PREPEND, "abc", Token.DIGIT, "d", 1, false, true, false},
+            {PREPEND, "abc", Token.DIGIT, "l", 1, false, true, false},
+            {PREPEND, "abc", Token.DIGIT, "u", 1, false, true, false},
+            {PREPEND, "abc", Token.DIGIT, "m", 1, false, true, false},
+            {PREPEND, "abc", Token.DIGIT, "e", 1, false, true, false},};
     }
 
     /**
@@ -210,7 +210,7 @@ public class MinterControllerTest {
         tempSetting.setPrefix(map.get("prefix"));
         tempSetting.setRootLength(Integer.parseInt(map.get("rootLength")));
         tempSetting.setCharMap(map.get("charMap"));
-        tempSetting.setTokenType(TokenType.valueOf(map.get("tokenType")));
+        tempSetting.setTokenType(Token.valueOf(map.get("tokenType")));
         tempSetting.setAuto(Boolean.getBoolean(map.get("auto")));
         tempSetting.setRandom(Boolean.getBoolean(map.get("random")));
         tempSetting.setSansVowels(Boolean.getBoolean(map.get("sansVowels")));
@@ -245,7 +245,7 @@ public class MinterControllerTest {
      * @throws Exception
      */
     @Test(dataProvider = "parameters")
-    public void testMintPersistedParameters(String prepend, String prefix, TokenType tokenType,
+    public void testMintPersistedParameters(String prepend, String prefix, Token tokenType,
             String charMap, int rootLength, boolean isAuto, boolean isRandom, boolean sansVowel)
             throws Exception {
 
@@ -381,7 +381,7 @@ public class MinterControllerTest {
     private DefaultSetting getSampleDefaultSetting() {
         DefaultSetting setting = new DefaultSetting("", // prepend
                 "", // prefix
-                TokenType.MIXED_ALPHABET, // tokentype
+                Token.MIXED_ALPHABET, // tokentype
                 "mmm", // charmap
                 3, // rootlength
                 true, // sansvowel

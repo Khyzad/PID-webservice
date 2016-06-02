@@ -6,7 +6,7 @@ package com.hida.model;
  *
  * @author lruffin
  */
-public enum TokenType {
+public enum Token {
 
     DIGIT("0123456789"),
     LOWER_ALPHABET("abcdefghijklmnopqrstuvwxyz"),
@@ -24,7 +24,7 @@ public enum TokenType {
 
     private final String characters;
 
-    TokenType(final String characters) {
+    Token(final String characters) {
         this.characters = characters;
     }
 
