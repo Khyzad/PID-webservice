@@ -6,7 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * An abstract Id generator That 
+ * An abstract Id generator That
  *
  * @author Brittany Cruz
  * @author lruffin
@@ -17,17 +17,17 @@ public abstract class IdGenerator {
      * Creates and new random number generator to aid in the production of
      * non-deterministic ids.
      */
-    protected static final SecureRandom Rng = new SecureRandom();   
+    protected static final SecureRandom Rng = new SecureRandom();
 
     /**
      * LOGGER; logfile to be stored in resource folder
      */
-    protected static final Logger LOGGER = LoggerFactory.getLogger(IdGenerator.class);   
+    protected static final Logger LOGGER = LoggerFactory.getLogger(IdGenerator.class);
 
     /**
      * The string that will be at the front of every id
      */
-    protected String Prefix;   
+    protected String Prefix;
 
     /**
      * missing javadoc
@@ -42,10 +42,14 @@ public abstract class IdGenerator {
 
     public abstract Set<Pid> sequentialMint(long amount);
 
-    public abstract long calculatePermutations();   
-    
+    public abstract long calculatePermutations();
+
     public abstract void incrementPid(Pid pid);
-    
+
+    protected abstract Pid longToPid(long value);
+
+    protected abstract long PidToLong(Pid pid);
+
     /**
      * Checks whether or not the prefix is valid.
      *
@@ -96,5 +100,5 @@ public abstract class IdGenerator {
 
     public void setPrefix(String Prefix) {
         this.Prefix = Prefix;
-    }   
+    }
 }

@@ -229,6 +229,16 @@ public class CustomIdGenerator extends IdGenerator {
             }
         }        
     }
+    
+    @Override
+    protected Pid longToPid(long value) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    protected long PidToLong(Pid pid) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
 
     /* getters and setters */
     public String getCharMap() {

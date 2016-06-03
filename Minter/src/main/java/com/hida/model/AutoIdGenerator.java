@@ -7,8 +7,7 @@ import java.util.TreeSet;
 
 /**
  * An Id Generator that creates Pids. For each Pid, their entire name will be
- uniformly determined by the possible characters provided by a single
- Token.
+ * uniformly determined by the possible characters provided by a single Token.
  *
  *
  * @author lruffin
@@ -26,8 +25,8 @@ public class AutoIdGenerator extends IdGenerator {
     private int RootLength;
 
     /**
-     * Default constructor. Aside from Token, there are no restrictions
- placed on the parameters and can be used however one sees fit.
+     * Default constructor. Aside from Token, there are no restrictions placed
+     * on the parameters and can be used however one sees fit.
      *
      * @param prefix A sequence of characters that appear in the beginning of
      * PIDs
@@ -166,6 +165,16 @@ public class AutoIdGenerator extends IdGenerator {
             }
         }
     }
+    
+    @Override
+    protected Pid longToPid(long value) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    protected long PidToLong(Pid pid) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
 
     /* getters and setters */
     public Token getTokenType() {
@@ -182,5 +191,5 @@ public class AutoIdGenerator extends IdGenerator {
 
     public void setRootLength(int RootLength) {
         this.RootLength = RootLength;
-    }
+    }   
 }
