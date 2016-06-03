@@ -383,8 +383,8 @@ public class MinterServiceTest {
         prop.setProperty("prepend", "");
         prop.setProperty("prefix", "");
         prop.setProperty("charMap", "ddddd");
-        prop.setProperty("rootLength", "DIGIT");
-        prop.setProperty("tokenType", "5");
+        prop.setProperty("rootLength", "5");
+        prop.setProperty("tokenType", "DIGIT");
         prop.setProperty("sansVowel", "true");
         prop.setProperty("auto", "true");
         prop.setProperty("random", "true");
