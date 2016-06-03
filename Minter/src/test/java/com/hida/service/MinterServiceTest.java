@@ -1,5 +1,6 @@
 package com.hida.service;
 
+import com.hida.configuration.RepositoryConfiguration;
 import com.hida.model.AutoIdGenerator;
 import com.hida.repositories.DefaultSettingRepository;
 import com.hida.repositories.PidRepository;
@@ -277,7 +278,7 @@ public class MinterServiceTest {
         DefaultSetting defaultSetting = DefaultSettingList.get(0);
         when(DefaultSettingRepo.findCurrentDefaultSetting()).thenReturn(defaultSetting);
 
-        MinterService.getCurrentSetting(this.TEST_FILE);
+        MinterService.getCurrentSetting();
         verify(DefaultSettingRepo, atLeastOnce()).findCurrentDefaultSetting();
     }
 
@@ -290,7 +291,7 @@ public class MinterServiceTest {
     public void testGetCurrentSettingWithoutExistingDefaultSetting() throws Exception {
         DefaultSetting defaultSetting = DefaultSettingList.get(0);
         when(DefaultSettingRepo.findCurrentDefaultSetting()).thenReturn(null);
-        DefaultSetting actualSetting = MinterService.getCurrentSetting(this.TEST_FILE);
+        DefaultSetting actualSetting = MinterService.getCurrentSetting();
 
         Assert.assertEquals(actualSetting.getCharMap(), defaultSetting.getCharMap());
         Assert.assertEquals(actualSetting.getPrefix(), defaultSetting.getPrefix());
@@ -311,7 +312,7 @@ public class MinterServiceTest {
         DefaultSetting defaultSetting = DefaultSettingList.get(0);
         when(DefaultSettingRepo.findCurrentDefaultSetting()).thenReturn(defaultSetting);
 
-        MinterService.updateCurrentSetting(this.TEST_FILE, defaultSetting);
+        MinterService.updateCurrentSetting(defaultSetting);
         verify(DefaultSettingRepo, atLeastOnce()).findCurrentDefaultSetting();
     }
 

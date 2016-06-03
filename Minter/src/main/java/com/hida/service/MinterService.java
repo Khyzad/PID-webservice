@@ -17,6 +17,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Properties;
 import java.util.Set;
 import java.util.TreeSet;
@@ -41,6 +44,11 @@ public class MinterService {
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(MinterService.class);
 
+    /**
+     * Default setting values stored in resources folder
+     */
+    private final String DEFAULT_SETTING_PATH = "DefaultSetting.properties";
+
     @Autowired
     private PidRepository PidRepo;
 
@@ -49,6 +57,8 @@ public class MinterService {
 
     @Autowired
     private DefaultSettingRepository DefaultSettingRepo;
+
+    private ArrayList<Pid> CachedPid;
 
     /**
      * Declares a Generator object to manage
@@ -167,6 +177,35 @@ public class MinterService {
     }
 
     /**
+     * Generates a list of Pids based on default settings.
+     *
+     * @throws IOException Thrown when the DEFAULT_SETTING_PATH cannot be found
+     */
+    public void generateCache() throws IOException {
+        // get default settings
+        CurrentDefaultSetting = this.getCurrentSetting();
+
+        // create the generator
+        createGenerator();
+
+        // get the maximum number of permutations 
+        long maxPermutation = Generator.calculatePermutations();
+
+        // create all possible permutations
+        Set<Pid> cache = Generator.sequentialMint(maxPermutation);
+
+        // add each mmember of the set to CachedPid
+        ArrayList<Pid> list = new ArrayList<>();
+
+        Iterator<Pid> iter = cache.iterator();
+        while (iter.hasNext()) {
+            list.add(iter.next());
+        }
+
+        CachedPid = list;
+    }
+
+    /**
      * Continuously increments a set of ids until the set is completely filled
      * with unique ids.
      *
@@ -190,7 +229,7 @@ public class MinterService {
             long counter = 0;
 
             // continuously increments invalid or non-unique ids
-            while (!isValidId(currentId) || uniqueList.contains(currentId)) {
+            while (!isValidPid(currentId) || uniqueList.contains(currentId)) {
                 /* 
                  if counter exceeds totalPermutations, then id has iterated through every 
                  possible permutation. Related format is updated as a quick look-up reference
@@ -288,7 +327,7 @@ public class MinterService {
      * @return Returns true if a Pid with the same doesn't exist, false
      * otherwise
      */
-    private boolean isValidId(Pid pid) {
+    private boolean isValidPid(Pid pid) {
         LOGGER.info("in isValidId");
         Pid entity = this.PidRepo.findOne(pid.getName());
         return entity == null;
@@ -298,12 +337,11 @@ public class MinterService {
      * Updates the CurrentDefaultSetting to match the values in the given
      * DefaultSetting.
      *
-     * @param filePath T
      * @param newSetting A DefaultSetting object that contains newly requested
      * values
      * @throws IOException
      */
-    public void updateCurrentSetting(String filePath, DefaultSetting newSetting) throws Exception {
+    public void updateCurrentSetting(DefaultSetting newSetting) throws Exception {
         LOGGER.info("in updateCurrentSetting");
 
         CurrentDefaultSetting = DefaultSettingRepo.findCurrentDefaultSetting();
@@ -317,22 +355,21 @@ public class MinterService {
         CurrentDefaultSetting.setSansVowels(newSetting.isSansVowels());
 
         // record Default Setting values into properties file
-        writeToPropertiesFile(filePath, newSetting);
+        writeToPropertiesFile(DEFAULT_SETTING_PATH, newSetting);
     }
 
     /**
      * Retrieves the CurrentSetting field from the database. If its null, then
      * it is given initial values.
      *
-     * @param filePath
      * @return The currently used setting in the database
-     * @throws IOException thrown whenever properties file does not exist
+     * @throws IOException Thrown when the file cannot be found
      */
-    public DefaultSetting getCurrentSetting(String filePath) throws Exception {
+    public DefaultSetting getCurrentSetting() throws IOException {
         CurrentDefaultSetting = DefaultSettingRepo.findCurrentDefaultSetting();
         if (CurrentDefaultSetting == null) {
             // read default values stored in properties file and save it
-            CurrentDefaultSetting = readPropertiesFile(filePath);
+            CurrentDefaultSetting = readPropertiesFile(DEFAULT_SETTING_PATH);
             DefaultSettingRepo.save(CurrentDefaultSetting);
         }
         return CurrentDefaultSetting;
@@ -347,7 +384,7 @@ public class MinterService {
      * DefaultSetting object
      *
      * @return DefaultSetting object with read values
-     * @throws IOException thrown whenever properties file does not exist
+     * @throws IOException Thrown when the file cannot be found
      */
     private DefaultSetting readPropertiesFile(String filename) throws IOException {
         Properties prop = new Properties();

@@ -37,7 +37,7 @@ public class MinterController {
     /**
      * Default setting values stored in resources folder
      */
-    private final String DEFAULT_SETTING_PATH = "DefaultSetting.properties";
+    //private final String DEFAULT_SETTING_PATH = "DefaultSetting.properties";
 
     /* 
      * Logger; logfile to be stored in resource folder    
@@ -95,7 +95,7 @@ public class MinterController {
         RequestLock.lock();
         try {
 
-            DefaultSetting oldSetting = MinterService.getCurrentSetting(DEFAULT_SETTING_PATH);
+            DefaultSetting oldSetting = MinterService.getCurrentSetting();
             DefaultSetting newSetting;
 
             LOGGER.info("in handleForm");
@@ -164,7 +164,7 @@ public class MinterController {
                         random);
             }
 
-            MinterService.updateCurrentSetting(DEFAULT_SETTING_PATH, newSetting);
+            MinterService.updateCurrentSetting(newSetting);
         }
         finally {
             // unlocks RequestLock and gives access to longest waiting thread            
@@ -205,7 +205,7 @@ public class MinterController {
 
             // override default settings where applicable
             DefaultSetting tempSetting = overrideDefaultSetting(parameters,
-                    MinterService.getCurrentSetting(DEFAULT_SETTING_PATH));
+                    MinterService.getCurrentSetting());
 
             // create the set of ids
             pidSet = MinterService.mint(requestedAmount, tempSetting);
@@ -218,7 +218,7 @@ public class MinterController {
 
         // return the generated set of Pids  
         return pidSet;
-    }
+    }    
 
     /**
      * Maps to the administration panel on the administration path.
@@ -231,7 +231,7 @@ public class MinterController {
         ModelAndView model = new ModelAndView();
 
         // retrieve default values stored in the database
-        DefaultSetting defaultSetting = MinterService.getCurrentSetting(DEFAULT_SETTING_PATH);
+        DefaultSetting defaultSetting = MinterService.getCurrentSetting();
 
         // add the values to the settings page so that they can be displayed 
         LOGGER.info("index page called");
@@ -387,7 +387,7 @@ public class MinterController {
     }
 
     /**
-     * Asserts the validity of a rootLength is valid. 
+     * Asserts the validity of a rootLength is valid.
      *
      * @param rootLength
      * @return

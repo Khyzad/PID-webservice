@@ -19,8 +19,6 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-import org.json.JSONArray;
-import org.json.JSONObject;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Mockito.doNothing;
@@ -167,9 +165,9 @@ public class MinterControllerTest {
         request.setParameter("charmapping", charMapping);
 
         // return originalSetting whenever CurrentSetting is called
-        when(MinterServiceDao.getCurrentSetting(any(String.class))).thenReturn(originalSetting);
+        when(MinterServiceDao.getCurrentSetting()).thenReturn(originalSetting);
         doNothing().when(MinterServiceDao).
-                updateCurrentSetting(any(String.class), any(DefaultSetting.class));
+                updateCurrentSetting(any(DefaultSetting.class));
 
         // call the method to test
         Controller.handleForm("prepend",
@@ -218,7 +216,7 @@ public class MinterControllerTest {
         Set<Pid> sampleSet = getSampleSet(tempSetting);
         
         // return originalSetting when getCurrentSetting is called and a sample Pid set 
-        when(MinterServiceDao.getCurrentSetting(any(String.class))).thenReturn(originalSetting);
+        when(MinterServiceDao.getCurrentSetting()).thenReturn(originalSetting);
         when(MinterServiceDao.mint(anyInt(), any(DefaultSetting.class))).
                 thenReturn(getSampleSet(tempSetting));
        
@@ -254,7 +252,7 @@ public class MinterControllerTest {
 
         Set<Pid> sampleSet = getSampleSet(setting);
         
-        when(MinterServiceDao.getCurrentSetting(any(String.class))).thenReturn(setting);
+        when(MinterServiceDao.getCurrentSetting()).thenReturn(setting);
         when(MinterServiceDao.mint(anyInt(), any(DefaultSetting.class))).
                 thenReturn(sampleSet);
                 
@@ -279,7 +277,7 @@ public class MinterControllerTest {
 
         DefaultSetting setting = this.getSampleDefaultSetting();
 
-        when(MinterServiceDao.getCurrentSetting(any(String.class))).thenReturn(setting);
+        when(MinterServiceDao.getCurrentSetting()).thenReturn(setting);
         Controller.mintPids(AMOUNT, parameters);
     }
 
@@ -296,7 +294,7 @@ public class MinterControllerTest {
 
         DefaultSetting setting = this.getSampleDefaultSetting();
 
-        when(MinterServiceDao.getCurrentSetting(any(String.class))).thenReturn(setting);
+        when(MinterServiceDao.getCurrentSetting()).thenReturn(setting);
         Controller.mintPids(AMOUNT, parameters);
     }
 
@@ -313,7 +311,7 @@ public class MinterControllerTest {
 
         DefaultSetting setting = this.getSampleDefaultSetting();
 
-        when(MinterServiceDao.getCurrentSetting(any(String.class))).thenReturn(setting);
+        when(MinterServiceDao.getCurrentSetting()).thenReturn(setting);
         Controller.mintPids(AMOUNT, parameters);
     }
 
@@ -329,7 +327,7 @@ public class MinterControllerTest {
 
         DefaultSetting setting = this.getSampleDefaultSetting();
 
-        when(MinterServiceDao.getCurrentSetting(any(String.class))).thenReturn(setting);
+        when(MinterServiceDao.getCurrentSetting()).thenReturn(setting);
         Controller.mintPids(-1, parameters);
     }
 
@@ -346,7 +344,7 @@ public class MinterControllerTest {
 
         DefaultSetting setting = this.getSampleDefaultSetting();
 
-        when(MinterServiceDao.getCurrentSetting(any(String.class))).thenReturn(setting);
+        when(MinterServiceDao.getCurrentSetting()).thenReturn(setting);
         Controller.mintPids(AMOUNT, parameters);
     }
 

@@ -31,7 +31,7 @@ import org.testng.annotations.Test;
 public class UsedSettingRepositoryTest extends AbstractTestNGSpringContextTests {
     
     @Autowired
-    private UsedSettingRepository UsedSettingRepo;        
+    private UsedSettingRepository UsedSettingRepo;           
 
     /**
      * Tests the functionality of UsedSettingDao save.
