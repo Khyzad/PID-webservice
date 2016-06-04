@@ -6,13 +6,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * An abstract Id generator That
+ * An abstract Id generator used to create Pids
  *
  * @author Brittany Cruz
  * @author lruffin
  */
 public abstract class IdGenerator {
-
+    
+    protected long MaxPermutation;
+    
     /**
      * Creates and new random number generator to aid in the production of
      * non-deterministic ids.
@@ -28,15 +30,10 @@ public abstract class IdGenerator {
      * The string that will be at the front of every id
      */
     protected String Prefix;
-
-    /**
-     * missing javadoc
-     *
-     * @param prefix
-     */
+    
     public IdGenerator(String prefix) {
         this.Prefix = prefix;
-    }
+    }        
 
     public abstract Set<Pid> randomMint(long amount);
 

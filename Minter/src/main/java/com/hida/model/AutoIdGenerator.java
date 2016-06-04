@@ -37,6 +37,7 @@ public class AutoIdGenerator extends IdGenerator {
         super(prefix);
         this.TokenType = tokenType;
         this.RootLength = rootLength;
+        this.MaxPermutation = calculatePermutations();
     }
 
     /**
@@ -53,29 +54,22 @@ public class AutoIdGenerator extends IdGenerator {
             throw new NotEnoughPermutationsException(total, amount);
         }
 
-        // store sequence of characters provided by Token
-        String map = TokenType.getCharacters();
-
         // create a set to contain Pids
         Set<Pid> pidSet = new TreeSet<>();
 
+        // randomly generate pids using a random number generator
         for (int i = 0; i < amount; i++) {
-            // create a name based off the token and the randomly generated numbers
-            String name = Prefix;
-            for (int j = 0; j < RootLength; j++) {
-                int randomNumber = Rng.nextInt(map.length());
-                name += map.charAt(randomNumber);
-            }
+            long value = Math.abs(Rng.nextLong()) % total;
+            Pid pid = this.longToPid(value);
 
             // create pid and add it to the set
-            Pid pid = new Pid(name);
             while (!pidSet.add(pid)) {
                 this.incrementPid(pid);
             }
 
             LOGGER.trace("Generated Auto Random ID: {}", pid);
         }
-
+        
         return pidSet;
     }
 
@@ -96,24 +90,22 @@ public class AutoIdGenerator extends IdGenerator {
         // create a set to contain Pids
         Set<Pid> pidSet = new TreeSet<>();
 
-        // create a base Pid using the first character of the Token 
-        char firstChar = TokenType.getCharacters().charAt(0);
-        String baseName = String.format("%0" + RootLength + "d", 0).replace('0', firstChar);
-        Pid basePid = new Pid(Prefix + baseName);
-
+        long ordinal = 0;
+        Pid basePid = this.longToPid(ordinal);
         for (int i = 0; i < amount; i++) {
 
             // copy the Name of basePid into a new Pid instance
-            Pid pid = new Pid(basePid);
+            Pid pid = new Pid(basePid.getName());
 
             // add the pid to the set
             pidSet.add(pid);
 
             // increment the base Pid
             this.incrementPid(basePid);
+
             LOGGER.trace("Generated Custom Sequential ID: {}", pid);
         }
-
+        
         return pidSet;
     }
 
@@ -124,7 +116,7 @@ public class AutoIdGenerator extends IdGenerator {
      * @return number of permutations
      */
     @Override
-    public long calculatePermutations() {
+    final public long calculatePermutations() {
         // get the base of each character
         int base = TokenType.getCharacters().length();
 
@@ -140,40 +132,54 @@ public class AutoIdGenerator extends IdGenerator {
      */
     @Override
     public void incrementPid(Pid pid) {
-        String name = pid.getName();
-        String map = TokenType.getCharacters();
-        int lastIndex = name.length() - 1;
-        int prefixLength = Prefix.length();
-        char lastChar = map.charAt(map.length() - 1);
-        char firstChar = map.charAt(0);
-        boolean overflow = true;
-
-        // continue until overflow is false or last value of the rootName is reached
-        for (int i = 0; i <= lastIndex - prefixLength && overflow; i++) {
-            int offset = lastIndex - i;
-            char c = name.charAt(offset);
-
-            if (c == lastChar) {
-                pid.replace(offset, firstChar);
-            }
-            else {
-                int position = map.indexOf(c);
-                char nextChar = map.charAt(position + 1);
-
-                pid.replace(offset, nextChar);
-                overflow = false;
-            }
-        }
+        long next = (this.PidToLong(pid) + 1) % this.MaxPermutation;       
+        pid.setName(this.longToPid(next).getName());       
     }
-    
+
+    /**
+     * Translates an ordinal number into a Pid.
+     *
+     * @param ordinal The nth position of a permutation
+     * @return The Pid at the nth position
+     */
     @Override
-    protected Pid longToPid(long value) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    protected Pid longToPid(long ordinal) {
+        StringBuilder name = new StringBuilder("");
+        String map = TokenType.getCharacters();
+        int radix = map.length();
+        int fullNameLength = RootLength + Prefix.length();
+
+        long remainder = ordinal;
+        for (int i = fullNameLength - 1; i >= Prefix.length(); i--) {
+            name.insert(0, map.charAt((int) remainder % radix));
+
+            remainder /= radix;
+        }
+
+        return new Pid(Prefix + name.toString());
     }
 
+    /**
+     * Translates a Pid into an ordinal number.
+     *
+     * @param pid A persistent identifier
+     * @return The ordinal number of the Pid
+     */
     @Override
     protected long PidToLong(Pid pid) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        String name = pid.getName();
+        String map = TokenType.getCharacters();
+        int radix = map.length();
+        int fullNameLength = RootLength + Prefix.length();
+
+        long ordinal = 0;
+        for (int i = Prefix.length(); i < fullNameLength; i++) {
+            int mapIndex = map.indexOf(name.charAt(i));
+
+            ordinal += (long) Math.pow(radix, name.length() - i - 1) * mapIndex;
+        }
+
+        return ordinal;
     }
 
     /* getters and setters */
@@ -191,5 +197,5 @@ public class AutoIdGenerator extends IdGenerator {
 
     public void setRootLength(int RootLength) {
         this.RootLength = RootLength;
-    }   
+    }
 }

@@ -97,8 +97,8 @@ public class CustomIdGeneratorTest {
 
         // create a generator object
         CustomIdGenerator minter = new CustomIdGenerator(prefix, sansVowel, charMap);
-        Set<Pid> sequentialSet = minter.sequentialMint(amount);       
-        
+        Set<Pid> sequentialSet = minter.sequentialMint(amount);
+
         Pid prev = null;
         Iterator<Pid> iter = sequentialSet.iterator();
         while (iter.hasNext()) {
@@ -227,10 +227,10 @@ public class CustomIdGeneratorTest {
     public void testSequentialLength(String prefix, boolean sansVowel, String charMap,
             int amount) {
         LOGGER.debug("inside testSequentialLength");
-        
+
         // store parameters in a setting object
         Setting setting = new Setting(prefix, null, charMap, charMap.length(), sansVowel);
-        
+
         // create a generator object
         CustomIdGenerator minter = new CustomIdGenerator(prefix, sansVowel, charMap);
         Set<Pid> sequentialSet = minter.sequentialMint(amount);
@@ -265,10 +265,10 @@ public class CustomIdGeneratorTest {
     @Test(dataProvider = "rootLength")
     public void testRandomLength(String prefix, boolean sansVowel, String charMap, int amount) {
         LOGGER.debug("inside testRandomLength");
-        
+
         // store parameters in a setting object
         Setting setting = new Setting(prefix, null, charMap, charMap.length(), sansVowel);
-        
+
         // create a generator object
         CustomIdGenerator minter = new CustomIdGenerator(prefix, sansVowel, charMap);
         Set<Pid> randomSet = minter.randomMint(amount);

@@ -7,8 +7,8 @@ import java.util.TreeSet;
 
 /**
  * An Id Generator that creates Pids. For each Pid, every digit in their names
- will be created using the possible characters provided by a character map.
- Each digit in a character map references a different Token object.
+ * will be created using the possible characters provided by a character map.
+ * Each digit in a character map references a different Token object.
  *
  *
  * @author lruffin
@@ -58,7 +58,8 @@ public class CustomIdGenerator extends IdGenerator {
         this.CharMap = charMap;
         this.TokenMap = new String[charMap.length()];
         this.SansVowel = sansVowel;
-
+        this.MaxPermutation = calculatePermutations();
+        
         initializeTokenMap();
     }
 
@@ -78,21 +79,19 @@ public class CustomIdGenerator extends IdGenerator {
         // generate ids        
         Set<Pid> pidSet = new TreeSet<>();
 
+        // randomly generate pids using a random number generator
         for (int i = 0; i < amount; i++) {
-            String name = Prefix;
-            for (String map : TokenMap) {
-                int randomNumber = Rng.nextInt(map.length());
-                name += map.charAt(randomNumber);
-            }
+            long value = Math.abs(Rng.nextLong()) % total;
+            Pid pid = this.longToPid(value);
 
-            Pid pid = new Pid(name);
+            // create pid and add it to the set
             while (!pidSet.add(pid)) {
                 this.incrementPid(pid);
             }
 
-            LOGGER.trace("Generated Custom Random ID: {}", pid);
+            LOGGER.trace("Generated Auto Random ID: {}", pid);
         }
-        
+       
         return pidSet;
     }
 
@@ -113,26 +112,21 @@ public class CustomIdGenerator extends IdGenerator {
         // create a set to contain Pids
         Set<Pid> pidSet = new TreeSet<>();
 
-        // create a base Pid using the first character of the Token 
-        String baseName = "";
-        for (int i = 0; i < CharMap.length(); i++) {
-            String map = TokenMap[i];
-            baseName += map.charAt(0);           
-        }        
-        Pid basePid = new Pid(Prefix + baseName);
-         
+        long ordinal = 0;
+        Pid basePid = this.longToPid(ordinal);
         for (int i = 0; i < amount; i++) {
-            
+
             // copy the Name of basePid into a new Pid instance
-            Pid pid = new Pid(basePid);
-            
+            Pid pid = new Pid(basePid.getName());
+
             // add the pid to the set
             pidSet.add(pid);
-            
+
             // increment the base Pid
             this.incrementPid(basePid);
+
             LOGGER.trace("Generated Custom Sequential ID: {}", pid);
-        }
+        }       
         return pidSet;
     }
 
@@ -143,7 +137,7 @@ public class CustomIdGenerator extends IdGenerator {
      * @return number of permutations
      */
     @Override
-    public long calculatePermutations() {
+    final public long calculatePermutations() {
         long totalPermutations = 1;
         for (int i = 0; i < CharMap.length(); i++) {
             if (CharMap.charAt(i) == 'd') {
@@ -203,41 +197,56 @@ public class CustomIdGenerator extends IdGenerator {
      */
     @Override
     public void incrementPid(Pid pid) {
-        String name = pid.getName();
-        int lastIndex = name.length() - 1;
-        int prefixLength = Prefix.length();
-        int tokenMapIndex = TokenMap.length - 1;
-        boolean overflow = true;
-
-        // continue until overflow is false or last value of the rootName is reached
-        for (int i = 0; i <= lastIndex - prefixLength && overflow; i++) {
-            int offset = lastIndex - i;
-            String map = TokenMap[tokenMapIndex - i];
-            char c = name.charAt(offset);
-            char firstChar = map.charAt(0);
-            char lastChar = map.charAt(map.length() - 1);
-
-            if (c == lastChar) {
-                pid.replace(offset, firstChar);
-            }
-            else {
-                int position = map.indexOf(c);
-                char nextChar = map.charAt(position + 1);
-
-                pid.replace(offset, nextChar);
-                overflow = false;
-            }
-        }        
+        long next = (this.PidToLong(pid) + 1) % this.MaxPermutation;
+        pid.setName(this.longToPid(next).getName());        
     }
-    
+
+    /**
+     * Translates an ordinal number into a Pid.
+     *
+     * @param ordinal The nth position of a permutation
+     * @return The Pid at the nth position
+     */
     @Override
-    protected Pid longToPid(long value) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    protected Pid longToPid(long ordinal) {
+        StringBuilder name = new StringBuilder("");
+        int fullNameLength = CharMap.length() + Prefix.length();
+
+        long remainder = ordinal;
+        for (int i = fullNameLength - 1; i >= Prefix.length(); i--) {
+            String map = TokenMap[i - Prefix.length()];
+            int radix = map.length();
+            name.insert(0, map.charAt((int) remainder % radix));
+
+            remainder /= radix;
+        }
+        
+        return new Pid(Prefix + name.toString());
     }
 
+    /**
+     * Translates a Pid into an ordinal number.
+     *
+     * @param pid A persistent identifier
+     * @return The ordinal number of the Pid
+     */
     @Override
     protected long PidToLong(Pid pid) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        String name = pid.getName();
+        int fullNameLength = CharMap.length() + Prefix.length();
+        int totalRadix = 1;
+
+        long ordinal = 0;
+        for (int i = fullNameLength - 1; i >= Prefix.length(); i--) {
+            String map = TokenMap[i - Prefix.length()];            
+            int mapIndex = map.indexOf(name.charAt(i));
+            int currentRadix = map.length();
+                        
+            ordinal += totalRadix * mapIndex;
+            totalRadix *= currentRadix;
+        }
+
+        return ordinal;
     }
 
     /* getters and setters */
