@@ -1,10 +1,5 @@
 package com.hida.model;
 
-import static com.hida.model.IdGenerator.Rng;
-import static com.hida.model.IdGenerator.LOGGER;
-import java.util.Set;
-import java.util.TreeSet;
-
 /**
  * An Id Generator that creates Pids. For each Pid, their entire name will be
  * uniformly determined by the possible characters provided by a single Token.
@@ -37,78 +32,9 @@ public class AutoIdGenerator extends IdGenerator {
         super(prefix);
         this.TokenType = tokenType;
         this.RootLength = rootLength;
-        this.MaxPermutation = calculatePermutations();
+        this.MaxPermutation = getMaxPermutation();
     }
-
-    /**
-     * Creates Pids without regard to a natural order.
-     *
-     * @param amount The number of PIDs to be created
-     * @return A set of Pids
-     */
-    @Override
-    public Set<Pid> randomMint(long amount) {
-        // checks to see if its possible to produce or add requested amount of
-        long total = calculatePermutations();
-        if (total < amount) {
-            throw new NotEnoughPermutationsException(total, amount);
-        }
-
-        // create a set to contain Pids
-        Set<Pid> pidSet = new TreeSet<>();
-
-        // randomly generate pids using a random number generator
-        for (int i = 0; i < amount; i++) {
-            long value = Math.abs(Rng.nextLong()) % total;
-            Pid pid = this.longToPid(value);
-
-            // create pid and add it to the set
-            while (!pidSet.add(pid)) {
-                this.incrementPid(pid);
-            }
-
-            LOGGER.trace("Generated Auto Random ID: {}", pid);
-        }
-        
-        return pidSet;
-    }
-
-    /**
-     * Creates Pids in ascending order
-     *
-     * @param amount The number of PIDs to be created
-     * @return A set of Pids
-     */
-    @Override
-    public Set<Pid> sequentialMint(long amount) {
-        // checks to see if its possible to produce or add requested amount of
-        long total = calculatePermutations();
-        if (total < amount) {
-            throw new NotEnoughPermutationsException(total, amount);
-        }
-
-        // create a set to contain Pids
-        Set<Pid> pidSet = new TreeSet<>();
-
-        long ordinal = 0;
-        Pid basePid = this.longToPid(ordinal);
-        for (int i = 0; i < amount; i++) {
-
-            // copy the Name of basePid into a new Pid instance
-            Pid pid = new Pid(basePid.getName());
-
-            // add the pid to the set
-            pidSet.add(pid);
-
-            // increment the base Pid
-            this.incrementPid(basePid);
-
-            LOGGER.trace("Generated Custom Sequential ID: {}", pid);
-        }
-        
-        return pidSet;
-    }
-
+    
     /**
      * This method calculates and returns the total possible number of
      * permutations using the values given in the constructor.
@@ -116,7 +42,7 @@ public class AutoIdGenerator extends IdGenerator {
      * @return number of permutations
      */
     @Override
-    final public long calculatePermutations() {
+    final public long getMaxPermutation() {
         // get the base of each character
         int base = TokenType.getCharacters().length();
 
@@ -198,4 +124,5 @@ public class AutoIdGenerator extends IdGenerator {
     public void setRootLength(int RootLength) {
         this.RootLength = RootLength;
     }
+    
 }

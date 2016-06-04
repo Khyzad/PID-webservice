@@ -2,6 +2,7 @@ package com.hida.model;
 
 import java.security.SecureRandom;
 import java.util.Set;
+import java.util.TreeSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,9 +13,9 @@ import org.slf4j.LoggerFactory;
  * @author lruffin
  */
 public abstract class IdGenerator {
-    
+
     protected long MaxPermutation;
-    
+
     /**
      * Creates and new random number generator to aid in the production of
      * non-deterministic ids.
@@ -30,22 +31,115 @@ public abstract class IdGenerator {
      * The string that will be at the front of every id
      */
     protected String Prefix;
-    
+
     public IdGenerator(String prefix) {
         this.Prefix = prefix;
-    }        
+    }
 
-    public abstract Set<Pid> randomMint(long amount);
-
-    public abstract Set<Pid> sequentialMint(long amount);
-
-    public abstract long calculatePermutations();
+    public abstract long getMaxPermutation();
 
     public abstract void incrementPid(Pid pid);
 
     protected abstract Pid longToPid(long value);
 
     protected abstract long PidToLong(Pid pid);
+
+    /**
+     * Creates Pids without regard to a natural order.
+     *
+     * @param amount The number of Pids to be created
+     * @return A set of Pids
+     */
+    public Set<Pid> randomMint(long amount) {
+        // checks to see if its possible to produce or add requested amount of
+        if (MaxPermutation < amount) {
+            throw new NotEnoughPermutationsException(MaxPermutation, amount);
+        }
+        // generate ids        
+        Set<Pid> pidSet = new TreeSet<>();
+
+        // randomly generate pids using a random number generator
+        for (int i = 0; i < amount; i++) {
+            long value = Math.abs(Rng.nextLong()) % MaxPermutation;
+            Pid pid = this.longToPid(value);
+
+            // create pid and add it to the set
+            while (!pidSet.add(pid)) {
+                this.incrementPid(pid);
+            }
+
+            LOGGER.trace("Generated Auto Random ID: {}", pid);
+        }
+
+        return pidSet;
+    }
+
+    /**
+     * Creates Pids in ascending order
+     *
+     * @param amount The number of PIDs to be created
+     * @return A set of Pids
+     */
+    public Set<Pid> sequentialMint(long amount) {
+        // checks to see if its possible to produce or add requested amount of
+        if (MaxPermutation < amount) {
+            throw new NotEnoughPermutationsException(MaxPermutation, amount);
+        }
+
+        // create a set to contain Pids
+        Set<Pid> pidSet = new TreeSet<>();
+
+        long ordinal = 0;
+        Pid basePid = this.longToPid(ordinal);
+        for (int i = 0; i < amount; i++) {
+
+            // copy the Name of basePid into a new Pid instance
+            Pid pid = new Pid(basePid.getName());
+
+            // add the pid to the set
+            pidSet.add(pid);
+
+            // increment the base Pid
+            this.incrementPid(basePid);
+
+            LOGGER.trace("Generated Custom Sequential ID: {}", pid);
+        }
+        return pidSet;
+    }
+
+    /**
+     * Creates Pids in ascending order starting at an arbitrary value.
+     *
+     * @param amount The number of Pids to be created
+     * @param startingValue The value to start sequentially generating Pids
+     * @return A set of Pids
+     */
+    public Set<Pid> sequentialMint(long amount, long startingValue) {
+        if (MaxPermutation < amount) {
+            throw new NotEnoughPermutationsException(MaxPermutation, amount);
+        }
+
+        // create a set to contain Pids
+        Set<Pid> pidSet = new TreeSet<>();
+
+        long ordinal = startingValue;
+        Pid basePid = this.longToPid(ordinal);
+        for (int i = 0; i < amount; i++) {
+
+            // copy the Name of basePid into a new Pid instance
+            Pid pid = new Pid(basePid.getName());
+
+            // add the pid to the set
+            pidSet.add(pid);
+
+            // increment the base Pid
+            this.incrementPid(basePid);
+
+            LOGGER.trace("Generated Custom Sequential ID: {}", pid);
+        }
+
+        return pidSet;
+    }
 
     /**
      * Checks whether or not the prefix is valid.

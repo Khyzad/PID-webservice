@@ -271,7 +271,7 @@ public class AutoIdGeneratorTest {
     @Test(expectedExceptions = NotEnoughPermutationsException.class)
     public void testSequentialNotEnoughPermutationException() {
         IdGenerator minter = new AutoIdGenerator("", Token.DIGIT, 5);
-        long total = minter.calculatePermutations();
+        long total = minter.getMaxPermutation();
 
         Set<Pid> sequentialSet = minter.randomMint(total + 1);
     }
@@ -283,7 +283,7 @@ public class AutoIdGeneratorTest {
     @Test(expectedExceptions = NotEnoughPermutationsException.class)
     public void testRandomNotEnoughPermutationException() {
         IdGenerator minter = new AutoIdGenerator("", Token.DIGIT, 5);
-        long total = minter.calculatePermutations();
+        long total = minter.getMaxPermutation();
 
         Set<Pid> randomSet = minter.randomMint(total + 1);
     }
@@ -307,7 +307,7 @@ public class AutoIdGeneratorTest {
     @Test
     public void testSequentialMintNegativeAmount() {
         IdGenerator minter = new AutoIdGenerator("", Token.DIGIT, 5);
-        long total = minter.calculatePermutations();
+        long total = minter.getMaxPermutation();
 
         Set<Pid> sequentialSet = minter.sequentialMint(-1);
         Assert.assertEquals(sequentialSet.isEmpty(), true);

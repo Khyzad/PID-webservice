@@ -18,7 +18,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Properties;
 import java.util.Set;
@@ -85,7 +84,7 @@ public class MinterService {
      */
     private long getRemainingPermutations() {
         LOGGER.info("in getRemainingPerumtations");
-        long totalPermutations = Generator.calculatePermutations();
+        long totalPermutations = Generator.getMaxPermutation();
         long amountCreated = getAmountCreated();
 
         return totalPermutations - amountCreated;
@@ -145,7 +144,7 @@ public class MinterService {
         createGenerator();
 
         // calculate total number of permutations
-        long total = Generator.calculatePermutations();
+        long total = Generator.getMaxPermutation();
 
         // determine remaining amount of permutations
         long remaining = getRemainingPermutations();
@@ -189,7 +188,7 @@ public class MinterService {
         createGenerator();
 
         // get the maximum number of permutations 
-        long maxPermutation = Generator.calculatePermutations();
+        long maxPermutation = Generator.getMaxPermutation();
 
         // create all possible permutations
         Set<Pid> cache = Generator.sequentialMint(maxPermutation);
@@ -275,7 +274,6 @@ public class MinterService {
         // update table format
         recordSettings(amountCreated);
 
-        //Logger.info("Finished; IDs printed to Database");
     }
 
     /**

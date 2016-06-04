@@ -289,7 +289,7 @@ public class CustomIdGeneratorTest {
         LOGGER.debug("inside testSequentialNotEnoughPermutationException");
 
         IdGenerator minter = new CustomIdGenerator("", true, "ddddd");
-        long total = minter.calculatePermutations();
+        long total = minter.getMaxPermutation();
 
         Set<Pid> sequentialSet = minter.randomMint(total + 1);
     }
@@ -303,7 +303,7 @@ public class CustomIdGeneratorTest {
         LOGGER.debug("inside testRandomNotEnoughPermutationException");
 
         IdGenerator minter = new CustomIdGenerator("", true, "ddddd");
-        long total = minter.calculatePermutations();
+        long total = minter.getMaxPermutation();
 
         Set<Pid> randomSet = minter.randomMint(total + 1);
     }
@@ -331,7 +331,7 @@ public class CustomIdGeneratorTest {
         LOGGER.debug("inside testSequentialMintNegativeAmount");
 
         IdGenerator minter = new CustomIdGenerator("", true, "ddddd");
-        long total = minter.calculatePermutations();
+        long total = minter.getMaxPermutation();
 
         Set<Pid> sequentialSet = minter.sequentialMint(-1);
         Assert.assertEquals(sequentialSet.isEmpty(), true);
