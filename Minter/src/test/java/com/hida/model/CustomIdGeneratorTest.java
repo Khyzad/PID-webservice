@@ -117,6 +117,49 @@ public class CustomIdGeneratorTest {
     }
 
     /**
+     * Tests CustomIdGenerator for the presence of vowels through the
+     * sequentialMint method at an arbitrary starting value.
+     *
+     * @param prefix A sequence of characters that appear in the beginning of
+     * PIDs
+     * @param sansVowel Dictates whether or not vowels are allowed
+     * @param charMap A sequence of characters used to configure PIDs
+     * @param amount The number of PIDs to be created
+     */
+    @Test(dataProvider = "sansVowel")
+    public void testSequentialMintSansVowelsWithStartingValue(String prefix, boolean sansVowel,
+            String charMap, int amount) {
+        LOGGER.trace("inside testSequentialMintSansVowels");
+
+        // store parameters in a setting object
+        Setting setting = new Setting(prefix, null, charMap, 0, sansVowel);
+
+        // create a generator object
+        CustomIdGenerator generator = new CustomIdGenerator(prefix, sansVowel, charMap);
+        int startingValue = amount / 2;
+        Set<Pid> sequentialSet = generator.sequentialMint(amount, startingValue);
+
+        int counter = 0;
+        Pid prev = null;
+        Iterator<Pid> iter = sequentialSet.iterator();
+        while (iter.hasNext()) {
+            // fail if the length does not match
+            Pid current = iter.next();
+            PidTest.testCharMap(current.getName(), setting);
+
+            if (prev != null && counter != startingValue) {
+                PidTest.testOrder(prev, current);
+            }
+
+            counter++;
+
+            prev = current;
+        }
+
+        Assert.assertEquals(sequentialSet.size(), amount);
+    }
+
+    /**
      * Tests CustomIdGenerator for the presence of vowels through the randomMint
      * method.
      *
@@ -186,6 +229,49 @@ public class CustomIdGeneratorTest {
     }
 
     /**
+     * Tests to see if the sequentialMint method will print the desired prefix
+     * at an arbitrary starting value.
+     *
+     * @param prefix A sequence of characters that appear in the beginning of
+     * PIDs
+     * @param sansVowel Dictates whether or not vowels are allowed
+     * @param charMap A sequence of characters used to configure PIDs
+     * @param amount The number of PIDs to be created
+     */
+    @Test(dataProvider = "prefix")
+    public void testSequentialMintPrefixWithStartingValue(String prefix, boolean sansVowel, 
+            String charMap, int amount) {
+        LOGGER.debug("inside testSequentialMintPrefix");
+
+        // store parameters in a setting object
+        Setting setting = new Setting(prefix, null, charMap, 0, sansVowel);
+
+        // create a generator object
+        CustomIdGenerator generator = new CustomIdGenerator(prefix, sansVowel, charMap);
+        int startingValue = amount / 2;
+        Set<Pid> sequentialSet = generator.sequentialMint(amount, startingValue);
+
+        int counter = 0;
+        Pid prev = null;
+        Iterator<Pid> iter = sequentialSet.iterator();
+        while (iter.hasNext()) {
+            // fail if the length does not match
+            Pid current = iter.next();
+            PidTest.testPrefix(current.getName(), setting);
+
+            if (prev != null && counter != startingValue) {
+                PidTest.testOrder(prev, current);
+            }
+
+            counter++;
+            prev = current;
+        }
+
+        // test to see if the amount matches the size of the generated set
+        Assert.assertEquals(sequentialSet.size(), amount);
+    }
+
+    /**
      * Tests to see if the randomMint method will print the desired prefix
      *
      * @param prefix A sequence of characters that appear in the beginning of
@@ -245,6 +331,50 @@ public class CustomIdGeneratorTest {
             if (prev != null) {
                 PidTest.testOrder(prev, current);
             }
+
+            prev = current;
+        }
+
+        // test to see if the amount matches the size of the generated set
+        Assert.assertEquals(sequentialSet.size(), amount);
+    }
+
+    /**
+     * Tests sequentialMint to see if it will produce the correct length of Pids
+     * at an arbitrary starting value.
+     *
+     * @param prefix A sequence of characters that appear in the beginning of
+     * PIDs
+     * @param sansVowel Dictates whether or not vowels are allowed
+     * @param charMap A sequence of characters used to configure PIDs
+     * @param amount The number of PIDs to be created
+     */
+    @Test(dataProvider = "rootLength")
+    public void testSequentialLengthWithStartingValue(String prefix, boolean sansVowel,
+            String charMap, int amount) {
+        LOGGER.debug("inside testSequentialLength");
+
+        // store parameters in a setting object
+        Setting setting = new Setting(prefix, null, charMap, charMap.length(), sansVowel);
+
+        // create a generator object
+        CustomIdGenerator generator = new CustomIdGenerator(prefix, sansVowel, charMap);
+        int startingValue = amount / 2;
+        Set<Pid> sequentialSet = generator.sequentialMint(amount, startingValue);
+
+        int counter = 0;
+        Pid prev = null;
+        Iterator<Pid> iter = sequentialSet.iterator();
+        while (iter.hasNext()) {
+            // fail if the length does not match
+            Pid current = iter.next();
+            PidTest.testRootLength(current.getName(), setting);
+
+            if (prev != null && counter < startingValue) {
+                PidTest.testOrder(prev, current);
+            }
+
+            counter++;
 
             prev = current;
         }

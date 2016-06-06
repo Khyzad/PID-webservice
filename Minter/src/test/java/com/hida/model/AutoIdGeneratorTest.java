@@ -90,7 +90,7 @@ public class AutoIdGeneratorTest {
         Setting setting = new Setting(prefix, tokenType, null, rootLength, sansVowel);
         IdGenerator generator = new AutoIdGenerator(prefix, tokenType, rootLength);
         Set<Pid> sequentialSet = generator.sequentialMint(amount);
-                       
+
         Pid prev = null;
         Iterator<Pid> iter = sequentialSet.iterator();
         while (iter.hasNext()) {
@@ -104,7 +104,46 @@ public class AutoIdGeneratorTest {
 
             prev = current;
         }
-        
+
+        Assert.assertEquals(sequentialSet.size(), amount);
+    }
+
+    /**
+     * Tests the AutoIdGenerator for the presence of vowels through the
+     * sequentialMint method at an arbitrary starting value.
+     *
+     * @param prefix A sequence of characters that appear in the beginning of
+     * PIDs
+     * @param sansVowel Dictates whether or not vowels are allowed
+     * @param tokenType An enum used to configure PIDS
+     * @param rootLength Designates the length of the id's root
+     * @param amount The number of PIDs to be created
+     */
+    @Test(dataProvider = "sansVowel")
+    public void testSequentialMintSansVowelsWithStartingValue(String prefix, boolean sansVowel,
+            Token tokenType, int rootLength, int amount) {
+
+        // store parameters in a setting object
+        Setting setting = new Setting(prefix, tokenType, null, rootLength, sansVowel);
+        IdGenerator generator = new AutoIdGenerator(prefix, tokenType, rootLength);
+        int startingValue = amount / 2;
+        Set<Pid> sequentialSet = generator.sequentialMint(amount, startingValue);
+
+        int counter = 0;
+        Pid prev = null;
+        Iterator<Pid> iter = sequentialSet.iterator();
+        while (iter.hasNext()) {
+            // fail if the length does not match
+            Pid current = iter.next();
+            PidTest.testTokenType(current.getName(), setting);
+
+            if (prev != null && counter != startingValue) {
+                PidTest.testOrder(prev, current);
+            }
+
+            counter++;
+            prev = current;
+        }
 
         Assert.assertEquals(sequentialSet.size(), amount);
     }
@@ -172,6 +211,46 @@ public class AutoIdGeneratorTest {
     }
 
     /**
+     * Tests to see if the sequentialMint method will print the desired prefix
+     * at an arbitrary starting value.
+     *
+     * @param prefix A sequence of characters that appear in the beginning of
+     * PIDs
+     * @param sansVowel Dictates whether or not vowels are allowed
+     * @param tokenType An enum used to configure PIDS
+     * @param rootLength Designates the length of the id's root
+     * @param amount The number of PIDs to be created
+     */
+    @Test(dataProvider = "prefix")
+    public void testSequentialMintPrefixWithStartingValue(String prefix, boolean sansVowel,
+            Token tokenType, int rootLength, int amount) {
+        // store parameters in a setting object
+        Setting setting = new Setting(prefix, tokenType, null, rootLength, sansVowel);
+        IdGenerator generator = new AutoIdGenerator(prefix, tokenType, rootLength);
+        int startingValue = amount / 2;
+        Set<Pid> sequentialSet = generator.sequentialMint(amount, startingValue);
+
+        int counter = 0;
+        Pid prev = null;
+        Iterator<Pid> iter = sequentialSet.iterator();
+        while (iter.hasNext()) {
+            // fail if the length does not match
+            Pid current = iter.next();
+            PidTest.testPrefix(current.getName(), setting);
+
+            if (prev != null && counter != startingValue) {
+                PidTest.testOrder(prev, current);
+            }
+
+            counter++;
+            prev = current;
+        }
+
+        // test to see if the amount matches the size of the generated set
+        Assert.assertEquals(sequentialSet.size(), amount);
+    }
+
+    /**
      * Tests to see if the randomMint method will print the desired prefix
      *
      * @param prefix A sequence of characters that appear in the beginning of
@@ -229,6 +308,49 @@ public class AutoIdGeneratorTest {
                 PidTest.testOrder(prev, current);
             }
 
+            prev = current;
+        }
+
+        // test to see if the amount matches the size of the generated set
+        Assert.assertEquals(sequentialSet.size(), amount);
+    }
+
+    /**
+     * Tests sequentialMint to see if it will produce the correct length of Pids
+     * at an arbitrary starting value.
+     *
+     * @param prefix A sequence of characters that appear in the beginning of
+     * PIDs
+     * @param sansVowel Dictates whether or not vowels are allowed
+     * @param tokenType An enum used to configure PIDS
+     * @param rootLength Designates the length of the id's root
+     * @param amount The number of PIDs to be created
+     */
+    @Test(dataProvider = "rootLength")
+    public void testSequentialRootLengthWithStartingValue(String prefix, boolean sansVowel,
+            Token tokenType, int rootLength, int amount) {
+
+        // store parameters in a setting object
+        Setting setting = new Setting(prefix, tokenType, null, rootLength, sansVowel);
+
+        // create a new minter and create a set
+        AutoIdGenerator generator = new AutoIdGenerator(prefix, tokenType, rootLength);
+        int startingValue = amount / 2;
+        Set<Pid> sequentialSet = generator.sequentialMint(amount, startingValue);
+
+        int counter = 0;
+        Pid prev = null;
+        Iterator<Pid> iter = sequentialSet.iterator();
+        while (iter.hasNext()) {
+            // fail if the length does not match
+            Pid current = iter.next();
+            PidTest.testRootLength(current.getName(), setting);
+
+            if (prev != null && counter != startingValue) {
+                PidTest.testOrder(prev, current);
+            }
+
+            counter++;
             prev = current;
         }
 
@@ -333,5 +455,5 @@ public class AutoIdGeneratorTest {
 
         Set<Pid> sequentialSet = minter.sequentialMint(0);
         Assert.assertEquals(sequentialSet.isEmpty(), true);
-    }   
+    }
 }
