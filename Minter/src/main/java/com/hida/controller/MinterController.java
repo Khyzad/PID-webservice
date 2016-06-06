@@ -273,7 +273,15 @@ public class MinterController {
         mav.addObject("exception", exception.getClass().getSimpleName());
         mav.addObject("message", exception.getMessage());
         LOGGER.error("General Error: " + exception.getMessage());
+        
+        StackTraceElement[] s = exception.getStackTrace();
+        String trace = "";
+        for(StackTraceElement g : s){
+            trace += g + "\n";
+        }
 
+        mav.addObject("stacktrace", trace);
+        
         mav.setViewName("error");
         return mav;
     }
@@ -314,11 +322,7 @@ public class MinterController {
         boolean isAuto = (parameters.containsKey("auto"))
                 ? convertBoolean(parameters.get("auto"), "auto")
                 : entity.isAuto();
-
-        boolean isRandom = (parameters.containsKey("random"))
-                ? convertBoolean(parameters.get("random"), "random")
-                : entity.isRandom();
-
+       
         boolean isSansVowels = (parameters.containsKey("sansVowels"))
                 ? convertBoolean(parameters.get("sansVowels"), "sansVowels")
                 : entity.isSansVowels();
@@ -330,7 +334,7 @@ public class MinterController {
                 rootLength,
                 isSansVowels,
                 isAuto,
-                isRandom);
+                entity.isRandom());
     }
 
     /**
