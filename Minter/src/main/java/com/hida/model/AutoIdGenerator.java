@@ -59,17 +59,18 @@ public class AutoIdGenerator extends IdGenerator {
     @Override
     public void incrementPid(Pid pid) {
         long next = (this.PidToLong(pid) + 1) % this.MaxPermutation;       
-        pid.setName(this.longToPid(next).getName());       
+        pid.setName(this.longToName(next));       
     }
 
     /**
-     * Translates an ordinal number into a Pid.
+     * Translates an ordinal number into a sequence of characters with a radix
+     * based on TokenType.
      *
      * @param ordinal The nth position of a permutation
-     * @return The Pid at the nth position
+     * @return The sequence at the nth position
      */
     @Override
-    protected Pid longToPid(long ordinal) {
+    protected String longToName(long ordinal) {
         StringBuilder name = new StringBuilder("");
         String map = TokenType.getCharacters();
         int radix = map.length();
@@ -82,7 +83,7 @@ public class AutoIdGenerator extends IdGenerator {
             remainder /= radix;
         }
 
-        return new Pid(Prefix + name.toString());
+        return Prefix + name.toString();
     }
 
     /**

@@ -40,7 +40,7 @@ public abstract class IdGenerator {
 
     public abstract void incrementPid(Pid pid);
 
-    protected abstract Pid longToPid(long value);
+    protected abstract String longToName(long value);
 
     protected abstract long PidToLong(Pid pid);
 
@@ -61,7 +61,7 @@ public abstract class IdGenerator {
         // randomly generate pids using a random number generator
         for (int i = 0; i < amount; i++) {
             long value = Math.abs(Rng.nextLong()) % MaxPermutation;
-            Pid pid = this.longToPid(value);
+            Pid pid = new Pid(this.longToName(value));
 
             // create pid and add it to the set
             while (!pidSet.add(pid)) {
@@ -90,7 +90,7 @@ public abstract class IdGenerator {
         Set<Pid> pidSet = new TreeSet<>();
 
         long ordinal = 0;
-        Pid basePid = this.longToPid(ordinal);
+        Pid basePid = new Pid(this.longToName(ordinal));
         for (int i = 0; i < amount; i++) {
 
             // copy the Name of basePid into a new Pid instance
@@ -123,7 +123,7 @@ public abstract class IdGenerator {
         Set<Pid> pidSet = new TreeSet<>();
 
         long ordinal = startingValue;
-        Pid basePid = this.longToPid(ordinal);
+        Pid basePid = new Pid(this.longToName(ordinal));
         for (int i = 0; i < amount; i++) {
 
             // copy the Name of basePid into a new Pid instance
