@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Properties;
 import java.util.Set;
-import java.util.TreeSet;
+import java.util.LinkedHashSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -220,7 +220,7 @@ public class MinterService {
         long uniqueIdCounter = 0;
 
         // Declares and initializes a list that holds unique values.          
-        Set<Pid> uniqueList = new TreeSet<>();
+        Set<Pid> uniqueList = new LinkedHashSet<>();
 
         // iterate through every id 
         for (Pid currentId : set) {

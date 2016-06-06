@@ -2,7 +2,7 @@ package com.hida.model;
 
 import java.security.SecureRandom;
 import java.util.Set;
-import java.util.TreeSet;
+import java.util.LinkedHashSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,7 +56,7 @@ public abstract class IdGenerator {
             throw new NotEnoughPermutationsException(MaxPermutation, amount);
         }
         // generate ids        
-        Set<Pid> pidSet = new TreeSet<>();
+        Set<Pid> pidSet = new LinkedHashSet<>();
 
         // randomly generate pids using a random number generator
         for (int i = 0; i < amount; i++) {
@@ -87,7 +87,7 @@ public abstract class IdGenerator {
         }
 
         // create a set to contain Pids
-        Set<Pid> pidSet = new TreeSet<>();
+        Set<Pid> pidSet = new LinkedHashSet<>();
 
         long ordinal = 0;
         Pid basePid = new Pid(this.longToName(ordinal));
@@ -120,7 +120,7 @@ public abstract class IdGenerator {
         }
 
         // create a set to contain Pids
-        Set<Pid> pidSet = new TreeSet<>();
+        Set<Pid> pidSet = new LinkedHashSet<>();
 
         long ordinal = startingValue;
         Pid basePid = new Pid(this.longToName(ordinal));

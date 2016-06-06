@@ -1,5 +1,6 @@
 package com.hida.model;
 
+import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -39,6 +40,26 @@ public class Pid implements Comparable<Pid> {
         this.Name = id.Name;
     }
 
+   
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Pid other = (Pid) obj;
+        return Objects.equals(this.Name, other.Name);
+    }                
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 71 * hash + Objects.hashCode(this.Name);
+        return hash;
+    }
+
     /**
      * Used to define the natural ordering of how id's should be listed. When
      * invoked, the two id's will be compared by their Names.
@@ -47,7 +68,7 @@ public class Pid implements Comparable<Pid> {
      * @return ordering is as follows: [0-9] < [a-z] < [A-Z]
      */
     @Override
-    public int compareTo(Pid t) {
+    public int compareTo(Pid t) {        
         String name1 = this.Name;
         String name2 = t.Name;
         if (name1.length() < name2.length()) {
@@ -99,6 +120,11 @@ public class Pid implements Comparable<Pid> {
         }
 
         Name = newName;
+    }
+    
+    @Override
+    public String toString(){
+        return this.Name;
     }
 
     /* getters and setters */
