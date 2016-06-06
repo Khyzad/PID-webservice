@@ -95,7 +95,7 @@ public class MinterController {
         RequestLock.lock();
         try {
 
-            DefaultSetting oldSetting = MinterService.getCurrentSetting();
+            DefaultSetting oldSetting = MinterService.getStoredSetting();
             DefaultSetting newSetting;
 
             LOGGER.info("in handleForm");
@@ -205,7 +205,7 @@ public class MinterController {
 
             // override default settings where applicable
             DefaultSetting tempSetting = overrideDefaultSetting(parameters,
-                    MinterService.getCurrentSetting());
+                    MinterService.getStoredSetting());
 
             // create the set of ids
             pidSet = MinterService.mint(requestedAmount, tempSetting);
@@ -231,7 +231,7 @@ public class MinterController {
         ModelAndView model = new ModelAndView();
 
         // retrieve default values stored in the database
-        DefaultSetting defaultSetting = MinterService.getCurrentSetting();
+        DefaultSetting defaultSetting = MinterService.getStoredSetting();
 
         // add the values to the settings page so that they can be displayed 
         LOGGER.info("index page called");

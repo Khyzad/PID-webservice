@@ -99,13 +99,14 @@ public class MinterServiceTest {
      * used
      */
     @Test(dataProvider = "mintSettings")
-    public void testMintWithNewUsedSetting(boolean isRandom, boolean isAuto) {
+    public void testMintWithNewUsedSetting(boolean isRandom, boolean isAuto) throws Exception {
         // retrieve a sample DefaultSetting entity
         DefaultSetting defaultSetting = DefaultSettingList.get(1);
         defaultSetting.setAuto(isAuto);
         defaultSetting.setRandom(isRandom);
 
         // assume that any Pids created aren't already persisted and pretend to persist them
+        when(DefaultSettingRepo.findCurrentDefaultSetting()).thenReturn(defaultSetting);
         when(PidRepo.findOne(any(String.class))).thenReturn(null);
         when(PidRepo.save(any(Pid.class))).thenReturn(null);
 
@@ -134,7 +135,7 @@ public class MinterServiceTest {
      * used
      */
     @Test(dataProvider = "mintSettings")
-    public void testMintWithOldUsedSetting(boolean isAuto, boolean isRandom) {
+    public void testMintWithOldUsedSetting(boolean isAuto, boolean isRandom) throws Exception {
         // retrieve a sample DefaultSetting entity
         DefaultSetting defaultSetting = DefaultSettingList.get(1);
         defaultSetting.setAuto(isAuto);
@@ -144,6 +145,38 @@ public class MinterServiceTest {
         UsedSetting usedSetting = getSampleUsedSetting();
 
         // assume that any Pids created aren't already persisted and pretend to persist them
+        when(DefaultSettingRepo.findCurrentDefaultSetting()).thenReturn(defaultSetting);
+        when(PidRepo.findOne(any(String.class))).thenReturn(null);
+        when(PidRepo.save(any(Pid.class))).thenReturn(null);
+
+        // assume the UsedSetting isn't persisted and pretend to persist it        
+        when(UsedSettingRepo.findUsedSetting(any(String.class),
+                any(Token.class),
+                any(String.class),
+                anyInt(),
+                anyBoolean())).thenReturn(usedSetting);
+        when(UsedSettingRepo.save(any(UsedSetting.class))).thenReturn(null);
+
+        int amount = 5;
+        Set<Pid> testSet = MinterService.mint(amount, defaultSetting);
+        boolean containsAll = PidSet.containsAll(testSet);
+        Assert.assertEquals(containsAll, true);
+    }
+
+    /**
+     * Tests to ensure that the whenever the stored default setting is used then
+     * the requested amount is saved and used as a starting value.   
+     */
+    @Test(priority = -1)
+    public void testMintWithStartingValue() throws Exception {
+        // retrieve a sample DefaultSetting entity
+        DefaultSetting defaultSetting = DefaultSettingList.get(1);
+
+        // get a sample UsedSetting entity
+        UsedSetting usedSetting = getSampleUsedSetting();
+
+        // assume that any Pids created aren't already persisted and pretend to persist them
+        when(DefaultSettingRepo.findCurrentDefaultSetting()).thenReturn(defaultSetting);
         when(PidRepo.findOne(any(String.class))).thenReturn(null);
         when(PidRepo.save(any(Pid.class))).thenReturn(null);
 
@@ -156,9 +189,12 @@ public class MinterServiceTest {
         when(UsedSettingRepo.save(any(UsedSetting.class))).thenReturn(null);
 
         // check to see if all the Pids were created
-        Set<Pid> testSet = MinterService.mint(5, defaultSetting);
+        long amount = 5;
+        long lastAmount = MinterService.getLastSequentialAmount();
+        Set<Pid> testSet = MinterService.mint(amount, defaultSetting);
         boolean containsAll = PidSet.containsAll(testSet);
         Assert.assertEquals(containsAll, true);
+        Assert.assertEquals((lastAmount + amount) % 10, MinterService.getLastSequentialAmount());
     }
 
     /**
@@ -173,7 +209,7 @@ public class MinterServiceTest {
      */
     @Test(expectedExceptions = NotEnoughPermutationsException.class, dataProvider = "mintSettings")
     public void testMintNotEnoughPermutationsExceptionInFindUsedSetting(
-            boolean isAuto, boolean isRandom) {
+            boolean isAuto, boolean isRandom) throws Exception {
         // retrieve a sample DefaultSetting entity
         DefaultSetting defaultSetting = DefaultSettingList.get(1);
         defaultSetting.setAuto(isAuto);
@@ -183,6 +219,7 @@ public class MinterServiceTest {
         UsedSetting usedSetting = getSampleUsedSetting();
 
         // assume that any Pids created aren't already persisted and pretend to persist them
+        when(DefaultSettingRepo.findCurrentDefaultSetting()).thenReturn(defaultSetting);
         when(PidRepo.findOne(any(String.class))).thenReturn(null);
         when(PidRepo.save(any(Pid.class))).thenReturn(null);
 
@@ -210,13 +247,14 @@ public class MinterServiceTest {
      */
     @Test(expectedExceptions = NotEnoughPermutationsException.class, dataProvider = "mintSettings")
     public void testMintNotEnoughPermutationsExceptionInCalculatePermutations(
-            boolean isAuto, boolean isRandom) {
+            boolean isAuto, boolean isRandom) throws Exception {
         // retrieve a sample DefaultSetting entity
         DefaultSetting defaultSetting = DefaultSettingList.get(1);
         defaultSetting.setAuto(isAuto);
         defaultSetting.setRandom(isRandom);
 
         // assume that any Pids created aren't already persisted and pretend to persist them
+        when(DefaultSettingRepo.findCurrentDefaultSetting()).thenReturn(defaultSetting);
         when(PidRepo.findOne(any(String.class))).thenReturn(null);
         when(PidRepo.save(any(Pid.class))).thenReturn(null);
 
@@ -244,7 +282,8 @@ public class MinterServiceTest {
      * used
      */
     @Test(expectedExceptions = NotEnoughPermutationsException.class, dataProvider = "mintSettings")
-    public void testMintNotEnoughPermutationExceptionInRollId(boolean isAuto, boolean isRandom) {
+    public void testMintNotEnoughPermutationExceptionInRollId(boolean isAuto, boolean isRandom)
+            throws Exception {
         // retrieve a sample DefaultSetting entity
         DefaultSetting defaultSetting = DefaultSettingList.get(1);
         defaultSetting.setAuto(isAuto);
@@ -256,6 +295,9 @@ public class MinterServiceTest {
         when(PidRepo.findOne(any(String.class))).thenReturn(null);
         when(PidRepo.findOne("0")).thenReturn(id);
         when(PidRepo.save(any(Pid.class))).thenReturn(null);
+
+        // return a defaultSeting whenever findCurrentDefaultSetting is called
+        when(DefaultSettingRepo.findCurrentDefaultSetting()).thenReturn(defaultSetting);
 
         // assume that UsedSetting entity with the relevant parameters does not exist
         when(UsedSettingRepo.findUsedSetting(any(String.class),
@@ -278,7 +320,7 @@ public class MinterServiceTest {
         DefaultSetting defaultSetting = DefaultSettingList.get(0);
         when(DefaultSettingRepo.findCurrentDefaultSetting()).thenReturn(defaultSetting);
 
-        MinterService.getCurrentSetting();
+        MinterService.getStoredSetting();
         verify(DefaultSettingRepo, atLeastOnce()).findCurrentDefaultSetting();
     }
 
@@ -291,7 +333,7 @@ public class MinterServiceTest {
     public void testGetCurrentSettingWithoutExistingDefaultSetting() throws Exception {
         DefaultSetting defaultSetting = DefaultSettingList.get(0);
         when(DefaultSettingRepo.findCurrentDefaultSetting()).thenReturn(null);
-        DefaultSetting actualSetting = MinterService.getCurrentSetting();
+        DefaultSetting actualSetting = MinterService.getStoredSetting();
 
         Assert.assertEquals(actualSetting.getCharMap(), defaultSetting.getCharMap());
         Assert.assertEquals(actualSetting.getPrefix(), defaultSetting.getPrefix());

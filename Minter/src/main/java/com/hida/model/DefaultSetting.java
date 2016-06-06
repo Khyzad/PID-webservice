@@ -1,5 +1,6 @@
 package com.hida.model;
 
+import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
@@ -7,7 +8,7 @@ import javax.persistence.Table;
 /**
  * A type of Setting that references the default values that could be used to
  * create a set of Pids. These default values can be overridden and only one
- * DefaultSetting object is persisted in the database at any given time. 
+ * DefaultSetting object is persisted in the database at any given time.
  *
  * @author lruffin
  */
@@ -45,6 +46,56 @@ public class DefaultSetting extends Setting {
         this.Auto = Auto;
         this.Random = Random;
 
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 43 * hash + Objects.hashCode(this.Prepend);
+        hash = 43 * hash + Objects.hashCode(this.getCharMap());
+        hash = 43 * hash + Objects.hashCode(this.getPrefix());
+        hash = 43 * hash + Objects.hashCode(this.getTokenType());
+        hash = 43 * hash + Objects.hashCode(this.getRootLength());
+        hash = 43 * hash + Objects.hashCode(this.isSansVowels());
+        hash = 43 * hash + (this.Auto ? 1 : 0);
+        hash = 43 * hash + (this.Random ? 1 : 0);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final DefaultSetting other = (DefaultSetting) obj;
+        if (!Objects.equals(this.Prepend, other.Prepend)) {
+            return false;
+        }
+        if (!Objects.equals(this.getPrefix(), other.getPrefix())) {
+            return false;
+        }
+        if (!Objects.equals(this.getRootLength(), other.getRootLength())) {
+            return false;
+        }
+        if (!Objects.equals(this.getCharMap(), other.getCharMap())) {
+            return false;
+        }
+        if (!Objects.equals(this.getTokenType(), other.getTokenType())) {
+            return false;
+        }
+        if (!Objects.equals(this.isSansVowels(), other.isSansVowels())) {
+            return false;
+        }
+        if (this.Auto != other.Auto) {
+            return false;
+        }
+        if (this.Random != other.Random) {
+            return false;
+        }
+        return true;
     }
 
     /**

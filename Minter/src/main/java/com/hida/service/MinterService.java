@@ -59,21 +59,29 @@ public class MinterService {
 
     private ArrayList<Pid> CachedPid;
 
+    private long LastSequentialAmount;
+
     /**
      * Declares a Generator object to manage
      */
     private IdGenerator Generator;
 
     /**
-     * Used to store the value of the current settings
+     * The setting used to store the values of the current request
      */
-    private DefaultSetting CurrentDefaultSetting;
+    private DefaultSetting CurrentSetting;
+
+    /**
+     * The default values that are currently stored in the properties file and
+     * in the database.
+     */
+    private DefaultSetting StoredSetting;
 
     /**
      * No-arg constructor
      */
     public MinterService() {
-
+        
     }
 
     /**
@@ -110,19 +118,19 @@ public class MinterService {
      */
     private void createGenerator() {
         LOGGER.info("in createGenerator");
-        if (CurrentDefaultSetting.isAuto()) {
+        if (CurrentSetting.isAuto()) {
             Generator = new AutoIdGenerator(
-                    CurrentDefaultSetting.getPrefix(),
-                    CurrentDefaultSetting.getTokenType(),
-                    CurrentDefaultSetting.getRootLength());
+                    CurrentSetting.getPrefix(),
+                    CurrentSetting.getTokenType(),
+                    CurrentSetting.getRootLength());
 
             LOGGER.info("AutoGenerator created");
         }
         else {
             Generator = new CustomIdGenerator(
-                    CurrentDefaultSetting.getPrefix(),
-                    CurrentDefaultSetting.isSansVowels(),
-                    CurrentDefaultSetting.getCharMap());
+                    CurrentSetting.getPrefix(),
+                    CurrentSetting.isSansVowels(),
+                    CurrentSetting.getCharMap());
             LOGGER.info("CustomIdGenerator created");
         }
     }
@@ -133,12 +141,17 @@ public class MinterService {
      * @param amount The number of PIDs to be created
      * @param setting The desired setting used to create a Pid
      * @return
+     * @throws IOException Thrown when the file cannot be found
      */
-    public Set<Pid> mint(long amount, DefaultSetting setting) {
+    public Set<Pid> mint(long amount, DefaultSetting setting) throws IOException {
         LOGGER.info("in mint");
 
         // store the desired setting values 
-        this.CurrentDefaultSetting = setting;
+        this.CurrentSetting = setting;      
+        
+        if(StoredSetting == null){
+            StoredSetting = this.getStoredSetting();
+        }
 
         // create appropriate generator
         createGenerator();
@@ -162,8 +175,17 @@ public class MinterService {
          if the current setting is random, have the generator return a random set,
          otherwise, have the generator return a sequential set
          */
-        Set<Pid> set = (CurrentDefaultSetting.isRandom()) ? Generator.randomMint(amount)
-                : Generator.sequentialMint(amount);
+        Set<Pid> set;
+        if (CurrentSetting.isRandom()) {
+            set = Generator.randomMint(amount);
+        }
+        else if (CurrentSetting.equals(StoredSetting)) {
+            set = Generator.sequentialMint(amount, LastSequentialAmount);
+            LastSequentialAmount = (LastSequentialAmount + amount) % total;
+        }
+        else {
+            set = Generator.sequentialMint(amount);
+        }
 
         // check ids and increment them appropriately
         set = rollPidSet(set, total, amount);
@@ -182,7 +204,7 @@ public class MinterService {
      */
     public void generateCache() throws IOException {
         // get default settings
-        CurrentDefaultSetting = this.getCurrentSetting();
+        CurrentSetting = this.getStoredSetting();
 
         // create the generator
         createGenerator();
@@ -284,11 +306,11 @@ public class MinterService {
     private UsedSetting findUsedSetting() {
         LOGGER.info("in findUsedSetting");
 
-        return UsedSettingRepo.findUsedSetting(CurrentDefaultSetting.getPrefix(),
-                CurrentDefaultSetting.getTokenType(),
-                CurrentDefaultSetting.getCharMap(),
-                CurrentDefaultSetting.getRootLength(),
-                CurrentDefaultSetting.isSansVowels());
+        return UsedSettingRepo.findUsedSetting(CurrentSetting.getPrefix(),
+                CurrentSetting.getTokenType(),
+                CurrentSetting.getCharMap(),
+                CurrentSetting.getRootLength(),
+                CurrentSetting.isSansVowels());
     }
 
     /**
@@ -303,11 +325,11 @@ public class MinterService {
         UsedSetting entity = findUsedSetting();
 
         if (entity == null) {
-            entity = new UsedSetting(CurrentDefaultSetting.getPrefix(),
-                    CurrentDefaultSetting.getTokenType(),
-                    CurrentDefaultSetting.getCharMap(),
-                    CurrentDefaultSetting.getRootLength(),
-                    CurrentDefaultSetting.isSansVowels(),
+            entity = new UsedSetting(CurrentSetting.getPrefix(),
+                    CurrentSetting.getTokenType(),
+                    CurrentSetting.getCharMap(),
+                    CurrentSetting.getRootLength(),
+                    CurrentSetting.isSansVowels(),
                     amount);
 
             UsedSettingRepo.save(entity);
@@ -342,39 +364,39 @@ public class MinterService {
     public void updateCurrentSetting(DefaultSetting newSetting) throws Exception {
         LOGGER.info("in updateCurrentSetting");
 
-        CurrentDefaultSetting = DefaultSettingRepo.findCurrentDefaultSetting();
-        CurrentDefaultSetting.setPrepend(newSetting.getPrepend());
-        CurrentDefaultSetting.setPrefix(newSetting.getPrefix());
-        CurrentDefaultSetting.setCharMap(newSetting.getCharMap());
-        CurrentDefaultSetting.setRootLength(newSetting.getRootLength());
-        CurrentDefaultSetting.setTokenType(newSetting.getTokenType());
-        CurrentDefaultSetting.setAuto(newSetting.isAuto());
-        CurrentDefaultSetting.setRandom(newSetting.isRandom());
-        CurrentDefaultSetting.setSansVowels(newSetting.isSansVowels());
+        CurrentSetting = DefaultSettingRepo.findCurrentDefaultSetting();
+        CurrentSetting.setPrepend(newSetting.getPrepend());
+        CurrentSetting.setPrefix(newSetting.getPrefix());
+        CurrentSetting.setCharMap(newSetting.getCharMap());
+        CurrentSetting.setRootLength(newSetting.getRootLength());
+        CurrentSetting.setTokenType(newSetting.getTokenType());
+        CurrentSetting.setAuto(newSetting.isAuto());
+        CurrentSetting.setRandom(newSetting.isRandom());
+        CurrentSetting.setSansVowels(newSetting.isSansVowels());
 
         // record Default Setting values into properties file
         writeToPropertiesFile(DEFAULT_SETTING_PATH, newSetting);
     }
 
     /**
-     * Retrieves the CurrentSetting field from the database. If its null, then
-     * it is given initial values.
+     * Retrieves the CurrentDefaultSetting field from the database. If its null,
+     * then it is given initial values.
      *
      * @return The currently used setting in the database
      * @throws IOException Thrown when the file cannot be found
      */
-    public DefaultSetting getCurrentSetting() throws IOException {
-        CurrentDefaultSetting = DefaultSettingRepo.findCurrentDefaultSetting();
-        if (CurrentDefaultSetting == null) {
+    public final DefaultSetting getStoredSetting() throws IOException {
+        StoredSetting = DefaultSettingRepo.findCurrentDefaultSetting();
+        if (StoredSetting == null) {
             // read default values stored in properties file and save it
-            CurrentDefaultSetting = readPropertiesFile(DEFAULT_SETTING_PATH);
-            DefaultSettingRepo.save(CurrentDefaultSetting);
+            StoredSetting = readPropertiesFile(DEFAULT_SETTING_PATH);
+            DefaultSettingRepo.save(CurrentSetting);
         }
-        return CurrentDefaultSetting;
+        return StoredSetting;
     }
 
     public void setCurrentSetting(DefaultSetting CurrentSetting) {
-        this.CurrentDefaultSetting = CurrentSetting;
+        this.CurrentSetting = CurrentSetting;
     }
 
     /**
@@ -439,4 +461,10 @@ public class MinterService {
         prop.store(output, "");
         output.close();
     }
+
+    public long getLastSequentialAmount() {
+        return LastSequentialAmount;
+    }
+    
+    
 }
