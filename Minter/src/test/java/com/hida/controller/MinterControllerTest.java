@@ -6,7 +6,6 @@ import com.hida.model.CustomIdGenerator;
 import com.hida.model.DefaultSetting;
 import com.hida.model.IdGenerator;
 import com.hida.model.Pid;
-import com.hida.model.PidTest;
 import com.hida.model.Token;
 import com.hida.service.MinterService;
 import java.util.HashMap;
@@ -16,19 +15,15 @@ import junit.framework.Assert;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.mockito.Spy;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.testng.annotations.DataProvider;
-import org.springframework.web.servlet.ModelAndView;
 
 /**
  * Class that tests MinterController
@@ -41,16 +36,10 @@ public class MinterControllerTest {
     private MinterService MinterServiceDao;
 
     @InjectMocks
-    private MinterController Controller;
-
-    @Spy
-    private ModelAndView Mav;
+    private MinterController Controller;   
     
-    private final PidTest PidTest = new PidTest();
     private final String PREPEND = "http://digitalarchives.hawaii.gov/70111/";
     private final int AMOUNT = 5;
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(MinterControllerTest.class);
 
     @BeforeClass
     public void setUpClass() throws Exception {
@@ -346,30 +335,6 @@ public class MinterControllerTest {
 
         when(MinterServiceDao.getCurrentSetting()).thenReturn(setting);
         Controller.mintPids(AMOUNT, parameters);
-    }
-
-    /**
-     * Tests a name using to see if it matches the values provided by setting
-     *
-     * @param name
-     * @param setting
-     */
-    private void testPid(String name, DefaultSetting setting) {
-        PidTest.testPrepend(name, setting);
-        
-        // remove the prepend as its irrelevant in future tests
-        String nameWithNoPrepend = name.replace(setting.getPrepend(), "");
-        
-        PidTest.testPrefix(nameWithNoPrepend, setting);
-
-        if (setting.isAuto()) {
-            PidTest.testRootLength(nameWithNoPrepend, setting);
-            PidTest.testTokenType(nameWithNoPrepend, setting);
-        }
-        else {
-            PidTest.testCharMap(nameWithNoPrepend, setting);
-        }
-
     }   
 
     /**
