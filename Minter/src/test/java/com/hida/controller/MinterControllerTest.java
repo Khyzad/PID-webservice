@@ -106,6 +106,14 @@ public class MinterControllerTest {
             {"random", "f"},
             {"sansVowels", "yes"},};
     }
+    
+    @Test
+    public void test() throws Exception{
+        Map<String, String> parm = this.getSampleMap();
+        when(MinterServiceDao.getStoredSetting()).thenReturn(null);
+        Controller.mintPids(AMOUNT, parm);
+        System.out.println("");
+    }
 
     /**
      * Tests data entry in the administration panel found at setting.html

@@ -385,7 +385,7 @@ public class MinterService {
      * @return The currently used setting in the database
      * @throws IOException Thrown when the file cannot be found
      */
-    public final DefaultSetting getStoredSetting() throws IOException {
+    public DefaultSetting getStoredSetting() throws IOException {
         StoredSetting = DefaultSettingRepo.findCurrentDefaultSetting();
         if (StoredSetting == null) {
             // read default values stored in properties file and save it
