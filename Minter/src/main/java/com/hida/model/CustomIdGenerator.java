@@ -145,7 +145,7 @@ public class CustomIdGenerator extends IdGenerator {
         for (int i = fullNameLength - 1; i >= Prefix.length(); i--) {
             String map = TokenMap[i - Prefix.length()];
             int radix = map.length();
-            name.insert(0, map.charAt((int) remainder % radix));
+            name.insert(0, map.charAt((int) (remainder % radix)));
 
             remainder /= radix;
         }

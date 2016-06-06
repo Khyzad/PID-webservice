@@ -78,7 +78,7 @@ public class AutoIdGenerator extends IdGenerator {
 
         long remainder = ordinal;
         for (int i = fullNameLength - 1; i >= Prefix.length(); i--) {
-            name.insert(0, map.charAt((int) remainder % radix));
+            name.insert(0, map.charAt( (int)(remainder % radix)));
 
             remainder /= radix;
         }
