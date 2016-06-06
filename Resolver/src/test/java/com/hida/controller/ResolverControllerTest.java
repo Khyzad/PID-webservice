@@ -50,8 +50,9 @@ public class ResolverControllerTest {
         verify(Service, atLeastOnce()).retrieveCitation(any(String.class));
 
         // test to see that Json is formated properly
-        String jsonObject = Controller.retrieve(entity.getPurl());
-        testJsonObject(jsonObject, entity);
+        Citation retrievedCitation = Controller.retrieve(entity.getPurl());
+
+        Assert.assertEquals(entity, retrievedCitation);
     }
 
     /**
@@ -69,8 +70,9 @@ public class ResolverControllerTest {
         when(Service.retrieveCitation(any(String.class))).thenReturn(entity);       
 
         // test to see that Json is formated properly
-        String jsonObject = Controller.edit(entity.getPurl(), entity.getUrl());
-        testJsonObject(jsonObject, entity);
+        String response = Controller.edit(entity.getPurl(), entity.getUrl());
+        
+        Assert.assertEquals("", response);
     }
 
     /**
@@ -87,13 +89,13 @@ public class ResolverControllerTest {
         doNothing().when(Service).insertCitation(any(Citation.class));       
 
         // test to see that Json is formated properly
-        String jsonObject = Controller.insert(entity.getPurl(),
+        String response = Controller.insert(entity.getPurl(),
                 entity.getUrl(),
                 entity.getErc(),
                 entity.getWho(),
                 entity.getWhat(),
                 entity.getDate());
-        testJsonObject(jsonObject, entity);
+        Assert.assertEquals("", response);
     }
 
     /**
@@ -107,41 +109,12 @@ public class ResolverControllerTest {
         doNothing().when(Service).deleteCitation(any(String.class));
 
         // call delete
-        ModelAndView mav = Controller.delete("");
-
-        // test to see that the correct view is returned
-        Assert.assertEquals("result", mav.getViewName());
+        String response = Controller.delete("");
 
         // test to see that Json is formated properly
-        Map<String, Object> map = mav.getModel();
-        String result = (String) map.get("message");
 
-        Assert.assertEquals("{\"result\":\"deleted\"}", result);
-    }   
-
-    /**
-     * Tests the given jsonObject to ensure that it matches the given entity
-     *
-     * @param jsonString Json object to test
-     * @param entity Entity to check against
-     */
-    private void testJsonObject(String jsonString, Citation entity) {
-        JSONObject testObject = new JSONObject(jsonString);
-
-        String pid = testObject.getString("pid");
-        String url = testObject.getString("url");
-        String erc = testObject.getString("erc");
-        String who = testObject.getString("who");
-        String what = testObject.getString("what");
-        String time = testObject.getString("date");
-
-        Assert.assertEquals(entity.getPurl(), pid);
-        Assert.assertEquals(entity.getUrl(), url);
-        Assert.assertEquals(entity.getErc(), erc);
-        Assert.assertEquals(entity.getWho(), who);
-        Assert.assertEquals(entity.getWhat(), what);
-        Assert.assertEquals(entity.getDate(), time);
-    }
+        Assert.assertEquals("", response);
+    }      
 
     /**
      * Gets a sample Citation object for testing
