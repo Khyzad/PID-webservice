@@ -424,6 +424,7 @@ public class MinterService {
         // get the property value, store it, and return it
         setting.setPrepend(prop.getProperty("prepend"));
         setting.setPrefix(prop.getProperty("prefix"));
+        setting.setCacheSize(Long.parseLong(prop.getProperty("cacheSize")));
         setting.setCharMap(prop.getProperty("charMap"));
         setting.setTokenType(Token.valueOf(prop.getProperty("tokenType")));
         setting.setRootLength(Integer.parseInt(prop.getProperty("rootLength")));
@@ -455,6 +456,7 @@ public class MinterService {
         // set the properties value
         prop.setProperty("prepend", setting.getPrepend());
         prop.setProperty("prefix", setting.getPrefix());
+        prop.setProperty("cacheSize", setting.getCacheSize() + "");
         prop.setProperty("charMap", setting.getCharMap());
         prop.setProperty("rootLength", setting.getRootLength() + "");
         prop.setProperty("tokenType", setting.getTokenType() + "");
