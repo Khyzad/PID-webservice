@@ -34,11 +34,6 @@ import org.springframework.web.servlet.ModelAndView;
 @RequestMapping("/Minter")
 public class MinterController {
 
-    /**
-     * Default setting values stored in resources folder
-     */
-    //private final String DEFAULT_SETTING_PATH = "DefaultSetting.properties";
-
     /* 
      * Logger; logfile to be stored in resource folder    
      */
@@ -63,6 +58,9 @@ public class MinterController {
      *
      * @param prepend String of characters that determine the domain of each Pid
      * @param idprefix String of characters that prefixes each Pid
+     * @param cacheSize The size of the cache that'll be generated whenever the
+     * context is refreshed. If an empty String is returned to cacheSize then
+     * the cacheSize will not be updated.
      * @param mintType Auto Generator is used if true, Custom Generator if false
      * @param mintOrder Pids are generated randomly if true, ordered if false
      * @param sansvowel Pids will contain vowels if true, false othwerise
@@ -79,6 +77,7 @@ public class MinterController {
     @RequestMapping(value = {"/administration"}, method = {RequestMethod.POST})
     public void handleForm(@RequestParam(required = false) String prepend,
             @RequestParam(required = false) String idprefix,
+            @RequestParam(required = false) String cacheSize,
             @RequestParam String mintType,
             @RequestParam String mintOrder,
             @RequestParam(defaultValue = "true") boolean sansvowel,
@@ -101,6 +100,14 @@ public class MinterController {
             LOGGER.info("in handleForm");
             boolean auto = mintType.equals("auto");
             boolean random = mintOrder.equals("random");
+            long size;
+
+            if (cacheSize.isEmpty()) {
+                size = oldSetting.getCacheSize();
+            }
+            else {
+                size = Long.parseLong(cacheSize);
+            }
 
             // assign values based on which minter type was selected
             if (auto) {
@@ -140,6 +147,7 @@ public class MinterController {
                 // create new defaultsetting object
                 newSetting = new DefaultSetting(prepend,
                         idprefix,
+                        size,
                         tokenType,
                         oldSetting.getCharMap(),
                         idlength,
@@ -156,6 +164,7 @@ public class MinterController {
                 // create new defaultsetting object
                 newSetting = new DefaultSetting(prepend,
                         idprefix,
+                        size,
                         oldSetting.getTokenType(),
                         charmapping,
                         oldSetting.getRootLength(),
@@ -218,7 +227,7 @@ public class MinterController {
 
         // return the generated set of Pids  
         return pidSet;
-    }    
+    }
 
     /**
      * Maps to the administration panel on the administration path.
@@ -273,15 +282,15 @@ public class MinterController {
         mav.addObject("exception", exception.getClass().getSimpleName());
         mav.addObject("message", exception.getMessage());
         LOGGER.error("General Error: " + exception.getMessage());
-        
+
         StackTraceElement[] s = exception.getStackTrace();
         String trace = "";
-        for(StackTraceElement g : s){
+        for (StackTraceElement g : s) {
             trace += g + "\n";
         }
 
         mav.addObject("stacktrace", trace);
-        
+
         mav.setViewName("error");
         return mav;
     }
@@ -322,13 +331,14 @@ public class MinterController {
         boolean isAuto = (parameters.containsKey("auto"))
                 ? convertBoolean(parameters.get("auto"), "auto")
                 : entity.isAuto();
-       
+
         boolean isSansVowels = (parameters.containsKey("sansVowels"))
                 ? convertBoolean(parameters.get("sansVowels"), "sansVowels")
                 : entity.isSansVowels();
 
         return new DefaultSetting(prepend,
                 prefix,
+                entity.getCacheSize(),
                 tokenType,
                 charMap,
                 rootLength,
