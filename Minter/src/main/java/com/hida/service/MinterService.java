@@ -81,7 +81,7 @@ public class MinterService {
      * No-arg constructor
      */
     public MinterService() {
-        
+
     }
 
     /**
@@ -147,9 +147,9 @@ public class MinterService {
         LOGGER.info("in mint");
 
         // store the desired setting values 
-        this.CurrentSetting = setting;      
-        
-        if(StoredSetting == null){
+        this.CurrentSetting = setting;
+
+        if (StoredSetting == null) {
             StoredSetting = this.getStoredSetting();
         }
 
@@ -203,6 +203,8 @@ public class MinterService {
      * @throws IOException Thrown when the DEFAULT_SETTING_PATH cannot be found
      */
     public void generateCache() throws IOException {
+        LOGGER.trace("in generateCache");
+
         // get default settings
         CurrentSetting = this.getStoredSetting();
 
@@ -213,17 +215,20 @@ public class MinterService {
         long maxPermutation = Generator.getMaxPermutation();
 
         // create all possible permutations
-        Set<Pid> cache = Generator.sequentialMint(maxPermutation);
-
+        Set<Pid> cache = Generator.sequentialMint(500);
+        
         // add each mmember of the set to CachedPid
         ArrayList<Pid> list = new ArrayList<>();
 
         Iterator<Pid> iter = cache.iterator();
         while (iter.hasNext()) {
-            list.add(iter.next());
+            Pid pid = iter.next();
+            list.add(pid);
+            LOGGER.info("adding " + pid);
         }
-
+        
         CachedPid = list;
+        LOGGER.trace("cache generated");                
     }
 
     /**
@@ -465,6 +470,5 @@ public class MinterService {
     public long getLastSequentialAmount() {
         return LastSequentialAmount;
     }
-    
-    
+
 }
