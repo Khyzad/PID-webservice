@@ -24,6 +24,9 @@ public class DefaultSetting extends Setting {
 
     @Column(name = "ISRANDOM")
     private boolean Random;
+    
+    @Column(name = "CACHESIZE")
+    private long CacheSize;
 
     /**
      * Constructor used to create a DefaultSetting entity
@@ -129,4 +132,11 @@ public class DefaultSetting extends Setting {
         this.Random = Random;
     }
 
+    public long getCacheSize() {
+        return CacheSize;
+    }
+
+    public void setCacheSize(long CacheSize) {
+        this.CacheSize = CacheSize;
+    }        
 }
