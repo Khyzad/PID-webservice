@@ -102,24 +102,24 @@
                 }
             }
 
-            function checkWindowSize(){
-                var value = document.getElementById("windowSize").value;
+            function checkCacheSize(){
+                var value = document.getElementById("cacheSize").value;
                 var valueInt = parseInt(value);
                 var isEmpty = value.toString() === "";                
                 var isWithinAcceptableRange = isEmpty || (valueInt >= 0 && valueInt <= 1000000);                
                 if (isWithinAcceptableRange) {
-                    document.getElementById("windowSize").style.borderColor = "#FFFFFF";
+                    document.getElementById("cacheSize").style.borderColor = "#FFFFFF";
                     document.getElementById("submit").disabled = false;
                     return true;
                 } else {
-                    document.getElementById("windowSize").style.borderColor = "#FF0000";
+                    document.getElementById("cacheSize").style.borderColor = "#FF0000";
                     document.getElementById("submit").disabled = true;
                     return false;
                 }
             }
             
             function checkAuto(){
-                if (prefixIDCHECK() && rootlengthCHECK() && tokensCHECK() && checkWindowSize()) {
+                if (prefixIDCHECK() && rootlengthCHECK() && tokensCHECK() && checkCacheSize()) {
                     document.getElementById("submit").disabled = false;
                 } else {
                     document.getElementById("submit").disabled = true;
@@ -127,7 +127,7 @@
             }
             
             function checkCustom(){                                                        
-                if (prefixIDCHECK() && charmappingCHECK() && checkWindowSize()){                    
+                if (prefixIDCHECK() && charmappingCHECK() && checkCacheSize()){                    
                     document.getElementById("submit").disabled = false;
                 } else {
                     document.getElementById("submit").disabled = true;
@@ -135,9 +135,6 @@
             }
             
             function checkAll($i) {
-                var window = checkWindowSize();               
-                console.warn("in checkAll. window = "+window);
-                
                 if($i === "custom") {
                     checkCustom();
                 } else {
@@ -197,10 +194,10 @@
                         <a href="#" class="tooltip" data-placement="left" data-tool="This is a text field where the user can adjust the size of their cache. A cache is a temporary collection of Pids that is created whenever the application is re/started. The format of the Pids are determined by the default settings. As Pids are created using the default values, they're drawn from the cache. ">
                             <img src="/images/help.png" width="12" height="12" alt="" />
                         </a>
-                        Window Size:
+                        Cache Size:
                     </td>
                     <td>
-                        <input type="text" id="windowSize" name="windowSize" pattern="[0-9]*" onkeyup="checkWindowSize()"/>
+                        <input type="text" id="cacheSize" name="cacheSize" pattern="[0-9]*" onkeyup="checkCacheSize()"/>
                     </td>
                 </tr>
 
@@ -338,6 +335,15 @@
                 </td>
                 <td>
                     <a th:text="${prefix}"></a>
+                </td>
+            </tr>
+
+            <tr id="trpresetcachesize">
+                <td align="right">
+                    Preset cache size:
+                </td>
+                <td>
+                    <a th:text="${cacheSize}"></a>
                 </td>
             </tr>
 
