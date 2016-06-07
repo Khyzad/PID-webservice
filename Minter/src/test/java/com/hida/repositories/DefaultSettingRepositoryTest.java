@@ -52,6 +52,7 @@ public class DefaultSettingRepositoryTest extends AbstractTestNGSpringContextTes
     private DefaultSetting getSampleDefaultSetting() {
         DefaultSetting setting = new DefaultSetting("",
                 "",
+                5,
                 Token.DIGIT,
                 "d",
                 1,

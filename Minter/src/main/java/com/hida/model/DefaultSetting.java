@@ -34,6 +34,8 @@ public class DefaultSetting extends Setting {
      * @param Prepend Primarily used to turn a Pid into a PURL
      * @param Prefix A sequence of characters that appear in the beginning of
      * PIDs
+     * @param CacheSize The size of the cache that'll be generated whenever the
+     * context is refreshed
      * @param TokenType An enum used to configure PIDS
      * @param CharMap A sequence of characters used to configure PIDs
      * @param RootLength Designates the length of the id's root
@@ -42,10 +44,11 @@ public class DefaultSetting extends Setting {
      * used
      * @param Random Determines if the PIDs are created randomly or sequentially
      */
-    public DefaultSetting(String Prepend, String Prefix, Token TokenType, String CharMap,
-            int RootLength, boolean SansVowels, boolean Auto, boolean Random) {
+    public DefaultSetting(String Prepend, String Prefix, long CacheSize, Token TokenType, 
+            String CharMap, int RootLength, boolean SansVowels, boolean Auto, boolean Random) {
         super(Prefix, TokenType, CharMap, RootLength, SansVowels);
         this.Prepend = Prepend;
+        this.CacheSize = CacheSize;
         this.Auto = Auto;
         this.Random = Random;
 

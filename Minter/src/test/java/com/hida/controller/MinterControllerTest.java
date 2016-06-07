@@ -161,6 +161,7 @@ public class MinterControllerTest {
         // call the method to test
         Controller.handleForm("prepend",
                 "idprefix",
+                "",
                 "mintType",
                 "mintOrder",
                 true,
@@ -236,7 +237,7 @@ public class MinterControllerTest {
             String charMap, int rootLength, boolean isAuto, boolean isRandom, boolean sansVowel)
             throws Exception {
 
-        DefaultSetting setting = new DefaultSetting(prepend, prefix, tokenType, charMap,
+        DefaultSetting setting = new DefaultSetting(prepend, prefix, 5, tokenType, charMap,
                 rootLength, isAuto, isRandom, sansVowel);
 
         Set<Pid> sampleSet = getSampleSet(setting);
@@ -344,6 +345,7 @@ public class MinterControllerTest {
     private DefaultSetting getSampleDefaultSetting() {
         DefaultSetting setting = new DefaultSetting("", // prepend
                 "", // prefix
+                5,
                 Token.MIXED_ALPHABET, // tokentype
                 "mmm", // charmap
                 3, // rootlength

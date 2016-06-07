@@ -364,6 +364,7 @@ public class MinterServiceTest {
     private void initializeDefaultSettingList() {
         DefaultSetting defaultSetting1 = new DefaultSetting("", // prepend
                 "", // prefix
+                5,
                 Token.DIGIT, // token type
                 "ddddd", // charmap
                 5, // rootlength
@@ -375,6 +376,7 @@ public class MinterServiceTest {
 
         DefaultSetting defaultSetting2 = new DefaultSetting("", // prepend
                 "", // prefix
+                5,
                 Token.DIGIT, // token type
                 "d", // charmap
                 1, // rootlength
