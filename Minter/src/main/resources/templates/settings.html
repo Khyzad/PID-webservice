@@ -14,26 +14,7 @@
                 document.getElementById("trcharmapping").style.display = "none";
             };
 
-
-            //Submitting the form.
-            function submitForm() {
-                var minter = document.getElementById("mintergentype").value;
-                var noSubmitAutoElements = ['charmapping'];
-                var noSubmitCustomElements = ['token', 'idlength'];
-                //Automated ID's - remove Custom ID's fields.
-                if (minter === "auto") {
-                    for (var i = 0, j = noSubmitAutoElements.length; i < j; i++) {
-                        document.getElementById(noSubmitElements[i]).removeAttribute('name');
-                    }
-                }
-                //Custom ID's - remove Automated ID's fields.
-                else {
-                    for (var i = 0, j = noSubmitCustomElements.length; i < j; i++) {
-                        document.getElementById(noSubmitElements[i]).removeAttribute('name');
-                    }
-                }
-            }
-            
+    
             //Changing the display for when to show "Auto" or "Custom" elements.
             function onMinterSelected() {
                 var minter = document.getElementById("mintergentype").value;
@@ -80,11 +61,9 @@
                 var isNumber = /^[0-9a-zA-Z]*$/.test(document.getElementById("idprefix").value.toString());
                 if (isNumber) {
                     document.getElementById("idprefix").style.borderColor = "#FFFFFF";
-                    //document.getElementById("submit").disabled = false;
                     return true;
                 } else {
                     document.getElementById("idprefix").style.borderColor = "#FF0000";
-                    //document.getElementById("submit").disabled = true;
                     return false;
                 }
             }
@@ -93,10 +72,8 @@
                 if (document.getElementById("lowercase").checked ||
                         document.getElementById("uppercase").checked ||
                         document.getElementById("digits").checked) {
-                    //document.getElementById("submit").disabled = false;
                     return true;
                 } else {
-                    //document.getElementById("submit").disabled = true;
                     return false;
                 }
             }
@@ -106,11 +83,9 @@
                 var isNumber = /(^10$)|(^[1-9]{1}$)/.test(document.getElementById("idlength").value.toString());
                 if (isNumber) {
                     document.getElementById("idlength").style.borderColor = "#FFFFFF";
-                    //document.getElementById("submit").disabled = false;
                     return true;
                 } else {
                     document.getElementById("idlength").style.borderColor = "#FF0000";
-                    //document.getElementById("submit").disabled = true;
                     return false;
                 }
             }
@@ -120,25 +95,39 @@
                 var isNumber = /^[dlume]+$/.test(document.getElementById("charmapping").value.toString());
                 if (isNumber) {
                     document.getElementById("charmapping").style.borderColor = "#FFFFFF";
-                    //document.getElementById("submit").disabled = false;
                     return true;
                 } else {
                     document.getElementById("charmapping").style.borderColor = "#FF0000";
-                    //document.getElementById("submit").disabled = true;
                     return false;
                 }
             }
 
+            function checkWindowSize(){
+                var value = document.getElementById("windowSize").value;
+                var valueInt = parseInt(value);
+                var isEmpty = value.toString() === "";                
+                var isWithinAcceptableRange = isEmpty || (valueInt >= 0 && valueInt <= 1000000);                
+                if (isWithinAcceptableRange) {
+                    document.getElementById("windowSize").style.borderColor = "#FFFFFF";
+                    document.getElementById("submit").disabled = false;
+                    return true;
+                } else {
+                    document.getElementById("windowSize").style.borderColor = "#FF0000";
+                    document.getElementById("submit").disabled = true;
+                    return false;
+                }
+            }
+            
             function checkAuto(){
-                if (prefixIDCHECK() && rootlengthCHECK() && tokensCHECK()) {
+                if (prefixIDCHECK() && rootlengthCHECK() && tokensCHECK() && checkWindowSize()) {
                     document.getElementById("submit").disabled = false;
                 } else {
                     document.getElementById("submit").disabled = true;
                 }
             }
             
-            function checkCustom(){                
-                if (prefixIDCHECK() && charmappingCHECK()) {
+            function checkCustom(){                                                        
+                if (prefixIDCHECK() && charmappingCHECK() && checkWindowSize()){                    
                     document.getElementById("submit").disabled = false;
                 } else {
                     document.getElementById("submit").disabled = true;
@@ -146,6 +135,9 @@
             }
             
             function checkAll($i) {
+                var window = checkWindowSize();               
+                console.warn("in checkAll. window = "+window);
+                
                 if($i === "custom") {
                     checkCustom();
                 } else {
@@ -195,6 +187,20 @@
                     </td>
                     <td>
                         <input type="text" id="idprefix" name="idprefix" pattern="[a-zA-Z0-9]*" maxlength="10" onkeyup="checkAuto()"/>
+                    </td>
+                </tr>
+                
+                
+                <!--WINDOW SIZE: A text field for the desired cache size -->
+                <tr id="tridWindowSize">
+                    <td align="right">
+                        <a href="#" class="tooltip" data-placement="left" data-tool="This is a text field where the user can adjust the size of their cache. A cache is a temporary collection of Pids that is created whenever the application is re/started. The format of the Pids are determined by the default settings. As Pids are created using the default values, they're drawn from the cache. ">
+                            <img src="/images/help.png" width="12" height="12" alt="" />
+                        </a>
+                        Window Size:
+                    </td>
+                    <td>
+                        <input type="text" id="windowSize" name="windowSize" pattern="[0-9]*" onkeyup="checkWindowSize()"/>
                     </td>
                 </tr>
 
