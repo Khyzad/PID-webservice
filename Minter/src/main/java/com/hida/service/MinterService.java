@@ -216,7 +216,7 @@ public class MinterService {
 
         // create all possible permutations
         Set<Pid> cache = Generator.sequentialMint(500);
-        
+
         // add each mmember of the set to CachedPid
         ArrayList<Pid> list = new ArrayList<>();
 
@@ -226,9 +226,9 @@ public class MinterService {
             list.add(pid);
             LOGGER.info("adding " + pid);
         }
-        
+
         CachedPid = list;
-        LOGGER.trace("cache generated");                
+        LOGGER.trace("cache generated");
     }
 
     /**
@@ -382,27 +382,25 @@ public class MinterService {
         // record Default Setting values into properties file
         writeToPropertiesFile(DEFAULT_SETTING_PATH, newSetting);
     }
-
+        
     /**
-     * Retrieves the CurrentDefaultSetting field from the database. If its null,
-     * then it is given initial values.
+     * Initializes the StoredSetting field by reading its value in the database.
+     * If its null, then it is given initial values.
      *
-     * @return The currently used setting in the database
      * @throws IOException Thrown when the file cannot be found
      */
-    public DefaultSetting getStoredSetting() throws IOException {
+    public void initializeStoredSetting() throws IOException {
         StoredSetting = DefaultSettingRepo.findCurrentDefaultSetting();
         if (StoredSetting == null) {
             // read default values stored in properties file and save it
             StoredSetting = readPropertiesFile(DEFAULT_SETTING_PATH);
-            DefaultSettingRepo.save(CurrentSetting);
+            DefaultSettingRepo.save(StoredSetting);
         }
+    }
+    
+    public DefaultSetting getStoredSetting() {        
         return StoredSetting;
-    }
-
-    public void setCurrentSetting(DefaultSetting CurrentSetting) {
-        this.CurrentSetting = CurrentSetting;
-    }
+    }   
 
     /**
      * Read DefaultSetting.properties and return its values in the form of a
