@@ -246,6 +246,7 @@ public class MinterController {
         LOGGER.info("index page called");
         model.addObject("prepend", defaultSetting.getPrepend());
         model.addObject("prefix", defaultSetting.getPrefix());
+        model.addObject("cacheSize", defaultSetting.getCacheSize());
         model.addObject("charMap", defaultSetting.getCharMap());
         model.addObject("tokenType", defaultSetting.getTokenType());
         model.addObject("rootLength", defaultSetting.getRootLength());
