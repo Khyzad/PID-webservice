@@ -1,6 +1,5 @@
 package com.hida.service;
 
-import com.hida.configuration.RepositoryConfiguration;
 import com.hida.model.AutoIdGenerator;
 import com.hida.repositories.DefaultSettingRepository;
 import com.hida.repositories.PidRepository;
@@ -72,6 +71,8 @@ public class MinterServiceTest {
         MockitoAnnotations.initMocks(this);
         initializeDefaultSettingList();
         initializePidSet();
+        MinterService.setDefaultSettingPath(TEST_FILE);
+        MinterService.initializeStoredSetting();
     }
 
     /**
@@ -101,7 +102,7 @@ public class MinterServiceTest {
     @Test(dataProvider = "mintSettings")
     public void testMintWithNewUsedSetting(boolean isRandom, boolean isAuto) throws Exception {
         // retrieve a sample DefaultSetting entity
-        DefaultSetting defaultSetting = DefaultSettingList.get(1);
+        DefaultSetting defaultSetting = DefaultSettingList.get(0);
         defaultSetting.setAuto(isAuto);
         defaultSetting.setRandom(isRandom);
 
@@ -167,10 +168,11 @@ public class MinterServiceTest {
      * Tests to ensure that the whenever the stored default setting is used then
      * the requested amount is saved and used as a starting value.   
      */
-    @Test(priority = -1)
+    @Test
     public void testMintWithStartingValue() throws Exception {
         // retrieve a sample DefaultSetting entity
-        DefaultSetting defaultSetting = DefaultSettingList.get(1);
+        DefaultSetting defaultSetting = DefaultSettingList.get(0);
+        defaultSetting.setRandom(false);
 
         // get a sample UsedSetting entity
         UsedSetting usedSetting = getSampleUsedSetting();
@@ -316,11 +318,11 @@ public class MinterServiceTest {
      * after.
      */
     @Test
-    public void testGetCurrentSettingWithExistingDefaultSetting() throws Exception {
+    public void testInitializeStoredSetting() throws Exception {
         DefaultSetting defaultSetting = DefaultSettingList.get(0);
         when(DefaultSettingRepo.findCurrentDefaultSetting()).thenReturn(defaultSetting);
 
-        MinterService.getStoredSetting();
+        MinterService.initializeStoredSetting();
         verify(DefaultSettingRepo, atLeastOnce()).findCurrentDefaultSetting();
     }
 
@@ -333,8 +335,8 @@ public class MinterServiceTest {
     public void testGetCurrentSettingWithoutExistingDefaultSetting() throws Exception {
         DefaultSetting defaultSetting = DefaultSettingList.get(0);
         when(DefaultSettingRepo.findCurrentDefaultSetting()).thenReturn(null);
-        DefaultSetting actualSetting = MinterService.getStoredSetting();
-
+        DefaultSetting actualSetting = MinterService.getStoredSetting();       
+        
         Assert.assertEquals(actualSetting.getCharMap(), defaultSetting.getCharMap());
         Assert.assertEquals(actualSetting.getPrefix(), defaultSetting.getPrefix());
         Assert.assertEquals(actualSetting.getPrepend(), defaultSetting.getPrepend());
@@ -364,7 +366,7 @@ public class MinterServiceTest {
     private void initializeDefaultSettingList() {
         DefaultSetting defaultSetting1 = new DefaultSetting("", // prepend
                 "", // prefix
-                5,
+                500, // cacheSize
                 Token.DIGIT, // token type
                 "ddddd", // charmap
                 5, // rootlength
@@ -376,7 +378,7 @@ public class MinterServiceTest {
 
         DefaultSetting defaultSetting2 = new DefaultSetting("", // prepend
                 "", // prefix
-                5,
+                500, // cacheSize
                 Token.DIGIT, // token type
                 "d", // charmap
                 1, // rootlength
@@ -386,6 +388,7 @@ public class MinterServiceTest {
 
         DefaultSettingList.add(defaultSetting2);
     }
+       
 
     /**
      * Create a sample set of Pid
@@ -426,6 +429,7 @@ public class MinterServiceTest {
         // set the properties value
         prop.setProperty("prepend", "");
         prop.setProperty("prefix", "");
+        prop.setProperty("cacheSize", "500");
         prop.setProperty("charMap", "ddddd");
         prop.setProperty("rootLength", "5");
         prop.setProperty("tokenType", "DIGIT");
@@ -438,5 +442,5 @@ public class MinterServiceTest {
         output.close();
 
     }
-
+   
 }
