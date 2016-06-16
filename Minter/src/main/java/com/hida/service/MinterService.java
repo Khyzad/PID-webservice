@@ -160,10 +160,10 @@ public class MinterService {
 
         // determine if its possible to create the requested amount of ids
         if (remaining < amount) {
-            LOGGER.error("Not enough remaining Permutations, "
-                    + "Requested Amount=" + amount + " --> "
-                    + "Amount Remaining=" + remaining);
-            throw new NotEnoughPermutationsException(remaining, amount);
+            NotEnoughPermutationsException exception
+                    = new NotEnoughPermutationsException(remaining, amount);
+            LOGGER.error("Exception caught;", exception);
+            throw exception;
         }
         LOGGER.info("request is valid");
 
@@ -220,7 +220,7 @@ public class MinterService {
         while (iter.hasNext()) {
             Pid pid = iter.next();
             list.add(pid);
-            LOGGER.info("adding " + pid);
+            LOGGER.info("adding {}", pid);
         }
 
         cachedPid_ = list;
@@ -259,9 +259,10 @@ public class MinterService {
                  NotEnoughPermutationsException is thrown stating remaining number of ids.
                  */
                 if (counter > totalPermutations) {
-                    LOGGER.error("Total number of Permutations Exceeded: Total Permutation Count="
-                            + totalPermutations);
-                    throw new NotEnoughPermutationsException(uniqueIdCounter, amount);
+                    NotEnoughPermutationsException exception
+                            = new NotEnoughPermutationsException(uniqueIdCounter, amount);
+                    LOGGER.error("Exception caught;", exception);
+                    throw exception;
                 }
                 generator_.incrementPid(currentId);
                 counter++;
@@ -287,13 +288,13 @@ public class MinterService {
      * @param rootLength Designates the length of the id's root.
      */
     private void addPidSet(Set<Pid> list, long amountCreated) {
-        LOGGER.info("in addIdlIst");
+        LOGGER.info("in addPidSet");
 
         for (Pid pid : list) {
             pidRepo_.save(pid);
         }
 
-        LOGGER.info("DatabaseUpdated with new pids");
+        LOGGER.info("Database Updated with new pids");
         // update table format
         recordSettings(amountCreated);
 
