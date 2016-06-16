@@ -57,7 +57,7 @@ public abstract class IdGenerator {
         }
         // generate ids        
         Set<Pid> pidSet = new LinkedHashSet<>();
-     
+
         // randomly generate pids using a random number generator
         for (int i = 0; i < amount; i++) {
             long value = Math.abs(rng_.nextLong()) % maxPermutation_;
@@ -89,20 +89,14 @@ public abstract class IdGenerator {
         // create a set to contain Pids
         Set<Pid> pidSet = new LinkedHashSet<>();
 
-        long ordinal = 0;
-        Pid basePid = new Pid(this.longToName(ordinal));
+        long startVal = 0;
         for (int i = 0; i < amount; i++) {
 
-            // copy the Name of basePid into a new Pid instance
-            Pid pid = new Pid(basePid.getName());
+            Pid newPid = new Pid(longToName(startVal));
+            pidSet.add(newPid);
+            startVal++;
 
-            // add the pid to the set
-            pidSet.add(pid);
-
-            // increment the base Pid
-            this.incrementPid(basePid);
-
-            LOGGER.trace("Generated Custom Sequential ID: {}", pid);
+            LOGGER.trace("Generated Custom Sequential ID: {}", newPid);
         }
         return pidSet;
     }
