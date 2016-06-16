@@ -13,8 +13,8 @@
         <springframework.version>4.2.5.RELEASE</springframework.version>
         <hibernate.version>4.3.6.Final</hibernate.version>
         <testng.version>6.9.4</testng.version>        
-        <maven.compiler.source>1.7</maven.compiler.source>
-        <maven.compiler.target>1.7</maven.compiler.target>        
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>        
         <java.version>1.8</java.version>
     </properties>        
     
