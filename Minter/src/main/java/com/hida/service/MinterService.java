@@ -147,11 +147,7 @@ public class MinterService {
         LOGGER.info("in mint");
 
         // store the desired setting values 
-        this.CurrentSetting = setting;
-
-        if (StoredSetting == null) {
-            StoredSetting = this.getStoredSetting();
-        }
+        this.CurrentSetting = setting;        
 
         // create appropriate generator
         createGenerator();
@@ -403,7 +399,7 @@ public class MinterService {
     }   
 
     /**
-     * Read DefaultSetting.properties and return its values in the form of a
+     * Read a given properties file and return its values in the form of a
      * DefaultSetting object
      *
      * @return DefaultSetting object with read values
@@ -436,7 +432,7 @@ public class MinterService {
     }
 
     /**
-     * Writes to DefaultSetting.properties, updating its key-value pairs using
+     * Writes to a given properties file, updating its key-value pairs using
      * the values stored in the setting parameter. If the file does not exist it
      * is created.
      *
