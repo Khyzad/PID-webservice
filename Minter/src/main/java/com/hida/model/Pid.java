@@ -42,10 +42,7 @@ public class Pid implements Comparable<Pid> {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
+        if (!(obj instanceof Pid)) {
             return false;
         }
         final Pid other = (Pid) obj;

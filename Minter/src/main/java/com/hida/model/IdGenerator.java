@@ -57,7 +57,7 @@ public abstract class IdGenerator {
         }
         // generate ids        
         Set<Pid> pidSet = new LinkedHashSet<>();
-
+     
         // randomly generate pids using a random number generator
         for (int i = 0; i < amount; i++) {
             long value = Math.abs(rng_.nextLong()) % maxPermutation_;
