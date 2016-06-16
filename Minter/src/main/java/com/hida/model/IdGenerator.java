@@ -25,7 +25,7 @@ public abstract class IdGenerator {
     /**
      * LOGGER; logfile to be stored in resource folder
      */
-    protected static final Logger LOGGER = LoggerFactory.getLogger(IdGenerator.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(IdGenerator.class);
 
     /**
      * The string that will be at the front of every id
