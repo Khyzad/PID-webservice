@@ -55,21 +55,23 @@ public abstract class IdGenerator {
         if (maxPermutation_ < amount) {
             throw new NotEnoughPermutationsException(maxPermutation_, amount);
         }
-        // generate ids        
-        Set<Pid> pidSet = new LinkedHashSet<>();
-
-        // randomly generate pids using a random number generator
+        
+        // generate longs               
+        Set<Long> longSet = new LinkedHashSet<>();
         for (int i = 0; i < amount; i++) {
             long value = Math.abs(rng_.nextLong()) % maxPermutation_;
-            Pid pid = new Pid(this.longToName(value));
-
-            // create pid and add it to the set
-            while (!pidSet.add(pid)) {
-                this.incrementPid(pid);
-            }
-
-            LOGGER.trace("Generated Auto Random ID: {}", pid);
+            
+            // create value and add it to the set
+            while (!longSet.add(value)) {
+                value = (value + 1) % maxPermutation_;
+            }            
         }
+        
+        // convert the longs into Pids
+        Set<Pid> pidSet = new LinkedHashSet<>();
+        for (long l : longSet){
+            pidSet.add(new Pid(longToName(l)));
+        }        
 
         return pidSet;
     }
@@ -91,7 +93,6 @@ public abstract class IdGenerator {
 
         long startVal = 0;
         for (int i = 0; i < amount; i++) {
-
             Pid newPid = new Pid(longToName(startVal));
             pidSet.add(newPid);
             startVal++;
@@ -115,15 +116,11 @@ public abstract class IdGenerator {
 
         // create a set to contain Pids
         Set<Pid> pidSet = new LinkedHashSet<>();
-
-        long ordinal = startingValue;
-        Pid basePid = new Pid(this.longToName(ordinal));
         for (int i = 0; i < amount; i++) {
-
             Pid newPid = new Pid(longToName(startingValue));
             pidSet.add(newPid);
-            startingValue++;
-
+            startingValue = (startingValue + 1) % maxPermutation_;
+            
             LOGGER.trace("Generated Custom Sequential ID: {}", newPid);
         }
 
