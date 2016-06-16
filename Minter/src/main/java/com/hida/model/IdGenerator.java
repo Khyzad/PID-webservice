@@ -120,16 +120,11 @@ public abstract class IdGenerator {
         Pid basePid = new Pid(this.longToName(ordinal));
         for (int i = 0; i < amount; i++) {
 
-            // copy the Name of basePid into a new Pid instance
-            Pid pid = new Pid(basePid.getName());
+            Pid newPid = new Pid(longToName(startingValue));
+            pidSet.add(newPid);
+            startingValue++;
 
-            // add the pid to the set
-            pidSet.add(pid);
-
-            // increment the base Pid
-            this.incrementPid(basePid);
-
-            LOGGER.trace("Generated Custom Sequential ID: {}", pid);
+            LOGGER.trace("Generated Custom Sequential ID: {}", newPid);
         }
 
         return pidSet;
