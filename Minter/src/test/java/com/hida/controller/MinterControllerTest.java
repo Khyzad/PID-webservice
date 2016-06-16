@@ -33,11 +33,11 @@ import org.testng.annotations.DataProvider;
 public class MinterControllerTest {
 
     @Mock
-    private MinterService MinterServiceDao;
+    private MinterService minterServiceDao_;
 
     @InjectMocks
-    private MinterController Controller;   
-    
+    private MinterController controller_;
+
     private final String PREPEND = "http://digitalarchives.hawaii.gov/70111/";
     private final int AMOUNT = 5;
 
@@ -105,7 +105,7 @@ public class MinterControllerTest {
             {"auto", "t"},
             //{"random", "f"},
             {"sansVowels", "yes"},};
-    }        
+    }
 
     /**
      * Tests data entry in the administration panel found at setting.html
@@ -135,7 +135,7 @@ public class MinterControllerTest {
     public void testHandleForm(String prepend, String idprefix, String mintType,
             String mintOrder, String vowels, String idLength, String digits,
             String lowercase, String uppercase, String charMapping) throws Exception {
-        
+
         // create a DefaultSetting object and create mock request and response object
         DefaultSetting originalSetting = getSampleDefaultSetting();
         MockHttpServletRequest request = new MockHttpServletRequest();
@@ -154,26 +154,26 @@ public class MinterControllerTest {
         request.setParameter("charmapping", charMapping);
 
         // return originalSetting whenever CurrentSetting is called
-        when(MinterServiceDao.getStoredSetting()).thenReturn(originalSetting);
-        doNothing().when(MinterServiceDao).
+        when(minterServiceDao_.getStoredSetting()).thenReturn(originalSetting);
+        doNothing().when(minterServiceDao_).
                 updateCurrentSetting(any(DefaultSetting.class));
 
         // call the method to test
-        Controller.handleForm("prepend",
+        controller_.handleForm("prepend",
                 "idprefix",
                 "",
                 "mintType",
                 "mintOrder",
                 true,
-                5,                
-                "charmapping",                
-                false,                
-                true,                
-                true,                
+                5,
+                "charmapping",
+                false,
+                true,
+                true,
                 request, response);
-        
+
         // get and test the url of the destination
-        String viewName = response.getHeader("Location");        
+        String viewName = response.getHeader("Location");
         Assert.assertEquals("administration", viewName);
     }
 
@@ -204,16 +204,16 @@ public class MinterControllerTest {
         tempSetting.setSansVowels(Boolean.getBoolean(map.get("sansVowels")));
 
         Set<Pid> sampleSet = getSampleSet(tempSetting);
-        
+
         // return originalSetting when getStoredSetting is called and a sample Pid set 
-        when(MinterServiceDao.getStoredSetting()).thenReturn(originalSetting);
-        when(MinterServiceDao.mint(anyInt(), any(DefaultSetting.class))).
+        when(minterServiceDao_.getStoredSetting()).thenReturn(originalSetting);
+        when(minterServiceDao_.mint(anyInt(), any(DefaultSetting.class))).
                 thenReturn(getSampleSet(tempSetting));
-       
-        Set<Pid> pidSet = Controller.mintPids(AMOUNT, map);                        
-        
+
+        Set<Pid> pidSet = controller_.mintPids(AMOUNT, map);
+
         Assert.assertEquals(sampleSet.size(), pidSet.size());
-        
+
     }
 
     /**
@@ -241,14 +241,13 @@ public class MinterControllerTest {
                 rootLength, isAuto, isRandom, sansVowel);
 
         Set<Pid> sampleSet = getSampleSet(setting);
-        
-        when(MinterServiceDao.getStoredSetting()).thenReturn(setting);
-        when(MinterServiceDao.mint(anyInt(), any(DefaultSetting.class))).
+
+        when(minterServiceDao_.getStoredSetting()).thenReturn(setting);
+        when(minterServiceDao_.mint(anyInt(), any(DefaultSetting.class))).
                 thenReturn(sampleSet);
-                
-        
-        Set<Pid> pidSet = Controller.mintPids(AMOUNT, new HashMap<String, String>());                        
-        
+
+        Set<Pid> pidSet = controller_.mintPids(AMOUNT, new HashMap<String, String>());
+
         Assert.assertEquals(sampleSet.size(), pidSet.size());
     }
 
@@ -267,8 +266,8 @@ public class MinterControllerTest {
 
         DefaultSetting setting = this.getSampleDefaultSetting();
 
-        when(MinterServiceDao.getStoredSetting()).thenReturn(setting);
-        Controller.mintPids(AMOUNT, parameters);
+        when(minterServiceDao_.getStoredSetting()).thenReturn(setting);
+        controller_.mintPids(AMOUNT, parameters);
     }
 
     /**
@@ -284,8 +283,8 @@ public class MinterControllerTest {
 
         DefaultSetting setting = this.getSampleDefaultSetting();
 
-        when(MinterServiceDao.getStoredSetting()).thenReturn(setting);
-        Controller.mintPids(AMOUNT, parameters);
+        when(minterServiceDao_.getStoredSetting()).thenReturn(setting);
+        controller_.mintPids(AMOUNT, parameters);
     }
 
     /**
@@ -301,8 +300,8 @@ public class MinterControllerTest {
 
         DefaultSetting setting = this.getSampleDefaultSetting();
 
-        when(MinterServiceDao.getStoredSetting()).thenReturn(setting);
-        Controller.mintPids(AMOUNT, parameters);
+        when(minterServiceDao_.getStoredSetting()).thenReturn(setting);
+        controller_.mintPids(AMOUNT, parameters);
     }
 
     /**
@@ -317,8 +316,8 @@ public class MinterControllerTest {
 
         DefaultSetting setting = this.getSampleDefaultSetting();
 
-        when(MinterServiceDao.getStoredSetting()).thenReturn(setting);
-        Controller.mintPids(-1, parameters);
+        when(minterServiceDao_.getStoredSetting()).thenReturn(setting);
+        controller_.mintPids(-1, parameters);
     }
 
     /**
@@ -334,13 +333,14 @@ public class MinterControllerTest {
 
         DefaultSetting setting = this.getSampleDefaultSetting();
 
-        when(MinterServiceDao.getStoredSetting()).thenReturn(setting);
-        Controller.mintPids(AMOUNT, parameters);
-    }   
+        when(minterServiceDao_.getStoredSetting()).thenReturn(setting);
+        controller_.mintPids(AMOUNT, parameters);
+    }
 
     /**
      * Returns a sample DefaultSetting object
-     * @return 
+     *
+     * @return
      */
     private DefaultSetting getSampleDefaultSetting() {
         DefaultSetting setting = new DefaultSetting("", // prepend
@@ -358,8 +358,9 @@ public class MinterControllerTest {
 
     /**
      * Returns a sample set of Pids
+     *
      * @param setting
-     * @return 
+     * @return
      */
     private Set<Pid> getSampleSet(DefaultSetting setting) {
         IdGenerator generator;
@@ -388,7 +389,8 @@ public class MinterControllerTest {
 
     /**
      * Returns a sample map object
-     * @return 
+     *
+     * @return
      */
     private Map<String, String> getSampleMap() {
         Map<String, String> map = new HashMap<>();
@@ -403,5 +405,5 @@ public class MinterControllerTest {
         map.put("sansVowel", "false");
 
         return map;
-    }        
+    }
 }

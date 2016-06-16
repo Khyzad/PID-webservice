@@ -22,16 +22,16 @@ import org.testng.Assert;
 public class CitationRepositoryTest {
     
     @Autowired
-    private CitationRepository CitationRepo;   
+    private CitationRepository citationRepo_;   
 
     /**
      * Tests to see if a Citation entity is retrievable
      */
     @Test
     public void testFindByPurl() {
-        Citation entity1 = CitationRepo.findOne("abc123");
-        Citation entity2 = CitationRepo.findOne("xyz");
-        Citation entity3 = CitationRepo.findOne("null");
+        Citation entity1 = citationRepo_.findOne("abc123");
+        Citation entity2 = citationRepo_.findOne("xyz");
+        Citation entity3 = citationRepo_.findOne("null");
         
         Assert.assertNotNull(entity1);
         Assert.assertNotNull(entity2);
@@ -44,9 +44,9 @@ public class CitationRepositoryTest {
     @Test
     public void testSavePurl() {
         Citation purl = new Citation("pid","url","erc","who","what","date");
-        CitationRepo.save(purl);
+        citationRepo_.save(purl);
         
-        Citation entity = CitationRepo.findOne("pid");
+        Citation entity = citationRepo_.findOne("pid");
         Assert.assertNotNull(entity);
     }
 
@@ -55,11 +55,11 @@ public class CitationRepositoryTest {
      */
     @Test
     public void testDeletePurl() {
-        Citation entity = CitationRepo.findOne("abc123");
+        Citation entity = citationRepo_.findOne("abc123");
         
-        CitationRepo.delete(entity);
+        citationRepo_.delete(entity);
         
-        Citation nullEntity = CitationRepo.findOne("abc123");
+        Citation nullEntity = citationRepo_.findOne("abc123");
         Assert.assertNull(nullEntity);       
     }
 

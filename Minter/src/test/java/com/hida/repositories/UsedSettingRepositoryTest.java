@@ -31,7 +31,7 @@ import org.testng.annotations.Test;
 public class UsedSettingRepositoryTest extends AbstractTestNGSpringContextTests {
     
     @Autowired
-    private UsedSettingRepository UsedSettingRepo;           
+    private UsedSettingRepository usedSettingRepo_;           
 
     /**
      * Tests the functionality of UsedSettingDao save.
@@ -40,12 +40,12 @@ public class UsedSettingRepositoryTest extends AbstractTestNGSpringContextTests 
     public void testSaveAndDelete() {
         final UsedSetting setting = getSampleUsedSetting();
         
-        UsedSettingRepo.save(setting);
-        UsedSetting entity = UsedSettingRepo.findOne(setting.getId());
+        usedSettingRepo_.save(setting);
+        UsedSetting entity = usedSettingRepo_.findOne(setting.getId());
         Assert.assertNotNull(entity);
         
-        UsedSettingRepo.delete(entity);
-        long size = UsedSettingRepo.count();
+        usedSettingRepo_.delete(entity);
+        long size = usedSettingRepo_.count();
         
         Assert.assertEquals(0, size);
     }   
@@ -54,9 +54,9 @@ public class UsedSettingRepositoryTest extends AbstractTestNGSpringContextTests 
     public void testFindById(){
         UsedSetting setting = getSampleUsedSetting();
         setting.setId(1);
-        UsedSettingRepo.save(setting);
+        usedSettingRepo_.save(setting);
         
-        UsedSetting entity = UsedSettingRepo.findOne(setting.getId());
+        UsedSetting entity = usedSettingRepo_.findOne(setting.getId());
         Assert.assertNotNull(entity);
     }
     
@@ -66,9 +66,9 @@ public class UsedSettingRepositoryTest extends AbstractTestNGSpringContextTests 
     @Test
     public void testSaveAndFindByUsedSetting() {
         UsedSetting sampleSetting = getSampleUsedSetting();
-        UsedSettingRepo.save(sampleSetting);
+        usedSettingRepo_.save(sampleSetting);
         
-        UsedSetting entity = UsedSettingRepo.findUsedSetting(sampleSetting.getPrefix(),
+        UsedSetting entity = usedSettingRepo_.findUsedSetting(sampleSetting.getPrefix(),
                 sampleSetting.getTokenType(),
                 sampleSetting.getCharMap(),
                 sampleSetting.getRootLength(),
@@ -97,6 +97,6 @@ public class UsedSettingRepositoryTest extends AbstractTestNGSpringContextTests 
      */
     @AfterMethod
     public void tearDown() {
-        UsedSettingRepo.deleteAll();
+        usedSettingRepo_.deleteAll();
     }
 }

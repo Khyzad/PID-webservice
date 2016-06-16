@@ -2,8 +2,6 @@ package com.hida.controller;
 
 import com.hida.model.Citation;
 import com.hida.service.ResolverService;
-import java.util.Map;
-import org.json.JSONObject;
 import org.mockito.InjectMocks;
 import static org.mockito.Matchers.any;
 import org.mockito.Mock;
@@ -12,7 +10,6 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.mockito.MockitoAnnotations;
-import org.springframework.web.servlet.ModelAndView;
 import org.testng.annotations.Test;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
@@ -26,10 +23,10 @@ import org.testng.annotations.BeforeClass;
 public class ResolverControllerTest {
 
     @Mock
-    private ResolverService Service;
+    private ResolverService service_;
 
     @InjectMocks
-    private ResolverController Controller;
+    private ResolverController controller_;
 
     @BeforeClass
     public void setUpClass() throws Exception {
@@ -44,13 +41,13 @@ public class ResolverControllerTest {
     @Test
     public void testRetrieve() throws Exception {
         Citation entity = getSampleCitation();
-        when(Service.retrieveCitation(any(String.class))).thenReturn(entity);       
+        when(service_.retrieveCitation(any(String.class))).thenReturn(entity);       
 
         // test to see that Service at least makes a call to get a Citation object
-        verify(Service, atLeastOnce()).retrieveCitation(any(String.class));
+        verify(service_, atLeastOnce()).retrieveCitation(any(String.class));
 
         // test to see that Json is formated properly
-        Citation retrievedCitation = Controller.retrieve(entity.getPurl());
+        Citation retrievedCitation = controller_.retrieve(entity.getPurl());
 
         Assert.assertEquals(entity, retrievedCitation);
     }
@@ -66,11 +63,11 @@ public class ResolverControllerTest {
         Citation entity = getSampleCitation();
 
         // pretend the entity was edited and return new entity
-        doNothing().when(Service).editUrl(any(String.class), any(String.class));
-        when(Service.retrieveCitation(any(String.class))).thenReturn(entity);       
+        doNothing().when(service_).editUrl(any(String.class), any(String.class));
+        when(service_.retrieveCitation(any(String.class))).thenReturn(entity);       
 
         // test to see that Json is formated properly
-        String response = Controller.edit(entity.getPurl(), entity.getUrl());
+        String response = controller_.edit(entity.getPurl(), entity.getUrl());
         
         Assert.assertEquals("", response);
     }
@@ -86,10 +83,10 @@ public class ResolverControllerTest {
         Citation entity = getSampleCitation();
 
         // pretend the entity was inserted 
-        doNothing().when(Service).insertCitation(any(Citation.class));       
+        doNothing().when(service_).insertCitation(any(Citation.class));       
 
         // test to see that Json is formated properly
-        String response = Controller.insert(entity.getPurl(),
+        String response = controller_.insert(entity.getPurl(),
                 entity.getUrl(),
                 entity.getErc(),
                 entity.getWho(),
@@ -106,10 +103,10 @@ public class ResolverControllerTest {
     @Test
     public void testDelete() throws Exception {
         // pretend the entity was deleted
-        doNothing().when(Service).deleteCitation(any(String.class));
+        doNothing().when(service_).deleteCitation(any(String.class));
 
         // call delete
-        String response = Controller.delete("");
+        String response = controller_.delete("");
 
         // test to see that Json is formated properly
 
