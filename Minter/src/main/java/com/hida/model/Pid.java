@@ -51,9 +51,7 @@ public class Pid implements Comparable<Pid> {
 
     @Override
     public int hashCode() {
-        int hash = 7;
-        hash = 71 * hash + Objects.hashCode(this.name_);
-        return hash;
+        return Objects.hash(this.name_);       
     }
 
     /**

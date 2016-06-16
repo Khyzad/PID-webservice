@@ -55,25 +55,21 @@ public class DefaultSetting extends Setting {
     }
 
     @Override
-    public int hashCode() {
-        int hash = 7;
-        hash = 43 * hash + Objects.hashCode(this.prepend_);
-        hash = 43 * hash + Objects.hashCode(this.getCharMap());
-        hash = 43 * hash + Objects.hashCode(this.getPrefix());
-        hash = 43 * hash + Objects.hashCode(this.getTokenType());
-        hash = 43 * hash + Objects.hashCode(this.getRootLength());
-        hash = 43 * hash + Objects.hashCode(this.isSansVowels());
-        hash = 43 * hash + (this.auto_ ? 1 : 0);
-        hash = 43 * hash + (this.random_ ? 1 : 0);
-        return hash;
+    public int hashCode() {        
+        return Objects.hash(this.getPrepend(), 
+                this.getCacheSize(), 
+                this.getCharMap(), 
+                this.getPrefix(), 
+                this.getTokenType(), 
+                this.getRootLength(), 
+                this.isAuto(), 
+                this.isRandom(), 
+                this.isSansVowels());
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
+    public boolean equals(Object obj) {                
+        if(!(obj instanceof DefaultSetting)){
             return false;
         }
         final DefaultSetting other = (DefaultSetting) obj;
