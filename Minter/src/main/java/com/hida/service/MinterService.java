@@ -46,7 +46,7 @@ public class MinterService {
     /**
      * Default setting values stored in resources folder
      */
-    private final String DEFAULT_SETTING_PATH = "DefaultSetting.properties";
+    private String DefaultSettingPath = "DefaultSetting.properties";
 
     @Autowired
     private PidRepository PidRepo;
@@ -380,7 +380,7 @@ public class MinterService {
         CurrentSetting.setSansVowels(newSetting.isSansVowels());
 
         // record Default Setting values into properties file
-        writeToPropertiesFile(DEFAULT_SETTING_PATH, newSetting);
+        writeToPropertiesFile(DefaultSettingPath, newSetting);
     }
         
     /**
@@ -393,7 +393,7 @@ public class MinterService {
         StoredSetting = DefaultSettingRepo.findCurrentDefaultSetting();
         if (StoredSetting == null) {
             // read default values stored in properties file and save it
-            StoredSetting = readPropertiesFile(DEFAULT_SETTING_PATH);
+            StoredSetting = readPropertiesFile(DefaultSettingPath);
             DefaultSettingRepo.save(StoredSetting);
         }
     }
@@ -471,4 +471,11 @@ public class MinterService {
         return LastSequentialAmount;
     }
 
+    public String getDefaultSettingPath() {
+        return DefaultSettingPath;
+    }
+
+    public void setDefaultSettingPath(String DefaultSettingPath) {
+        this.DefaultSettingPath = DefaultSettingPath;
+    }        
 }
