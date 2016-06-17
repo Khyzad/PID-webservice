@@ -1,8 +1,10 @@
 package com.hida.model;
 
 import java.security.SecureRandom;
+import java.util.Iterator;
 import java.util.Set;
 import java.util.LinkedHashSet;
+import java.util.stream.LongStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,23 +57,28 @@ public abstract class IdGenerator {
         if (maxPermutation_ < amount) {
             throw new NotEnoughPermutationsException(maxPermutation_, amount);
         }
-        
-        // generate longs               
+
+        // create sets to guarantee unique membership           
         Set<Long> longSet = new LinkedHashSet<>();
-        for (int i = 0; i < amount; i++) {
-            long value = Math.abs(rng_.nextLong()) % maxPermutation_;
-            
-            // create value and add it to the set
+        Set<Pid> pidSet = new LinkedHashSet<>();
+
+        // create a LongStream of size amount, bound by [0, maxPermutation_)                
+        LongStream longStream = rng_.longs(amount, 0, maxPermutation_);
+
+        // iterate through every member of the stream
+        Iterator<Long> longIter = longStream.iterator();
+        while (longIter.hasNext()) {
+
+            // try to add the value to the set, if it can't be added increment it
+            long value = longIter.next();
             while (!longSet.add(value)) {
                 value = (value + 1) % maxPermutation_;
-            }            
+            }
+            
+            // if a value can be added to longSet then it can be added to PidSet
+            Pid pid = new Pid(longToName(value));
+            pidSet.add(pid);
         }
-        
-        // convert the longs into Pids
-        Set<Pid> pidSet = new LinkedHashSet<>();
-        for (long l : longSet){
-            pidSet.add(new Pid(longToName(l)));
-        }        
 
         return pidSet;
     }
@@ -120,7 +127,7 @@ public abstract class IdGenerator {
             Pid newPid = new Pid(longToName(startingValue));
             pidSet.add(newPid);
             startingValue = (startingValue + 1) % maxPermutation_;
-            
+
             LOGGER.trace("Generated Custom Sequential ID: {}", newPid);
         }
 
