@@ -54,7 +54,7 @@ public abstract class IdGenerator {
      */
     public Set<Pid> randomMint(long amount) {
         // checks to see if its possible to produce or add requested amount of
-        if (maxPermutation_ < amount) {
+        if (maxPermutation_ < amount || amount < 0) {
             throw new NotEnoughPermutationsException(maxPermutation_, amount);
         }
 
@@ -91,7 +91,7 @@ public abstract class IdGenerator {
      */
     public Set<Pid> sequentialMint(long amount) {
         // checks to see if its possible to produce or add requested amount of
-        if (maxPermutation_ < amount) {
+        if (maxPermutation_ < amount || amount < 0) {
             throw new NotEnoughPermutationsException(maxPermutation_, amount);
         }
 
