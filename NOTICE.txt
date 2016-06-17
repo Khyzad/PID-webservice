@@ -1,5 +1,4 @@
-Apache [PID Web Service]
-Copyright [2015-2016] The Apache Software Foundation
+PID Web Service
+Copyright 2016 Lawrence Ruffin, Leland Lopez, Brittany Cruz, Stephen Anspach
 
-This product includes software developed at
-The Apache Software Foundation (http://www.apache.org/).
+Developed in collaboration with the Hawaii State Digital Archives.
