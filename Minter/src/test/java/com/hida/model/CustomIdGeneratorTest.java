@@ -453,10 +453,10 @@ public class CustomIdGeneratorTest {
     }
 
     /**
-     * Tests to see if sequentialMint will through NotEnoughPermutation
+     * Tests to see if sequentialMint will throw NotEnoughPermutation
      * exception when the amount is negative
      */
-    @Test
+    @Test(expectedExceptions = NotEnoughPermutationsException.class)
     public void testSequentialMintNegativeAmount() {
         LOGGER.debug("inside testSequentialMintNegativeAmount");
 
@@ -464,7 +464,6 @@ public class CustomIdGeneratorTest {
         long total = minter.getMaxPermutation();
 
         Set<Pid> sequentialSet = minter.sequentialMint(-1);
-        Assert.assertEquals(sequentialSet.isEmpty(), true);
     }
 
     /**
