@@ -14,13 +14,13 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class IdGenerator {
 
-    protected long MaxPermutation;
+    protected long raxPermutation_;
 
     /**
      * Creates and new random number generator to aid in the production of
      * non-deterministic ids.
      */
-    protected static final SecureRandom Rng = new SecureRandom();
+    protected static final SecureRandom rng_ = new SecureRandom();
 
     /**
      * LOGGER; logfile to be stored in resource folder
@@ -30,10 +30,10 @@ public abstract class IdGenerator {
     /**
      * The string that will be at the front of every id
      */
-    protected String Prefix;
+    protected String prefix_;
 
     public IdGenerator(String prefix) {
-        this.Prefix = prefix;
+        this.prefix_ = prefix;
     }
 
     public abstract long getMaxPermutation();
@@ -52,15 +52,15 @@ public abstract class IdGenerator {
      */
     public Set<Pid> randomMint(long amount) {
         // checks to see if its possible to produce or add requested amount of
-        if (MaxPermutation < amount) {
-            throw new NotEnoughPermutationsException(MaxPermutation, amount);
+        if (raxPermutation_ < amount) {
+            throw new NotEnoughPermutationsException(raxPermutation_, amount);
         }
         // generate ids        
         Set<Pid> pidSet = new LinkedHashSet<>();
 
         // randomly generate pids using a random number generator
         for (int i = 0; i < amount; i++) {
-            long value = Math.abs(Rng.nextLong()) % MaxPermutation;
+            long value = Math.abs(rng_.nextLong()) % raxPermutation_;
             Pid pid = new Pid(this.longToName(value));
 
             // create pid and add it to the set
@@ -82,8 +82,8 @@ public abstract class IdGenerator {
      */
     public Set<Pid> sequentialMint(long amount) {
         // checks to see if its possible to produce or add requested amount of
-        if (MaxPermutation < amount) {
-            throw new NotEnoughPermutationsException(MaxPermutation, amount);
+        if (raxPermutation_ < amount) {
+            throw new NotEnoughPermutationsException(raxPermutation_, amount);
         }
 
         // create a set to contain Pids
@@ -115,8 +115,8 @@ public abstract class IdGenerator {
      * @return A set of Pids
      */
     public Set<Pid> sequentialMint(long amount, long startingValue) {
-        if (MaxPermutation < amount) {
-            throw new NotEnoughPermutationsException(MaxPermutation, amount);
+        if (raxPermutation_ < amount) {
+            throw new NotEnoughPermutationsException(raxPermutation_, amount);
         }
 
         // create a set to contain Pids
@@ -186,10 +186,10 @@ public abstract class IdGenerator {
 
     /* typical getter and setter methods */
     public String getPrefix() {
-        return Prefix;
+        return prefix_;
     }
 
     public void setPrefix(String Prefix) {
-        this.Prefix = Prefix;
+        this.prefix_ = Prefix;
     }
 }

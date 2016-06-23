@@ -13,11 +13,11 @@ import org.springframework.data.repository.query.Param;
  */
 public interface UsedSettingRepository extends CrudRepository<UsedSetting, Integer> {
 
-    @Query("select s from UsedSetting s where s.Prefix = :prefix and "
-            + "s.TokenType = :tokenType and "
-            + "s.CharMap = :charMap and "
-            + "s.RootLength = :rootLength and "
-            + "s.SansVowels = :sansVowel")
+    @Query("select s from UsedSetting s where s.prefix_ = :prefix and "
+            + "s.tokenType_ = :tokenType and "
+            + "s.charMap_ = :charMap and "
+            + "s.rootLength_ = :rootLength and "
+            + "s.sansVowels_ = :sansVowel")
     public UsedSetting findUsedSetting(@Param("prefix") String prefix,
             @Param("tokenType") Token tokenType,
             @Param("charMap") String charMap,

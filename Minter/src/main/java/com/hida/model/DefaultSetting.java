@@ -17,16 +17,16 @@ import javax.persistence.Table;
 public class DefaultSetting extends Setting {
 
     @Column(name = "PREPEND", nullable = false)
-    private String Prepend;
+    private String prepend_;
 
     @Column(name = "ISAUTO")
-    private boolean Auto;
+    private boolean auto_;
 
     @Column(name = "ISRANDOM")
-    private boolean Random;
-    
+    private boolean random_;
+
     @Column(name = "CACHESIZE")
-    private long CacheSize;
+    private long cacheSize_;
 
     /**
      * Constructor used to create a DefaultSetting entity
@@ -40,31 +40,31 @@ public class DefaultSetting extends Setting {
      * @param CharMap A sequence of characters used to configure PIDs
      * @param RootLength Designates the length of the id's root
      * @param SansVowels Dictates whether or not vowels are allowed
-     * @param Auto Determines which generator, either Auto or Custom, will be
+     * @param Auto Determines which generator, either auto_ or Custom, will be
      * used
      * @param Random Determines if the PIDs are created randomly or sequentially
      */
-    public DefaultSetting(String Prepend, String Prefix, long CacheSize, Token TokenType, 
+    public DefaultSetting(String Prepend, String Prefix, long CacheSize, Token TokenType,
             String CharMap, int RootLength, boolean SansVowels, boolean Auto, boolean Random) {
         super(Prefix, TokenType, CharMap, RootLength, SansVowels);
-        this.Prepend = Prepend;
-        this.CacheSize = CacheSize;
-        this.Auto = Auto;
-        this.Random = Random;
+        this.prepend_ = Prepend;
+        this.cacheSize_ = CacheSize;
+        this.auto_ = Auto;
+        this.random_ = Random;
 
     }
 
     @Override
     public int hashCode() {
         int hash = 7;
-        hash = 43 * hash + Objects.hashCode(this.Prepend);
+        hash = 43 * hash + Objects.hashCode(this.prepend_);
         hash = 43 * hash + Objects.hashCode(this.getCharMap());
         hash = 43 * hash + Objects.hashCode(this.getPrefix());
         hash = 43 * hash + Objects.hashCode(this.getTokenType());
         hash = 43 * hash + Objects.hashCode(this.getRootLength());
         hash = 43 * hash + Objects.hashCode(this.isSansVowels());
-        hash = 43 * hash + (this.Auto ? 1 : 0);
-        hash = 43 * hash + (this.Random ? 1 : 0);
+        hash = 43 * hash + (this.auto_ ? 1 : 0);
+        hash = 43 * hash + (this.random_ ? 1 : 0);
         return hash;
     }
 
@@ -77,7 +77,7 @@ public class DefaultSetting extends Setting {
             return false;
         }
         final DefaultSetting other = (DefaultSetting) obj;
-        if (!Objects.equals(this.Prepend, other.Prepend)) {
+        if (!Objects.equals(this.prepend_, other.prepend_)) {
             return false;
         }
         if (!Objects.equals(this.getPrefix(), other.getPrefix())) {
@@ -95,10 +95,10 @@ public class DefaultSetting extends Setting {
         if (!Objects.equals(this.isSansVowels(), other.isSansVowels())) {
             return false;
         }
-        if (this.Auto != other.Auto) {
+        if (this.auto_ != other.auto_) {
             return false;
         }
-        if (this.Random != other.Random) {
+        if (this.random_ != other.random_) {
             return false;
         }
         return true;
@@ -112,34 +112,34 @@ public class DefaultSetting extends Setting {
     }
 
     public String getPrepend() {
-        return this.Prepend;
+        return this.prepend_;
     }
 
     public void setPrepend(String prepend) {
-        this.Prepend = prepend;
+        this.prepend_ = prepend;
     }
 
     public boolean isAuto() {
-        return Auto;
+        return auto_;
     }
 
     public void setAuto(boolean Auto) {
-        this.Auto = Auto;
+        this.auto_ = Auto;
     }
 
     public boolean isRandom() {
-        return Random;
+        return random_;
     }
 
     public void setRandom(boolean Random) {
-        this.Random = Random;
+        this.random_ = Random;
     }
 
     public long getCacheSize() {
-        return CacheSize;
+        return cacheSize_;
     }
 
     public void setCacheSize(long CacheSize) {
-        this.CacheSize = CacheSize;
-    }        
+        this.cacheSize_ = CacheSize;
+    }
 }

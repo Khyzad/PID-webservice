@@ -22,10 +22,10 @@ import org.testng.annotations.BeforeClass;
 public class ResolverServiceTest {
 
     @Mock
-    private CitationRepository CitationRepo;
+    private CitationRepository citationRepo_;
 
     @InjectMocks
-    private ResolverService Service;
+    private ResolverService service_;
 
     /**
      * Sets up Mockito
@@ -46,13 +46,13 @@ public class ResolverServiceTest {
         String url = "url";
         Citation entity = new Citation(purl);
         entity.setUrl(url);
-        when(CitationRepo.findOne(purl)).thenReturn(entity);
+        when(citationRepo_.findOne(purl)).thenReturn(entity);
 
-        String entityUrl = Service.retrieveUrl(purl);
+        String entityUrl = service_.retrieveUrl(purl);
 
-        verify(CitationRepo, atLeastOnce()).findOne(purl);
+        verify(citationRepo_, atLeastOnce()).findOne(purl);
         Assert.assertEquals(url, entityUrl);
-        
+
     }
 
     /**
@@ -61,11 +61,11 @@ public class ResolverServiceTest {
     @Test
     public void testEditUrl() {
         Citation entity = new Citation();
-        when(CitationRepo.findOne(any(String.class))).thenReturn(entity);
+        when(citationRepo_.findOne(any(String.class))).thenReturn(entity);
 
         String newUrl = "newUrl";
-        Service.editUrl("purl", newUrl);
-        verify(CitationRepo, atLeastOnce()).findOne(any(String.class));
+        service_.editUrl("purl", newUrl);
+        verify(citationRepo_, atLeastOnce()).findOne(any(String.class));
         Assert.assertEquals(newUrl, entity.getUrl());
     }
 
@@ -75,11 +75,11 @@ public class ResolverServiceTest {
     @Test
     public void testDeleteCitation() {
         Citation entity = new Citation();
-        when(CitationRepo.findOne(any(String.class))).thenReturn(entity);
-        doNothing().when(CitationRepo).delete(entity);
+        when(citationRepo_.findOne(any(String.class))).thenReturn(entity);
+        doNothing().when(citationRepo_).delete(entity);
 
-        Service.deleteCitation("");
-        verify(CitationRepo, atLeastOnce()).delete(any(Citation.class));
+        service_.deleteCitation("");
+        verify(citationRepo_, atLeastOnce()).delete(any(Citation.class));
     }
 
     /**
@@ -90,11 +90,11 @@ public class ResolverServiceTest {
         Citation citation = new Citation();
         String purl = "purl";
         citation.setPurl(purl);
-        
-        when(CitationRepo.findOne(any(String.class))).thenReturn(citation);
 
-        Citation entity = Service.retrieveCitation(purl);
-        verify(CitationRepo, atLeastOnce()).findOne(any(String.class));
+        when(citationRepo_.findOne(any(String.class))).thenReturn(citation);
+
+        Citation entity = service_.retrieveCitation(purl);
+        verify(citationRepo_, atLeastOnce()).findOne(any(String.class));
         Assert.assertEquals(citation, entity);
     }
 
@@ -104,10 +104,10 @@ public class ResolverServiceTest {
     @Test
     public void testInsertCitation() {
         Citation purl = new Citation();
-        when(CitationRepo.save(purl)).thenReturn(null);
+        when(citationRepo_.save(purl)).thenReturn(null);
 
-        Service.insertCitation(purl);
-        verify(CitationRepo, atLeastOnce()).save(any(Citation.class));
+        service_.insertCitation(purl);
+        verify(citationRepo_, atLeastOnce()).save(any(Citation.class));
     }
 
 }
