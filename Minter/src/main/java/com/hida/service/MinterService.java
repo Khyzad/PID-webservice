@@ -147,7 +147,7 @@ public class MinterService {
         LOGGER.info("in mint");
 
         // store the desired setting values 
-        this.CurrentSetting = setting;        
+        this.CurrentSetting = setting;
 
         // create appropriate generator
         createGenerator();
@@ -160,10 +160,10 @@ public class MinterService {
 
         // determine if its possible to create the requested amount of ids
         if (remaining < amount) {
-            LOGGER.error("Not enough remaining Permutations, "
-                    + "Requested Amount=" + amount + " --> "
-                    + "Amount Remaining=" + remaining);
-            throw new NotEnoughPermutationsException(remaining, amount);
+            NotEnoughPermutationsException exception
+                    = new NotEnoughPermutationsException(remaining, amount);
+            LOGGER.error("Not enough remaining Permutations {} ", exception);
+            throw exception;
         }
         LOGGER.info("request is valid");
 
@@ -220,7 +220,7 @@ public class MinterService {
         while (iter.hasNext()) {
             Pid pid = iter.next();
             list.add(pid);
-            LOGGER.info("adding " + pid);
+            LOGGER.info("adding {}", pid);
         }
 
         CachedPid = list;
@@ -259,9 +259,10 @@ public class MinterService {
                  NotEnoughPermutationsException is thrown stating remaining number of ids.
                  */
                 if (counter > totalPermutations) {
-                    LOGGER.error("Total number of Permutations Exceeded: Total Permutation Count="
-                            + totalPermutations);
-                    throw new NotEnoughPermutationsException(uniqueIdCounter, amount);
+                    NotEnoughPermutationsException exception
+                            = new NotEnoughPermutationsException(uniqueIdCounter, amount);
+                    LOGGER.error("Not enough remaining Permutations {} ", exception);
+                    throw exception;
                 }
                 Generator.incrementPid(currentId);
                 counter++;
@@ -378,7 +379,7 @@ public class MinterService {
         // record Default Setting values into properties file
         writeToPropertiesFile(DefaultSettingPath, newSetting);
     }
-        
+
     /**
      * Initializes the StoredSetting field by reading its value in the database.
      * If its null, then it is given initial values.
@@ -393,10 +394,10 @@ public class MinterService {
             DefaultSettingRepo.save(StoredSetting);
         }
     }
-    
-    public DefaultSetting getStoredSetting() {        
+
+    public DefaultSetting getStoredSetting() {
         return StoredSetting;
-    }   
+    }
 
     /**
      * Read a given properties file and return its values in the form of a
@@ -432,9 +433,9 @@ public class MinterService {
     }
 
     /**
-     * Writes to a given properties file, updating its key-value pairs using
-     * the values stored in the setting parameter. If the file does not exist it
-     * is created.
+     * Writes to a given properties file, updating its key-value pairs using the
+     * values stored in the setting parameter. If the file does not exist it is
+     * created.
      *
      * @param setting The setting whose value needs to be stored
      * @throws Exception
@@ -473,5 +474,5 @@ public class MinterService {
 
     public void setDefaultSettingPath(String DefaultSettingPath) {
         this.DefaultSettingPath = DefaultSettingPath;
-    }        
+    }
 }
