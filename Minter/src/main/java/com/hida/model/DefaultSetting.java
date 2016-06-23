@@ -77,31 +77,15 @@ public class DefaultSetting extends Setting {
             return false;
         }
         final DefaultSetting other = (DefaultSetting) obj;
-        if (!Objects.equals(this.Prepend, other.Prepend)) {
-            return false;
-        }
-        if (!Objects.equals(this.getPrefix(), other.getPrefix())) {
-            return false;
-        }
-        if (!Objects.equals(this.getRootLength(), other.getRootLength())) {
-            return false;
-        }
-        if (!Objects.equals(this.getCharMap(), other.getCharMap())) {
-            return false;
-        }
-        if (!Objects.equals(this.getTokenType(), other.getTokenType())) {
-            return false;
-        }
-        if (!Objects.equals(this.isSansVowels(), other.isSansVowels())) {
-            return false;
-        }
-        if (this.Auto != other.Auto) {
-            return false;
-        }
-        if (this.Random != other.Random) {
-            return false;
-        }
-        return true;
+        
+        return !(!Objects.equals(this.getPrepend(), other.getPrepend())
+                && !Objects.equals(this.getPrefix(), other.getPrefix())
+                && !Objects.equals(this.getRootLength(), other.getRootLength())
+                && !Objects.equals(this.getCharMap(), other.getCharMap())
+                && !Objects.equals(this.getTokenType(), other.getTokenType())
+                && !Objects.equals(this.isSansVowels(), other.isSansVowels())
+                && this.isAuto() != other.isAuto()
+                && this.isRandom() != other.isRandom());
     }
 
     /**
