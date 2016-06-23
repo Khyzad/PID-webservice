@@ -24,7 +24,7 @@ public class DefaultSetting extends Setting {
 
     @Column(name = "ISRANDOM")
     private boolean Random;
-    
+
     @Column(name = "CACHESIZE")
     private long CacheSize;
 
@@ -44,7 +44,7 @@ public class DefaultSetting extends Setting {
      * used
      * @param Random Determines if the PIDs are created randomly or sequentially
      */
-    public DefaultSetting(String Prepend, String Prefix, long CacheSize, Token TokenType, 
+    public DefaultSetting(String Prepend, String Prefix, long CacheSize, Token TokenType,
             String CharMap, int RootLength, boolean SansVowels, boolean Auto, boolean Random) {
         super(Prefix, TokenType, CharMap, RootLength, SansVowels);
         this.Prepend = Prepend;
@@ -70,12 +70,10 @@ public class DefaultSetting extends Setting {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == null) {
+        if (!(obj instanceof DefaultSetting)) {
             return false;
         }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
+        
         final DefaultSetting other = (DefaultSetting) obj;
         if (!Objects.equals(this.Prepend, other.Prepend)) {
             return false;
@@ -141,5 +139,5 @@ public class DefaultSetting extends Setting {
 
     public void setCacheSize(long CacheSize) {
         this.CacheSize = CacheSize;
-    }        
+    }
 }
