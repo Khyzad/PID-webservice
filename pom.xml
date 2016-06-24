@@ -35,6 +35,6 @@
 
     <modules>
         <module>Minter</module>
-        <module>PURL</module>
+        <module>Resolver</module>
     </modules>
 </project>
