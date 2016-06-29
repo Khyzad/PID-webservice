@@ -27,20 +27,9 @@ public class NotEnoughPermutationsException extends RuntimeException {
      */
     public NotEnoughPermutationsException() {
     }
-
-    /**
-     * Constructs an instance of <code>TooManyPermutationsException</code> with
-     * the specified detail message.
-     *
-     * @param msg the detail message.
-     */
-    public NotEnoughPermutationsException(String msg) {
-        super(msg);
-    }
-
+    
     @Override
     public String getMessage() {
-        //Logger.error(RequestedAmount+" ids were requested but only "+RemainingPermutations+" can be created using given format");
         return String.format("%d ids were requested but only %d can be created using given format",
                 RequestedAmount, RemainingPermutations);
     }

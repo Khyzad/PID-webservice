@@ -23,20 +23,19 @@ public class AutoIdGeneratorTest {
     @DataProvider(name = "sansVowel")
     public Object[][] sansVowelParameters() {
         return new Object[][]{
-            {"", true, TokenType.DIGIT, 1, 10},
-            {"", true, TokenType.LOWERCASE, 1, 20},
-            {"", true, TokenType.UPPERCASE, 1, 20},
-            {"", true, TokenType.MIXEDCASE, 1, 40},
-            {"", true, TokenType.LOWER_EXTENDED, 1, 30},
-            {"", true, TokenType.UPPER_EXTENDED, 1, 30},
-            {"", true, TokenType.MIXED_EXTENDED, 1, 50},
-            {"", false, TokenType.DIGIT, 1, 10},
-            {"", false, TokenType.LOWERCASE, 1, 26},
-            {"", false, TokenType.UPPERCASE, 1, 26},
-            {"", false, TokenType.MIXEDCASE, 1, 52},
-            {"", false, TokenType.LOWER_EXTENDED, 1, 36},
-            {"", false, TokenType.UPPER_EXTENDED, 1, 36},
-            {"", false, TokenType.MIXED_EXTENDED, 1, 62}
+            {"", true, Token.DIGIT, 1, 10},
+            {"", true, Token.LOWER_CONSONANTS, 1, 20},
+            {"", true, Token.UPPER_CONSONANTS, 1, 20},
+            {"", true, Token.MIXED_CONSONANTS, 1, 40},
+            {"", true, Token.LOWER_CONSONANTS_EXTENDED, 1, 30},
+            {"", true, Token.UPPER_CONSONANTS_EXTENDED, 1, 30},
+            {"", true, Token.MIXED_CONSONANTS_EXTENDED, 1, 50},
+            {"", false, Token.LOWER_ALPHABET, 1, 26},
+            {"", false, Token.UPPER_ALPHABET, 1, 26},
+            {"", false, Token.MIXED_ALPHABET, 1, 52},
+            {"", false, Token.LOWER_ALPHABET_EXTENDED, 1, 36},
+            {"", false, Token.UPPER_ALPHABET_EXTENDED, 1, 36},
+            {"", false, Token.MIXED_ALPHABET_EXTENDED, 1, 62}
         };
     }
 
@@ -48,13 +47,13 @@ public class AutoIdGeneratorTest {
     @DataProvider(name = "prefix")
     public Object[][] prefixParameters() {
         return new Object[][]{
-            {"", false, TokenType.DIGIT, 1, 10},
-            {"!@*(", false, TokenType.DIGIT, 1, 10},
-            {"www", false, TokenType.DIGIT, 1, 10},
-            {"123", false, TokenType.DIGIT, 1, 10},
-            {"123abc", false, TokenType.DIGIT, 1, 10},
-            {"!a1", false, TokenType.DIGIT, 1, 10},
-            {" ", false, TokenType.DIGIT, 1, 10}
+            {"", false, Token.DIGIT, 1, 10},
+            {"!@*(", false, Token.DIGIT, 1, 10},
+            {"www", false, Token.DIGIT, 1, 10},
+            {"123", false, Token.DIGIT, 1, 10},
+            {"123abc", false, Token.DIGIT, 1, 10},
+            {"!a1", false, Token.DIGIT, 1, 10},
+            {" ", false, Token.DIGIT, 1, 10}
         };
     }
 
@@ -67,7 +66,7 @@ public class AutoIdGeneratorTest {
     public Object[][] rootLengthParameters() {
         Object[][] parameter = new Object[2][];
         for (int i = 1; i <= 2; i++) {
-            Object[] array = {"", false, TokenType.DIGIT, i, (int) Math.pow(10, i)};
+            Object[] array = {"", false, Token.DIGIT, i, (int) Math.pow(10, i)};
             parameter[i - 1] = array;
         }
         return parameter;
@@ -85,24 +84,64 @@ public class AutoIdGeneratorTest {
      * @param amount The number of PIDs to be created
      */
     @Test(dataProvider = "sansVowel")
-    public void testSequentialMintSansVowels(String prefix, boolean sansVowel, TokenType tokenType,
+    public void testSequentialMintSansVowels(String prefix, boolean sansVowel, Token tokenType,
             int rootLength, int amount) {
         // store parameters in a setting object
         Setting setting = new Setting(prefix, tokenType, null, rootLength, sansVowel);
-        IdGenerator generator = new AutoIdGenerator(prefix, sansVowel, tokenType, rootLength);
+        IdGenerator generator = new AutoIdGenerator(prefix, tokenType, rootLength);
         Set<Pid> sequentialSet = generator.sequentialMint(amount);
-        
-        String prev = null;
+
+        Pid prev = null;
         Iterator<Pid> iter = sequentialSet.iterator();
         while (iter.hasNext()) {
-            // fail if the id does not match the token 
-            String current = iter.next().toString();
-            PidTest.testTokenType(current, setting);
+            // fail if the length does not match
+            Pid current = iter.next();
+            PidTest.testTokenType(current.getName(), setting);
 
             if (prev != null) {
                 PidTest.testOrder(prev, current);
             }
 
+            prev = current;
+        }
+
+        Assert.assertEquals(sequentialSet.size(), amount);
+    }
+
+    /**
+     * Tests the AutoIdGenerator for the presence of vowels through the
+     * sequentialMint method at an arbitrary starting value.
+     *
+     * @param prefix A sequence of characters that appear in the beginning of
+     * PIDs
+     * @param sansVowel Dictates whether or not vowels are allowed
+     * @param tokenType An enum used to configure PIDS
+     * @param rootLength Designates the length of the id's root
+     * @param amount The number of PIDs to be created
+     */
+    @Test(dataProvider = "sansVowel")
+    public void testSequentialMintSansVowelsWithStartingValue(String prefix, boolean sansVowel,
+            Token tokenType, int rootLength, int amount) {
+
+        // store parameters in a setting object
+        Setting setting = new Setting(prefix, tokenType, null, rootLength, sansVowel);
+        IdGenerator generator = new AutoIdGenerator(prefix, tokenType, rootLength);
+        int startingValue = amount / 2;
+        Set<Pid> sequentialSet = generator.sequentialMint(amount, startingValue);
+
+        int counter = 0;
+        Pid prev = null;
+        Iterator<Pid> iter = sequentialSet.iterator();
+        while (iter.hasNext()) {
+            // fail if the length does not match
+            Pid current = iter.next();
+            PidTest.testTokenType(current.getName(), setting);
+
+            if (prev != null && counter != startingValue) {
+                PidTest.testOrder(prev, current);
+            }
+
+            counter++;
             prev = current;
         }
 
@@ -121,11 +160,11 @@ public class AutoIdGeneratorTest {
      * @param amount The number of PIDs to be created
      */
     @Test(dataProvider = "sansVowel")
-    public void testRandomMintSansVowels(String prefix, boolean sansVowel, TokenType tokenType,
+    public void testRandomMintSansVowels(String prefix, boolean sansVowel, Token tokenType,
             int rootLength, int amount) {
         // store parameters in a setting object
         Setting setting = new Setting(prefix, tokenType, null, rootLength, sansVowel);
-        IdGenerator generator = new AutoIdGenerator(prefix, sansVowel, tokenType, rootLength);
+        IdGenerator generator = new AutoIdGenerator(prefix, tokenType, rootLength);
         Set<Pid> randomSet = generator.randomMint(amount);
 
         for (Pid id : randomSet) {
@@ -146,23 +185,64 @@ public class AutoIdGeneratorTest {
      * @param amount The number of PIDs to be created
      */
     @Test(dataProvider = "prefix")
-    public void testSequentialMintPrefix(String prefix, boolean sansVowel, TokenType tokenType,
+    public void testSequentialMintPrefix(String prefix, boolean sansVowel, Token tokenType,
             int rootLength, int amount) {
         // store parameters in a setting object
         Setting setting = new Setting(prefix, tokenType, null, rootLength, sansVowel);
-        IdGenerator generator = new AutoIdGenerator(prefix, sansVowel, tokenType, rootLength);
+        IdGenerator generator = new AutoIdGenerator(prefix, tokenType, rootLength);
         Set<Pid> sequentialSet = generator.sequentialMint(amount);
 
-        String prev = null;
+        Pid prev = null;
         Iterator<Pid> iter = sequentialSet.iterator();
         while (iter.hasNext()) {
-            String current = iter.next().toString();
-            PidTest.testPrefix(current, setting);
+            // fail if the length does not match
+            Pid current = iter.next();
+            PidTest.testPrefix(current.getName(), setting);
 
             if (prev != null) {
                 PidTest.testOrder(prev, current);
             }
 
+            prev = current;
+        }
+
+        // test to see if the amount matches the size of the generated set
+        Assert.assertEquals(sequentialSet.size(), amount);
+    }
+
+    /**
+     * Tests to see if the sequentialMint method will print the desired prefix
+     * at an arbitrary starting value.
+     *
+     * @param prefix A sequence of characters that appear in the beginning of
+     * PIDs
+     * @param sansVowel Dictates whether or not vowels are allowed
+     * @param tokenType An enum used to configure PIDS
+     * @param rootLength Designates the length of the id's root
+     * @param amount The number of PIDs to be created
+     */
+    @Test(dataProvider = "prefix")
+    public void testSequentialMintPrefixWithStartingValue(String prefix, boolean sansVowel,
+            Token tokenType, int rootLength, int amount) {
+        // store parameters in a setting object
+        Setting setting = new Setting(prefix, tokenType, null, rootLength, sansVowel);
+        IdGenerator generator = new AutoIdGenerator(prefix, tokenType, rootLength);
+        int startingValue = amount / 2;
+        Set<Pid> sequentialSet = generator.sequentialMint(amount, startingValue);
+
+        int counter = 0;
+        Pid prev = null;
+        Iterator<Pid> iter = sequentialSet.iterator();
+        while (iter.hasNext()) {
+            // fail if the length does not match
+            Pid current = iter.next();
+            PidTest.testPrefix(current.getName(), setting);
+
+            if (prev != null && counter != startingValue) {
+                PidTest.testOrder(prev, current);
+            }
+
+            counter++;
             prev = current;
         }
 
@@ -181,12 +261,12 @@ public class AutoIdGeneratorTest {
      * @param amount The number of PIDs to be created
      */
     @Test(dataProvider = "prefix")
-    public void testRandomMintPrefix(String prefix, boolean sansVowel, TokenType tokenType,
+    public void testRandomMintPrefix(String prefix, boolean sansVowel, Token tokenType,
             int rootLength, int amount) {
 
         // store parameters in a setting object
         Setting setting = new Setting(prefix, tokenType, null, rootLength, sansVowel);
-        IdGenerator generator = new AutoIdGenerator(prefix, sansVowel, tokenType, rootLength);
+        IdGenerator generator = new AutoIdGenerator(prefix, tokenType, rootLength);
         Set<Pid> randomSet = generator.randomMint(amount);
 
         for (Pid id : randomSet) {
@@ -208,26 +288,69 @@ public class AutoIdGeneratorTest {
      * @param amount The number of PIDs to be created
      */
     @Test(dataProvider = "rootLength")
-    public void testSequentialRootLength(String prefix, boolean sansVowel, TokenType tokenType,
+    public void testSequentialRootLength(String prefix, boolean sansVowel, Token tokenType,
             int rootLength, int amount) {
         // store parameters in a setting object
         Setting setting = new Setting(prefix, tokenType, null, rootLength, sansVowel);
 
         // create a new minter and create a set
-        AutoIdGenerator minter = new AutoIdGenerator(prefix, sansVowel, tokenType, rootLength);
+        AutoIdGenerator minter = new AutoIdGenerator(prefix, tokenType, rootLength);
         Set<Pid> sequentialSet = minter.sequentialMint(amount);
 
-        String prev = null;
+        Pid prev = null;
         Iterator<Pid> iter = sequentialSet.iterator();
         while (iter.hasNext()) {
             // fail if the length does not match
-            String current = iter.next().toString();
-            PidTest.testPrefix(current, setting);
+            Pid current = iter.next();
+            PidTest.testRootLength(current.getName(), setting);
 
             if (prev != null) {
                 PidTest.testOrder(prev, current);
             }
 
+            prev = current;
+        }
+
+        // test to see if the amount matches the size of the generated set
+        Assert.assertEquals(sequentialSet.size(), amount);
+    }
+
+    /**
+     * Tests sequentialMint to see if it will produce the correct length of Pids
+     * at an arbitrary starting value.
+     *
+     * @param prefix A sequence of characters that appear in the beginning of
+     * PIDs
+     * @param sansVowel Dictates whether or not vowels are allowed
+     * @param tokenType An enum used to configure PIDS
+     * @param rootLength Designates the length of the id's root
+     * @param amount The number of PIDs to be created
+     */
+    @Test(dataProvider = "rootLength")
+    public void testSequentialRootLengthWithStartingValue(String prefix, boolean sansVowel,
+            Token tokenType, int rootLength, int amount) {
+
+        // store parameters in a setting object
+        Setting setting = new Setting(prefix, tokenType, null, rootLength, sansVowel);
+
+        // create a new minter and create a set
+        AutoIdGenerator generator = new AutoIdGenerator(prefix, tokenType, rootLength);
+        int startingValue = amount / 2;
+        Set<Pid> sequentialSet = generator.sequentialMint(amount, startingValue);
+
+        int counter = 0;
+        Pid prev = null;
+        Iterator<Pid> iter = sequentialSet.iterator();
+        while (iter.hasNext()) {
+            // fail if the length does not match
+            Pid current = iter.next();
+            PidTest.testRootLength(current.getName(), setting);
+
+            if (prev != null && counter != startingValue) {
+                PidTest.testOrder(prev, current);
+            }
+
+            counter++;
             prev = current;
         }
 
@@ -246,17 +369,17 @@ public class AutoIdGeneratorTest {
      * @param amount The number of PIDs to be created
      */
     @Test(dataProvider = "rootLength")
-    public void testRandomRootLength(String prefix, boolean sansVowel, TokenType tokenType,
+    public void testRandomRootLength(String prefix, boolean sansVowel, Token tokenType,
             int rootLength, int amount) {
         // store parameters in a setting object
         Setting setting = new Setting(prefix, tokenType, null, rootLength, sansVowel);
 
         // create a new minter and create a set
-        AutoIdGenerator minter = new AutoIdGenerator(prefix, sansVowel, tokenType, rootLength);
+        AutoIdGenerator minter = new AutoIdGenerator(prefix, tokenType, rootLength);
         Set<Pid> randomSet = minter.randomMint(amount);
 
         for (Pid id : randomSet) {
-            PidTest.testPrefix(id.getName(), setting);
+            PidTest.testRootLength(id.getName(), setting);
         }
 
         // test to see if the amount matches the size of the generated set
@@ -269,8 +392,8 @@ public class AutoIdGeneratorTest {
      */
     @Test(expectedExceptions = NotEnoughPermutationsException.class)
     public void testSequentialNotEnoughPermutationException() {
-        IdGenerator minter = new AutoIdGenerator("", true, TokenType.DIGIT, 5);
-        long total = minter.calculatePermutations();
+        IdGenerator minter = new AutoIdGenerator("", Token.DIGIT, 5);
+        long total = minter.getMaxPermutation();
 
         Set<Pid> sequentialSet = minter.randomMint(total + 1);
     }
@@ -281,8 +404,8 @@ public class AutoIdGeneratorTest {
      */
     @Test(expectedExceptions = NotEnoughPermutationsException.class)
     public void testRandomNotEnoughPermutationException() {
-        IdGenerator minter = new AutoIdGenerator("", true, TokenType.DIGIT, 5);
-        long total = minter.calculatePermutations();
+        IdGenerator minter = new AutoIdGenerator("", Token.DIGIT, 5);
+        long total = minter.getMaxPermutation();
 
         Set<Pid> randomSet = minter.randomMint(total + 1);
     }
@@ -293,7 +416,7 @@ public class AutoIdGeneratorTest {
      */
     @Test
     public void testRandomMintNegativeAmount() {
-        IdGenerator minter = new AutoIdGenerator("", true, TokenType.DIGIT, 5);
+        IdGenerator minter = new AutoIdGenerator("", Token.DIGIT, 5);
 
         Set<Pid> randomSet = minter.randomMint(-1);
         Assert.assertEquals(randomSet.isEmpty(), true);
@@ -305,8 +428,8 @@ public class AutoIdGeneratorTest {
      */
     @Test
     public void testSequentialMintNegativeAmount() {
-        IdGenerator minter = new AutoIdGenerator("", true, TokenType.DIGIT, 5);
-        long total = minter.calculatePermutations();
+        IdGenerator minter = new AutoIdGenerator("", Token.DIGIT, 5);
+        long total = minter.getMaxPermutation();
 
         Set<Pid> sequentialSet = minter.sequentialMint(-1);
         Assert.assertEquals(sequentialSet.isEmpty(), true);
@@ -317,7 +440,7 @@ public class AutoIdGeneratorTest {
      */
     @Test
     public void testRandomMintZeroAmount() {
-        IdGenerator minter = new AutoIdGenerator("", true, TokenType.DIGIT, 5);
+        IdGenerator minter = new AutoIdGenerator("", Token.DIGIT, 5);
 
         Set<Pid> randomSet = minter.randomMint(0);
         Assert.assertEquals(randomSet.isEmpty(), true);
@@ -328,9 +451,9 @@ public class AutoIdGeneratorTest {
      */
     @Test
     public void testSequentialMintZeroAmount() {
-        IdGenerator minter = new AutoIdGenerator("", true, TokenType.DIGIT, 5);
+        IdGenerator minter = new AutoIdGenerator("", Token.DIGIT, 5);
 
         Set<Pid> sequentialSet = minter.sequentialMint(0);
         Assert.assertEquals(sequentialSet.isEmpty(), true);
-    }   
+    }
 }

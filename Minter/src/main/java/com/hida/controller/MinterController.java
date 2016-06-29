@@ -2,162 +2,173 @@ package com.hida.controller;
 
 import com.hida.model.BadParameterException;
 import com.hida.model.DefaultSetting;
-import com.hida.model.NotEnoughPermutationsException;
+import com.hida.model.IdGenerator;
 import com.hida.model.Pid;
-import com.hida.model.TokenType;
+import com.hida.model.Token;
 import com.hida.service.MinterService;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.util.concurrent.locks.ReentrantLock;
-import javax.json.Json;
-import javax.json.JsonArray;
-import javax.json.JsonArrayBuilder;
-import javax.json.JsonBuilderFactory;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 
 /**
- * A controller class that paths the user to all jsp files in WEB_INF/jsp.
+ * A Controller that handles the requests and responses between the user and the
+ * Minter.
  *
  * @author lruffin
  */
-@Controller
-@RequestMapping("/")
+@RestController
+@RequestMapping("/Minter")
 public class MinterController {
 
     /* 
      * Logger; logfile to be stored in resource folder    
      */
-    private static final Logger Logger = LoggerFactory.getLogger(MinterController.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MinterController.class);
+
     /**
-     * Creates a fair reentrant RequestLock to serialize each request
-     * sequentially instead of concurrently.
+     * A fair lock used to synchronize access to the minter service.
      */
     private static final ReentrantLock RequestLock = new ReentrantLock(true);
 
     /**
-     * create a database to be used to create and count number of ids
+     * The service to use to mint IDs.
      */
     @Autowired
     private MinterService MinterService;
 
     /**
-     * Redirects to the index after retrieving updated settings from the
+     * Using values sent from the /administration end point, this method updates
+     * the DefaultSetting object, database, and the properties file. The names
+     * of the requested parameters are given by the name attributes in the
      * administration panel.
      *
+     * @param prepend String of characters that determine the domain of each Pid
+     * @param idprefix String of characters that prefixes each Pid
+     * @param cacheSize The size of the cache that'll be generated whenever the
+     * context is refreshed. If an empty String is returned to cacheSize then
+     * the cacheSize will not be updated.
+     * @param mintType Auto Generator is used if true, Custom Generator if false
+     * @param mintOrder Pids are generated randomly if true, ordered if false
+     * @param sansvowel Pids will contain vowels if true, false othwerise
+     * @param idlength the length of the pid's root name
+     * @param charmapping the mapping used when Custom Generator is selected
+     * @param digits digits is included if selected
+     * @param lowercase lowercase is included if selected
+     * @param uppercase uppercase is included if selected
      * @param request HTTP request from the administration panel
      * @param response HTTP response that redirects to the administration panel
      * after updating the new settings.
-     * @return The name of the page to redirect.
-     * @throws BadParameterException Thrown whenever a bad parameter is
-     * detected.
+     * @throws Exception
      */
-    @RequestMapping(value = {"/confirmation"}, method = {RequestMethod.POST})
-    public String handleForm(HttpServletRequest request, HttpServletResponse response)
-            throws BadParameterException {
+    @RequestMapping(value = {"/administration"}, method = {RequestMethod.POST})
+    public void handleForm(@RequestParam(required = false) String prepend,
+            @RequestParam(required = false) String idprefix,
+            @RequestParam(required = false) String cacheSize,
+            @RequestParam String mintType,
+            @RequestParam String mintOrder,
+            @RequestParam(defaultValue = "true") boolean sansvowel,
+            @RequestParam(required = false, defaultValue = "-1") int idlength,
+            @RequestParam(required = false) String charmapping,
+            @RequestParam(required = false) boolean digits,
+            @RequestParam(required = false) boolean lowercase,
+            @RequestParam(required = false) boolean uppercase,
+            HttpServletRequest request,
+            HttpServletResponse response)
+            throws Exception {
+
+        // prevents other clients from accessing the database whenever the form is submitted            
+        RequestLock.lock();
         try {
-            // prevents other clients from accessing the database whenever the form is submitted
-            RequestLock.lock();
-            DefaultSetting oldSetting = MinterService.getCurrentSetting();
+
+            DefaultSetting oldSetting = MinterService.getStoredSetting();
             DefaultSetting newSetting;
 
-            Logger.info("in handleForm");
-            String prepend = request.getParameter("prepend");
-            String prefix = request.getParameter("idprefix");
-            String isAuto = request.getParameter("mintType");
-            String isRandom = request.getParameter("mintOrder");
-            String sansVowels = request.getParameter("vowels");
-            String rootLength = request.getParameter("idlength");
-            String digitToken;
-            String lowerToken;
-            String upperToken;
-            String charMap;
+            LOGGER.info("in handleForm");
+            boolean auto = mintType.equals("auto");
+            boolean random = mintOrder.equals("random");
+            long size;
 
-            boolean auto = isAuto.equals("auto");
-            boolean random = isRandom.equals("random");
-            boolean vowels = sansVowels == null;
-
-            // assign a non-null value to prepend, prefix, and rootLength
-            if (prepend == null) {
-                prepend = "";
+            if (cacheSize.isEmpty()) {
+                size = oldSetting.getCacheSize();
             }
-            if (prefix == null) {
-                prefix = "";
+            else {
+                size = Long.parseLong(cacheSize);
             }
-            if ((rootLength == null || rootLength.isEmpty()) && !auto) {
-                rootLength = "1";
-            }
-
-            int length = Integer.parseInt(rootLength);
 
             // assign values based on which minter type was selected
             if (auto) {
-                digitToken = request.getParameter("digits");
-                lowerToken = request.getParameter("lowercase");
-                upperToken = request.getParameter("uppercase");
-
-                TokenType tokenType;
-
-                // gets the tokenmap value
-                if (digitToken != null && lowerToken == null && upperToken == null) {
-                    tokenType = TokenType.DIGIT;
+                // gets the token value
+                Token tokenType;
+                if (digits && !lowercase && !uppercase) {
+                    tokenType = Token.DIGIT;
                 }
-                else if (digitToken == null && lowerToken != null && upperToken == null) {
-                    tokenType = TokenType.LOWERCASE;
+                else if (!digits && lowercase && !uppercase) {
+                    tokenType = (sansvowel) ? Token.LOWER_CONSONANTS
+                            : Token.LOWER_ALPHABET;
                 }
-                else if (digitToken == null && lowerToken == null && upperToken != null) {
-                    tokenType = TokenType.UPPERCASE;
+                else if (!digits && !lowercase && uppercase) {
+                    tokenType = (sansvowel) ? Token.UPPER_CONSONANTS
+                            : Token.UPPER_ALPHABET;
                 }
-                else if (digitToken == null && lowerToken != null && upperToken != null) {
-                    tokenType = TokenType.MIXEDCASE;
+                else if (!digits && lowercase && uppercase) {
+                    tokenType = (sansvowel) ? Token.MIXED_CONSONANTS
+                            : Token.MIXED_ALPHABET;
                 }
-                else if (digitToken != null && lowerToken != null && upperToken == null) {
-                    tokenType = TokenType.LOWER_EXTENDED;
+                else if (digits && lowercase && !uppercase) {
+                    tokenType = (sansvowel) ? Token.LOWER_CONSONANTS_EXTENDED
+                            : Token.LOWER_ALPHABET_EXTENDED;
                 }
-                else if (digitToken == null && lowerToken == null && upperToken != null) {
-                    tokenType = TokenType.UPPER_EXTENDED;
+                else if (digits && !lowercase && uppercase) {
+                    tokenType = (sansvowel) ? Token.UPPER_CONSONANTS_EXTENDED
+                            : Token.UPPER_ALPHABET_EXTENDED;
                 }
-                else if (digitToken != null && lowerToken != null && upperToken != null) {
-                    tokenType = TokenType.MIXED_EXTENDED;
+                else if (digits && lowercase && uppercase) {
+                    tokenType = (sansvowel) ? Token.MIXED_CONSONANTS_EXTENDED
+                            : Token.MIXED_ALPHABET_EXTENDED;
                 }
                 else {
                     throw new BadParameterException();
                 }
 
-                // create new defaultsetting bject
+                // create new defaultsetting object
                 newSetting = new DefaultSetting(prepend,
-                        prefix,
+                        idprefix,
+                        size,
                         tokenType,
                         oldSetting.getCharMap(),
-                        length,
-                        vowels,
+                        idlength,
+                        sansvowel,
                         auto,
                         random);
             }
             else {
-                charMap = request.getParameter("charmapping");
-                if (charMap == null || charMap.isEmpty()) {
+                // validate charmapping
+                if (charmapping == null || charmapping.isEmpty()) {
                     throw new BadParameterException();
                 }
+
+                // create new defaultsetting object
                 newSetting = new DefaultSetting(prepend,
-                        prefix,
+                        idprefix,
+                        size,
                         oldSetting.getTokenType(),
-                        charMap,
+                        charmapping,
                         oldSetting.getRootLength(),
-                        vowels,
+                        sansvowel,
                         auto,
                         random);
             }
@@ -167,80 +178,75 @@ public class MinterController {
         finally {
             // unlocks RequestLock and gives access to longest waiting thread            
             RequestLock.unlock();
-            Logger.warn("Request to update default settings finished, UNLOCKING MINTER");
+            LOGGER.warn("Request to update default settings finished, UNLOCKING MINTER");
         }
-        // redirect to the administration panel located at http://[domain]/
-        return "redirect:";
 
+        // redirect to the administration panel      
+        response.sendRedirect("administration");
     }
 
     /**
-     * Creates a path to mint ids. If parameters aren't given then printPids
-     * will resort to using the default values found in minter_config.properties
+     * Creates a path to mint ids. If parameters aren't given then mintPids will
+     * resort to using the default values found in DefaultSetting.properties
      *
      * @param requestedAmount requested number of ids to mint
-     * @param model serves as a holder for the model so that attributes can be
-     * added.
      * @param parameters parameters given by user to instill variety in ids
      * @return paths user to mint.jsp
      * @throws Exception catches all sorts of exceptions that may be thrown by
      * any methods
      */
-    @RequestMapping(value = {"/mint/{requestedAmount}"}, method = {RequestMethod.GET})
-    public String printPids(@PathVariable long requestedAmount, ModelMap model,
+    @ResponseStatus(code = HttpStatus.CREATED)
+    @RequestMapping(value = {"/mint/{requestedAmount}"},
+            method = {RequestMethod.GET},
+            produces = "application/json")
+    public Set<Pid> mintPids(@PathVariable long requestedAmount,
             @RequestParam Map<String, String> parameters) throws Exception {
 
         // ensure that only one thread access the minter at any given time
         RequestLock.lock();
-        Logger.warn("Request to Minter made, LOCKING MINTER");
 
-        // message variable to be sent to mint.jsp
-        String message;
+        Set<Pid> pidSet;
         try {
+            LOGGER.info("Request to Minter made, LOCKING MINTER");
+
             // validate amount
             validateAmount(requestedAmount);
 
             // override default settings where applicable
             DefaultSetting tempSetting = overrideDefaultSetting(parameters,
-                    MinterService.getCurrentSetting());
+                    MinterService.getStoredSetting());
 
             // create the set of ids
-            Set<Pid> idList = MinterService.mint(requestedAmount, tempSetting);
-
-            // convert the set of ids into a json array
-            message = convertListToJson(idList, tempSetting.getPrepend());
-            Logger.info("Message from Minter: " + message);
-
-            // print list of ids to screen
-            Logger.debug(message);
-            model.addAttribute("message", message);
-
+            pidSet = MinterService.mint(requestedAmount, tempSetting);
         }
         finally {
             // unlocks RequestLock and gives access to longest waiting thread            
             RequestLock.unlock();
-            Logger.warn("Request to Minter Finished, UNLOCKING MINTER");
+            LOGGER.info("Request to Minter Finished, UNLOCKING MINTER");
         }
-        // return to mint.jsp
-        return "mint";
+
+        // return the generated set of Pids  
+        return pidSet;
     }
 
     /**
-     * Maps to the admin panel on the home page.
+     * Maps to the administration panel on the administration path.
      *
      * @return name of the index page
+     * @throws Exception
      */
-    @RequestMapping(value = {""}, method = {RequestMethod.GET})
-    public ModelAndView displayIndex() {
+    @RequestMapping(value = {"/administration"}, method = {RequestMethod.GET})
+    public ModelAndView displayAdministrationPanel() throws Exception {
         ModelAndView model = new ModelAndView();
 
         // retrieve default values stored in the database
-        DefaultSetting defaultSetting = MinterService.getCurrentSetting();
+        DefaultSetting defaultSetting = MinterService.getStoredSetting();
 
         // add the values to the settings page so that they can be displayed 
-        Logger.info("index page called");
+        LOGGER.info("index page called");
         model.addObject("prepend", defaultSetting.getPrepend());
         model.addObject("prefix", defaultSetting.getPrefix());
+        model.addObject("cacheSize", defaultSetting.getCacheSize());
         model.addObject("charMap", defaultSetting.getCharMap());
         model.addObject("tokenType", defaultSetting.getTokenType());
         model.addObject("rootLength", defaultSetting.getRootLength());
@@ -253,62 +259,38 @@ public class MinterController {
     }
 
     /**
-     * Returns a view that displays the error message of
-     * NotEnoughPermutationsException.
+     * Maps to the root of the application
      *
-     * @param req The HTTP request.
-     * @param exception NotEnoughPermutationsException.
-     * @return The view of the error message in json format.
+     * @return
      */
-    @ExceptionHandler(NotEnoughPermutationsException.class)
-    public ModelAndView handlePermutationError(HttpServletRequest req, Exception exception) {
-        Logger.error("Request: " + req.getRequestURL()
-                + " raised " + exception
-                + " with message " + exception.getMessage());
-
-        ModelAndView mav = new ModelAndView();
-        mav.addObject("status", 400);
-        mav.addObject("exception", exception.getClass().getSimpleName());
-        mav.addObject("message", exception.getMessage());
-        mav.setViewName("error");
-        return mav;
-
+    @RequestMapping(value = {""}, method = {RequestMethod.GET})
+    public String displayIndex() {
+        return "";
     }
 
     /**
-     * Returns a view that displays the error message of BadParameterException.
-     *
-     * @param req The HTTP request.
-     * @param exception BadParameterException.
-     * @return The view of the error message in json format.
-     */
-    @ExceptionHandler(BadParameterException.class)
-    public ModelAndView handleBadParameterError(HttpServletRequest req, Exception exception) {
-        Logger.error("Request: " + req.getRequestURL() + " raised " + exception);
-        ModelAndView mav = new ModelAndView();
-        mav.addObject("status", 400);
-        mav.addObject("exception", exception.getClass().getSimpleName());
-        mav.addObject("message", exception.getMessage());
-        Logger.error("Error with bad parameter: " + exception.getMessage());
-
-        mav.setViewName("error");
-        return mav;
-    }
-
-    /**
-     * Throws any exception that may be caught within the program
+     * Handles any exception that may be caught within the program
      *
      * @param req the HTTP request
      * @param exception the caught exception
      * @return The view of the error message
      */
+    @ResponseStatus(code = HttpStatus.BAD_REQUEST)
     @ExceptionHandler(Exception.class)
     public ModelAndView handleGeneralError(HttpServletRequest req, Exception exception) {
         ModelAndView mav = new ModelAndView();
         mav.addObject("status", 500);
         mav.addObject("exception", exception.getClass().getSimpleName());
         mav.addObject("message", exception.getMessage());
-        Logger.error("General Error: " + exception.getMessage());
+        LOGGER.error("General Error: " + exception.getMessage());
+
+        StackTraceElement[] s = exception.getStackTrace();
+        String trace = "";
+        for (StackTraceElement g : s) {
+            trace += g + "\n";
+        }
+
+        mav.addObject("stacktrace", trace);
 
         mav.setViewName("error");
         return mav;
@@ -336,24 +318,20 @@ public class MinterController {
                 : entity.getPrefix();
 
         int rootLength = (parameters.containsKey("rootLength"))
-                ? Integer.parseInt(parameters.get("rootLength"))
+                ? validateRootLength(Integer.parseInt(parameters.get("rootLength")))
                 : entity.getRootLength();
 
         String charMap = (parameters.containsKey("charMap"))
                 ? validateCharMap(parameters.get("charMap"))
                 : entity.getCharMap();
 
-        TokenType tokenType = (parameters.containsKey("tokenType"))
-                ? getValidTokenType(parameters.get("tokenType"))
+        Token tokenType = (parameters.containsKey("tokenType"))
+                ? Token.valueOf(parameters.get("tokenType"))
                 : entity.getTokenType();
 
         boolean isAuto = (parameters.containsKey("auto"))
                 ? convertBoolean(parameters.get("auto"), "auto")
                 : entity.isAuto();
-
-        boolean isRandom = (parameters.containsKey("random"))
-                ? convertBoolean(parameters.get("random"), "random")
-                : entity.isRandom();
 
         boolean isSansVowels = (parameters.containsKey("sansVowels"))
                 ? convertBoolean(parameters.get("sansVowels"), "sansVowels")
@@ -361,25 +339,25 @@ public class MinterController {
 
         return new DefaultSetting(prepend,
                 prefix,
+                entity.getCacheSize(),
                 tokenType,
                 charMap,
                 rootLength,
                 isSansVowels,
                 isAuto,
-                isRandom);
+                entity.isRandom());
     }
 
     /**
-     * This method is used to check to see whether or not the given parameter is
+     * This method is used to check whether or not the given parameter is
      * explicitly equivalent to "true" or "false" and returns them respectively.
-     * The method provided by the Boolean wrapper class converts all Strings
-     * that do no explictly contain true to false.
      *
      * @param parameter the given string to convert.
      * @param parameterType the type of the parameter.
-     * @throws BadParameterException Thrown whenever a malformed parameter is
-     * formed or passed
-     * @return the equivalent version of true or false.
+     * @throws BadParameterException Thrown whenever parameter is neither "true"
+     * nor "false"
+     * @return true if the parameter is "true", false if the parameter is
+     * "false"
      */
     private boolean convertBoolean(String parameter, String parameterType)
             throws BadParameterException {
@@ -395,46 +373,7 @@ public class MinterController {
     }
 
     /**
-     * Creates a Json object based off a set of ids given in the parameter
-     *
-     * @param set A set of ids to display into JSON
-     * @param prepend A value to attach to the beginning of every id. Typically
-     * used to determine the format of the id. For example, ARK or DOI.
-     * @return A reference to a String that contains Json set of ids
-     * @throws IOException thrown whenever a file could not be found
-     */
-    private String convertListToJson(Set<Pid> set, String prepend) throws IOException {
-
-        // Jackson objects to format JSON strings
-        String jsonString;
-        ObjectMapper mapper = new ObjectMapper();
-        Object formattedJson;
-
-        // Javax objects to create JSON strings
-        JsonBuilderFactory factory = Json.createBuilderFactory(null);
-        JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
-        JsonArray jsonArray;
-
-        // convert the set of ids into a json array
-        int counter = 0;
-        for (Pid id : set) {
-            arrayBuilder.add(factory.createObjectBuilder()
-                    .add("id", counter)
-                    .add("name", prepend + id.toString()));
-            counter++;
-        }
-        jsonArray = arrayBuilder.build();
-
-        // format json array
-        formattedJson = mapper.readValue(jsonArray.toString(), Object.class);
-        jsonString = mapper.writerWithDefaultPrettyPrinter().
-                writeValueAsString(formattedJson);
-
-        return jsonString;
-    }
-
-    /**
-     * Checks to see if a given charMap is valid
+     * Asserts the validity of a CharMap using the minter service.
      *
      * @param charMap A sequence of characters used to configure PIDs
      * @return Returns the given charMap if nothing wrong was detected
@@ -442,27 +381,42 @@ public class MinterController {
      * detected.
      */
     private String validateCharMap(String charMap) throws BadParameterException {
-        if (!charMap.matches("[dlume]+")) {
+        if (!IdGenerator.isValidCharMap(charMap)) {
             throw new BadParameterException(charMap, "charMap");
         }
         return charMap;
     }
 
     /**
-     * Checks to see if the amount is valid
+     * Asserts the validity of an amount using the minter service. A valid
+     * amount is greater than or equal to 0.
      *
      * @param amount The number of PIDs to be created
      * @throws BadParameterException Thrown whenever a bad parameter is
      * detected.
      */
     private void validateAmount(long amount) throws BadParameterException {
-        if (amount < 0) {
+        if (!IdGenerator.isValidAmount(amount)) {
             throw new BadParameterException(amount, "amount");
         }
     }
 
     /**
-     * Checks to see if the prefix is valid
+     * Asserts the validity of a rootLength is valid.
+     *
+     * @param rootLength
+     * @return
+     * @throws BadParameterException
+     */
+    private int validateRootLength(int rootLength) throws BadParameterException {
+        if (!IdGenerator.isValidRootLength(rootLength)) {
+            throw new BadParameterException(rootLength, "rootLength");
+        }
+        return rootLength;
+    }
+
+    /**
+     * Asserts the validity of prefix is valid.
      *
      * @param prefix A sequence of characters that appear in the beginning of
      * PIDs
@@ -471,42 +425,9 @@ public class MinterController {
      * detected.
      */
     private String validatePrefix(String prefix) throws BadParameterException {
-        if (!prefix.matches("[a-zA-z0-9]*")) {
+        if (!IdGenerator.isValidPrefix(prefix)) {
             throw new BadParameterException(prefix, "prefix");
         }
         return prefix;
     }
-
-    /**
-     * Attempts to convert a string into an equivalent enum TokenType.
-     *
-     * @param tokenType Designates what characters are contained in the id's
-     * root.
-     * @return Returns the enum type if succesful, throws BadParameterException
-     * otherwise.
-     * @throws BadParameterException thrown whenever a malformed or invalid
-     * parameter is passed
-     */
-    protected TokenType getValidTokenType(String tokenType) throws BadParameterException {
-        tokenType = tokenType.toUpperCase();
-        switch (tokenType) {
-            case "DIGIT":
-                return TokenType.DIGIT;
-            case "LOWERCASE":
-                return TokenType.LOWERCASE;
-            case "UPPERCASE":
-                return TokenType.UPPERCASE;
-            case "MIXEDCASE":
-                return TokenType.MIXEDCASE;
-            case "LOWER_EXTENDED":
-                return TokenType.LOWER_EXTENDED;
-            case "UPPER_EXTENDED":
-                return TokenType.UPPER_EXTENDED;
-            case "MIXED_EXTENDED":
-                return TokenType.MIXED_EXTENDED;
-            default:
-                throw new BadParameterException(tokenType, "TokenType");
-        }
-    }
-
 }

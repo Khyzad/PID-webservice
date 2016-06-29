@@ -1,9 +1,10 @@
 # Maven
 target/
 
+# Minter specific
+**/testWriteDefaultSetting.properties
 
-
-# PURL specific 
+# Resolver specific 
 doc/
 
 # Eclipse
@@ -12,4 +13,13 @@ doc/
 .settings
 
 # Netbeans
-nb-configuration.xml
+**/nb-configuration.xml
+**/nbactions.xml
+
+# Database
+*.lck
+*.script
+Minter/*.properties
+Minter/*.log
+Resolver/*.properties
+Resolver/*.log

@@ -1,18 +1,20 @@
 package com.hida.model;
 
 import java.security.SecureRandom;
-import java.util.HashMap;
 import java.util.Set;
+import java.util.LinkedHashSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * An abstract Id generator that all potential Pid generators should extend. 
+ * An abstract Id generator used to create Pids
  *
  * @author Brittany Cruz
  * @author lruffin
  */
 public abstract class IdGenerator {
+
+    protected long MaxPermutation;
 
     /**
      * Creates and new random number generator to aid in the production of
@@ -21,60 +23,123 @@ public abstract class IdGenerator {
     protected static final SecureRandom Rng = new SecureRandom();
 
     /**
-     * Contains the range of all the digits
+     * LOGGER; logfile to be stored in resource folder
      */
-    protected final static String DIGIT_TOKEN = "0123456789";
-
-    /**
-     * Contains the range of the English alphabet without vowels and y.
-     */
-    protected final static String SANS_VOWEL_TOKEN = "bcdfghjklmnpqrstvwxz";
-
-    /**
-     * Contains the range of the English alphabet with vowels and y.
-     */
-    protected final static String VOWEL_TOKEN = "abcdefghijklmnopqrstuvwxyz";
-
-    /**
-     * Logger; logfile to be stored in resource folder
-     */
-    protected static final Logger Logger = LoggerFactory.getLogger(IdGenerator.class);
-
-    /**
-     * Contains the mappings for either tokens or the charMaps. The AutoMinter
-     * constructor will assign token mappings. The CustomMinter constructor will
-     * assign character mappings. The values will depend on whether or sansVowel
-     * specified in the constructor.
-     */
-    protected final HashMap<Object, String> BaseMap = new HashMap<>();
+    protected static final Logger LOGGER = LoggerFactory.getLogger(IdGenerator.class);
 
     /**
      * The string that will be at the front of every id
      */
     protected String Prefix;
 
-    /**
-     * A variable that will affect whether or not vowels have the possibility of
-     * being included in each id.
-     */
-    protected boolean SansVowel;
-
-    /**
-     * missing javadoc
-     *
-     * @param prefix
-     * @param sansVowel
-     */
-    public IdGenerator(String prefix, boolean sansVowel) {
+    public IdGenerator(String prefix) {
         this.Prefix = prefix;
-        this.SansVowel = sansVowel;
     }
 
-    public abstract Set<Pid> randomMint(long amount);
+    public abstract long getMaxPermutation();
 
-    public abstract Set<Pid> sequentialMint(long amount);
+    public abstract void incrementPid(Pid pid);
 
-    public abstract long calculatePermutations();   
+    protected abstract String longToName(long value);
+
+    protected abstract long PidToLong(Pid pid);
+
+    /**
+     * Creates Pids without regard to a natural order.
+     *
+     * @param amount The number of Pids to be created
+     * @return A set of Pids
+     */
+    public Set<Pid> randomMint(long amount) {
+        // checks to see if its possible to produce or add requested amount of
+        if (MaxPermutation < amount) {
+            throw new NotEnoughPermutationsException(MaxPermutation, amount);
+        }
+        // generate ids        
+        Set<Pid> pidSet = new LinkedHashSet<>();
+
+        // randomly generate pids using a random number generator
+        for (int i = 0; i < amount; i++) {
+            long value = Math.abs(Rng.nextLong()) % MaxPermutation;
+            Pid pid = new Pid(this.longToName(value));
+
+            // create pid and add it to the set
+            while (!pidSet.add(pid)) {
+                this.incrementPid(pid);
+            }
+
+            LOGGER.trace("Generated Auto Random ID: {}", pid);
+        }
+
+        return pidSet;
+    }
+
+    /**
+     * Creates Pids in ascending order
+     *
+     * @param amount The number of PIDs to be created
+     * @return A set of Pids
+     */
+    public Set<Pid> sequentialMint(long amount) {
+        // checks to see if its possible to produce or add requested amount of
+        if (MaxPermutation < amount) {
+            throw new NotEnoughPermutationsException(MaxPermutation, amount);
+        }
+
+        // create a set to contain Pids
+        Set<Pid> pidSet = new LinkedHashSet<>();
+
+        long ordinal = 0;
+        Pid basePid = new Pid(this.longToName(ordinal));
+        for (int i = 0; i < amount; i++) {
+
+            // copy the Name of basePid into a new Pid instance
+            Pid pid = new Pid(basePid.getName());
+
+            // add the pid to the set
+            pidSet.add(pid);
+
+            // increment the base Pid
+            this.incrementPid(basePid);
+
+            LOGGER.trace("Generated Custom Sequential ID: {}", pid);
+        }
+        return pidSet;
+    }
+
+    /**
+     * Creates Pids in ascending order starting at an arbitrary value.
+     *
+     * @param amount The number of Pids to be created
+     * @param startingValue The value to start sequentially generating Pids
+     * @return A set of Pids
+     */
+    public Set<Pid> sequentialMint(long amount, long startingValue) {
+        if (MaxPermutation < amount) {
+            throw new NotEnoughPermutationsException(MaxPermutation, amount);
+        }
+
+        // create a set to contain Pids
+        Set<Pid> pidSet = new LinkedHashSet<>();
+
+        long ordinal = startingValue;
+        Pid basePid = new Pid(this.longToName(ordinal));
+        for (int i = 0; i < amount; i++) {
+
+            // copy the Name of basePid into a new Pid instance
+            Pid pid = new Pid(basePid.getName());
+
+            // add the pid to the set
+            pidSet.add(pid);
+
+            // increment the base Pid
+            this.incrementPid(basePid);
+
+            LOGGER.trace("Generated Custom Sequential ID: {}", pid);
+        }
+
+        return pidSet;
+    }
 
     /**
      * Checks whether or not the prefix is valid.
@@ -83,7 +148,7 @@ public abstract class IdGenerator {
      * @return true if it contains numbers and letters and does not exceed 20
      * characters.
      */
-    public final boolean isValidPrefix(String prefix) {
+    public static final boolean isValidPrefix(String prefix) {
         return prefix.matches("^[0-9a-zA-Z]*$") && prefix.length() <= 20;
     }
 
@@ -93,7 +158,7 @@ public abstract class IdGenerator {
      * @param amount The amount of ids requested.
      * @return True if amount is non-negative.
      */
-    public final boolean isValidAmount(long amount) {
+    public static final boolean isValidAmount(long amount) {
         return amount >= 0;
     }
 
@@ -103,7 +168,7 @@ public abstract class IdGenerator {
      * @param rootLength Designates the length of the id's root.
      * @return True if rootLength is non-negative and less than or equal to 10.
      */
-    public final boolean isValidRootLength(long rootLength) {
+    public static final boolean isValidRootLength(long rootLength) {
         return rootLength >= 0 && rootLength <= 10;
     }
 
@@ -115,8 +180,8 @@ public abstract class IdGenerator {
      * @return True if charMap only contains the characters: 'd', 'l', 'u', 'm',
      * or 'e'.
      */
-    public final boolean isValidCharMap(String charMap) {
-        return charMap.matches("^[dlume]*$");
+    public static final boolean isValidCharMap(String charMap) {
+        return charMap.matches("^[dlume]+$");
     }
 
     /* typical getter and setter methods */
@@ -126,13 +191,5 @@ public abstract class IdGenerator {
 
     public void setPrefix(String Prefix) {
         this.Prefix = Prefix;
-    }
-
-    public boolean isSansVowel() {
-        return SansVowel;
-    }
-
-    public void setSansVowel(boolean SansVowel) {
-        this.SansVowel = SansVowel;
     }
 }

@@ -6,31 +6,23 @@ import com.hida.model.CustomIdGenerator;
 import com.hida.model.DefaultSetting;
 import com.hida.model.IdGenerator;
 import com.hida.model.Pid;
-import com.hida.model.PidTest;
-import com.hida.model.TokenType;
-import com.hida.service.MinterServiceImpl;
+import com.hida.model.Token;
+import com.hida.service.MinterService;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import javax.servlet.http.HttpServletResponse;
 import junit.framework.Assert;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.mockito.Spy;
-import org.springframework.ui.ModelMap;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-import org.json.JSONArray;
-import org.json.JSONObject;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
-import org.mockito.Mockito;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.mock.web.MockHttpServletResponse;
 import org.testng.annotations.DataProvider;
 
 /**
@@ -41,19 +33,13 @@ import org.testng.annotations.DataProvider;
 public class MinterControllerTest {
 
     @Mock
-    MinterServiceImpl MinterServiceDao;
+    private MinterService MinterServiceDao;
 
     @InjectMocks
-    MinterController Controller;
-
-    @Spy
-    ModelMap ModelMap;
+    private MinterController Controller;   
     
-    private final PidTest PidTest = new PidTest();
     private final String PREPEND = "http://digitalarchives.hawaii.gov/70111/";
     private final int AMOUNT = 5;
-
-    private static final Logger Logger = LoggerFactory.getLogger(MinterControllerTest.class);
 
     @BeforeClass
     public void setUpClass() throws Exception {
@@ -61,7 +47,7 @@ public class MinterControllerTest {
     }
 
     /**
-     * Returns a data set. Each array contains attributes found in setting.jsp
+     * Returns a data set. Each array contains attributes found in setting.html
      *
      * @return A data set
      */
@@ -86,25 +72,25 @@ public class MinterControllerTest {
     @DataProvider(name = "parameters")
     private Object[][] parameters() {
         return new Object[][]{
-            {PREPEND, "abc", TokenType.DIGIT, "d", 1, true, true, true},
-            {PREPEND, "abc", TokenType.LOWERCASE, "d", 1, true, true, true},
-            {PREPEND, "abc", TokenType.UPPERCASE, "d", 1, true, true, true},
-            {PREPEND, "abc", TokenType.MIXEDCASE, "d", 1, true, true, true},
-            {PREPEND, "abc", TokenType.LOWER_EXTENDED, "d", 1, true, true, true},
-            {PREPEND, "abc", TokenType.UPPER_EXTENDED, "d", 1, true, true, true},
-            {PREPEND, "abc", TokenType.MIXED_EXTENDED, "d", 1, true, true, true},
-            {PREPEND, "abc", TokenType.DIGIT, "d", 1, true, true, false},
-            {PREPEND, "abc", TokenType.LOWERCASE, "d", 1, true, true, false},
-            {PREPEND, "abc", TokenType.UPPERCASE, "d", 1, true, true, false},
-            {PREPEND, "abc", TokenType.MIXEDCASE, "d", 1, true, true, false},
-            {PREPEND, "abc", TokenType.LOWER_EXTENDED, "d", 1, true, true, false},
-            {PREPEND, "abc", TokenType.UPPER_EXTENDED, "d", 1, true, true, false},
-            {PREPEND, "abc", TokenType.MIXED_EXTENDED, "d", 1, true, true, false},
-            {PREPEND, "abc", TokenType.DIGIT, "d", 1, false, true, false},
-            {PREPEND, "abc", TokenType.DIGIT, "l", 1, false, true, false},
-            {PREPEND, "abc", TokenType.DIGIT, "u", 1, false, true, false},
-            {PREPEND, "abc", TokenType.DIGIT, "m", 1, false, true, false},
-            {PREPEND, "abc", TokenType.DIGIT, "e", 1, false, true, false},};
+            {PREPEND, "abc", Token.DIGIT, "d", 1, true, true, true},
+            {PREPEND, "abc", Token.LOWER_CONSONANTS, "d", 1, true, true, true},
+            {PREPEND, "abc", Token.UPPER_CONSONANTS, "d", 1, true, true, true},
+            {PREPEND, "abc", Token.MIXED_CONSONANTS, "d", 1, true, true, true},
+            {PREPEND, "abc", Token.LOWER_CONSONANTS_EXTENDED, "d", 1, true, true, true},
+            {PREPEND, "abc", Token.UPPER_CONSONANTS_EXTENDED, "d", 1, true, true, true},
+            {PREPEND, "abc", Token.MIXED_CONSONANTS_EXTENDED, "d", 1, true, true, true},
+            {PREPEND, "abc", Token.DIGIT, "d", 1, true, true, false},
+            {PREPEND, "abc", Token.LOWER_ALPHABET, "d", 1, true, true, false},
+            {PREPEND, "abc", Token.UPPER_ALPHABET, "d", 1, true, true, false},
+            {PREPEND, "abc", Token.MIXED_ALPHABET, "d", 1, true, true, false},
+            {PREPEND, "abc", Token.LOWER_ALPHABET_EXTENDED, "d", 1, true, true, false},
+            {PREPEND, "abc", Token.UPPER_ALPHABET_EXTENDED, "d", 1, true, true, false},
+            {PREPEND, "abc", Token.MIXED_ALPHABET_EXTENDED, "d", 1, true, true, false},
+            {PREPEND, "abc", Token.DIGIT, "d", 1, false, true, false},
+            {PREPEND, "abc", Token.DIGIT, "l", 1, false, true, false},
+            {PREPEND, "abc", Token.DIGIT, "u", 1, false, true, false},
+            {PREPEND, "abc", Token.DIGIT, "m", 1, false, true, false},
+            {PREPEND, "abc", Token.DIGIT, "e", 1, false, true, false},};
     }
 
     /**
@@ -117,12 +103,12 @@ public class MinterControllerTest {
     private Object[][] badBooleans() {
         return new Object[][]{
             {"auto", "t"},
-            {"random", "f"},
+            //{"random", "f"},
             {"sansVowels", "yes"},};
-    }
+    }        
 
     /**
-     * Tests data entry in the administration panel found at setting.jsp.
+     * Tests data entry in the administration panel found at setting.html
      *
      * The following parameters are parameters that are contained in the request
      * object
@@ -146,13 +132,14 @@ public class MinterControllerTest {
      * @throws Exception
      */
     @Test(dataProvider = "request parameters")
-    public void testDisplayIndex(String prepend, String idprefix, String mintType,
+    public void testHandleForm(String prepend, String idprefix, String mintType,
             String mintOrder, String vowels, String idLength, String digits,
             String lowercase, String uppercase, String charMapping) throws Exception {
+        
         // create a DefaultSetting object and create mock request and response object
         DefaultSetting originalSetting = getSampleDefaultSetting();
         MockHttpServletRequest request = new MockHttpServletRequest();
-        HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
+        MockHttpServletResponse response = new MockHttpServletResponse();
 
         // assign values to the mock request object
         request.setParameter("prepend", prepend);
@@ -167,10 +154,27 @@ public class MinterControllerTest {
         request.setParameter("charmapping", charMapping);
 
         // return originalSetting whenever CurrentSetting is called
-        when(MinterServiceDao.getCurrentSetting()).thenReturn(originalSetting);
-        doNothing().when(MinterServiceDao).updateCurrentSetting(originalSetting);
+        when(MinterServiceDao.getStoredSetting()).thenReturn(originalSetting);
+        doNothing().when(MinterServiceDao).
+                updateCurrentSetting(any(DefaultSetting.class));
 
-        Assert.assertEquals("redirect:", Controller.handleForm(request, response));
+        // call the method to test
+        Controller.handleForm("prepend",
+                "idprefix",
+                "",
+                "mintType",
+                "mintOrder",
+                true,
+                5,                
+                "charmapping",                
+                false,                
+                true,                
+                true,                
+                request, response);
+        
+        // get and test the url of the destination
+        String viewName = response.getHeader("Location");        
+        Assert.assertEquals("administration", viewName);
     }
 
     /**
@@ -194,33 +198,22 @@ public class MinterControllerTest {
         tempSetting.setPrefix(map.get("prefix"));
         tempSetting.setRootLength(Integer.parseInt(map.get("rootLength")));
         tempSetting.setCharMap(map.get("charMap"));
-        tempSetting.setTokenType(Controller.getValidTokenType(map.get("tokenType")));
+        tempSetting.setTokenType(Token.valueOf(map.get("tokenType")));
         tempSetting.setAuto(Boolean.getBoolean(map.get("auto")));
         tempSetting.setRandom(Boolean.getBoolean(map.get("random")));
         tempSetting.setSansVowels(Boolean.getBoolean(map.get("sansVowels")));
 
-        // return originalSetting when getCurrentSetting is called and a sample Pid set 
-        when(MinterServiceDao.getCurrentSetting()).thenReturn(originalSetting);
+        Set<Pid> sampleSet = getSampleSet(tempSetting);
+        
+        // return originalSetting when getStoredSetting is called and a sample Pid set 
+        when(MinterServiceDao.getStoredSetting()).thenReturn(originalSetting);
         when(MinterServiceDao.mint(anyInt(), any(DefaultSetting.class))).
                 thenReturn(getSampleSet(tempSetting));
-
-        // check to see if the correct jsp page is returned
-        String jspName = Controller.printPids(AMOUNT, ModelMap, map);
-        Assert.assertEquals("mint", jspName);
-
-        // create Json objects to extract Json array
-        String message = (String) ModelMap.get("message");
-        Logger.debug(message);
-        JSONArray testJsonArray = new JSONArray(message);
-
-        // test the pid and ensure that they match the used setting
-        for (int i = 0; i < AMOUNT; i++) {
-            JSONObject object = testJsonArray.getJSONObject(i);
-            int id = object.getInt("id");
-            String name = object.getString("name");
-            Assert.assertEquals(id, i);
-            testPid(name, tempSetting);
-        }
+       
+        Set<Pid> pidSet = Controller.mintPids(AMOUNT, map);                        
+        
+        Assert.assertEquals(sampleSet.size(), pidSet.size());
+        
     }
 
     /**
@@ -240,34 +233,23 @@ public class MinterControllerTest {
      * @throws Exception
      */
     @Test(dataProvider = "parameters")
-    public void testMintPersistedParameters(String prepend, String prefix, TokenType tokenType,
+    public void testMintPersistedParameters(String prepend, String prefix, Token tokenType,
             String charMap, int rootLength, boolean isAuto, boolean isRandom, boolean sansVowel)
             throws Exception {
 
-        DefaultSetting setting = new DefaultSetting(prepend, prefix, tokenType, charMap,
+        DefaultSetting setting = new DefaultSetting(prepend, prefix, 5, tokenType, charMap,
                 rootLength, isAuto, isRandom, sansVowel);
 
-        when(MinterServiceDao.getCurrentSetting()).thenReturn(setting);
+        Set<Pid> sampleSet = getSampleSet(setting);
+        
+        when(MinterServiceDao.getStoredSetting()).thenReturn(setting);
         when(MinterServiceDao.mint(anyInt(), any(DefaultSetting.class))).
-                thenReturn(getSampleSet(setting));
-
-        // check to see if the correct jsp page is returned
-        String jspName = Controller.printPids(AMOUNT, ModelMap, new HashMap<String, String>());
-        Assert.assertEquals("mint", jspName);
-
-        // create Json objects to extract Json array
-        String message = (String) ModelMap.get("message");
-        Logger.debug(message);
-        JSONArray testJsonArray = new JSONArray(message);
-
-        // test the pid and ensure that they match the used setting
-        for (int i = 0; i < testJsonArray.length(); i++) {
-            JSONObject object = testJsonArray.getJSONObject(i);
-            int id = object.getInt("id");
-            String name = object.getString("name");
-            Assert.assertEquals(id, i);
-            testPid(name, setting);
-        }
+                thenReturn(sampleSet);
+                
+        
+        Set<Pid> pidSet = Controller.mintPids(AMOUNT, new HashMap<String, String>());                        
+        
+        Assert.assertEquals(sampleSet.size(), pidSet.size());
     }
 
     /**
@@ -285,8 +267,8 @@ public class MinterControllerTest {
 
         DefaultSetting setting = this.getSampleDefaultSetting();
 
-        when(MinterServiceDao.getCurrentSetting()).thenReturn(setting);
-        Controller.printPids(AMOUNT, ModelMap, parameters);
+        when(MinterServiceDao.getStoredSetting()).thenReturn(setting);
+        Controller.mintPids(AMOUNT, parameters);
     }
 
     /**
@@ -295,15 +277,15 @@ public class MinterControllerTest {
      *
      * @throws Exception
      */
-    @Test(expectedExceptions = BadParameterException.class)
+    @Test(expectedExceptions = IllegalArgumentException.class)
     public void testBadParameterExceptionTokenType() throws Exception {
         Map<String, String> parameters = new HashMap<>();
-        parameters.put("tokenType", "digits");
+        parameters.put("tokenType", "digit");
 
         DefaultSetting setting = this.getSampleDefaultSetting();
 
-        when(MinterServiceDao.getCurrentSetting()).thenReturn(setting);
-        Controller.printPids(AMOUNT, ModelMap, parameters);
+        when(MinterServiceDao.getStoredSetting()).thenReturn(setting);
+        Controller.mintPids(AMOUNT, parameters);
     }
 
     /**
@@ -319,8 +301,8 @@ public class MinterControllerTest {
 
         DefaultSetting setting = this.getSampleDefaultSetting();
 
-        when(MinterServiceDao.getCurrentSetting()).thenReturn(setting);
-        Controller.printPids(AMOUNT, ModelMap, parameters);
+        when(MinterServiceDao.getStoredSetting()).thenReturn(setting);
+        Controller.mintPids(AMOUNT, parameters);
     }
 
     /**
@@ -335,8 +317,8 @@ public class MinterControllerTest {
 
         DefaultSetting setting = this.getSampleDefaultSetting();
 
-        when(MinterServiceDao.getCurrentSetting()).thenReturn(setting);
-        Controller.printPids(-1, ModelMap, parameters);
+        when(MinterServiceDao.getStoredSetting()).thenReturn(setting);
+        Controller.mintPids(-1, parameters);
     }
 
     /**
@@ -352,32 +334,8 @@ public class MinterControllerTest {
 
         DefaultSetting setting = this.getSampleDefaultSetting();
 
-        when(MinterServiceDao.getCurrentSetting()).thenReturn(setting);
-        Controller.printPids(AMOUNT, ModelMap, parameters);
-    }
-
-    /**
-     * Tests a name using to see if it matches the values provided by setting
-     *
-     * @param name
-     * @param setting
-     */
-    private void testPid(String name, DefaultSetting setting) {
-        PidTest.testPrepend(name, setting);
-        
-        // remove the prepend as its irrelevant in future tests
-        String nameWithNoPrepend = name.replace(setting.getPrepend(), "");
-        
-        PidTest.testPrefix(nameWithNoPrepend, setting);
-
-        if (setting.isAuto()) {
-            PidTest.testRootLength(nameWithNoPrepend, setting);
-            PidTest.testTokenType(nameWithNoPrepend, setting);
-        }
-        else {
-            PidTest.testCharMap(nameWithNoPrepend, setting);
-        }
-
+        when(MinterServiceDao.getStoredSetting()).thenReturn(setting);
+        Controller.mintPids(AMOUNT, parameters);
     }   
 
     /**
@@ -387,7 +345,8 @@ public class MinterControllerTest {
     private DefaultSetting getSampleDefaultSetting() {
         DefaultSetting setting = new DefaultSetting("", // prepend
                 "", // prefix
-                TokenType.MIXEDCASE, // tokentype
+                5,
+                Token.MIXED_ALPHABET, // tokentype
                 "mmm", // charmap
                 3, // rootlength
                 true, // sansvowel
@@ -406,7 +365,6 @@ public class MinterControllerTest {
         IdGenerator generator;
         if (setting.isAuto()) {
             generator = new AutoIdGenerator(setting.getPrefix(),
-                    setting.isSansVowels(),
                     setting.getTokenType(),
                     setting.getRootLength());
         }
@@ -437,7 +395,7 @@ public class MinterControllerTest {
 
         map.put("prepend", PREPEND);
         map.put("prefix", "xyz");
-        map.put("tokenType", "lowercase");
+        map.put("tokenType", "LOWER_ALPHABET");
         map.put("charMap", "m");
         map.put("rootLength", "2");
         map.put("auto", "false");
@@ -445,5 +403,5 @@ public class MinterControllerTest {
         map.put("sansVowel", "false");
 
         return map;
-    }
+    }        
 }

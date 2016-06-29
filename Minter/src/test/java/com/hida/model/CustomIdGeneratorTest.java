@@ -15,7 +15,7 @@ import org.testng.annotations.Test;
  */
 public class CustomIdGeneratorTest {
 
-    protected static final Logger Logger = LoggerFactory.getLogger(CustomIdGeneratorTest.class);
+    protected static final Logger LOGGER = LoggerFactory.getLogger(CustomIdGeneratorTest.class);
     private final PidTest PidTest = new PidTest();
 
     /**
@@ -90,7 +90,7 @@ public class CustomIdGeneratorTest {
     @Test(dataProvider = "sansVowel")
     public void testSequentialMintSansVowels(String prefix, boolean sansVowel,
             String charMap, int amount) {
-        Logger.trace("inside testSequentialMintSansVowels");
+        LOGGER.trace("inside testSequentialMintSansVowels");
 
         // store parameters in a setting object
         Setting setting = new Setting(prefix, null, charMap, 0, sansVowel);
@@ -99,16 +99,59 @@ public class CustomIdGeneratorTest {
         CustomIdGenerator minter = new CustomIdGenerator(prefix, sansVowel, charMap);
         Set<Pid> sequentialSet = minter.sequentialMint(amount);
 
-        String prev = null;
+        Pid prev = null;
         Iterator<Pid> iter = sequentialSet.iterator();
         while (iter.hasNext()) {
-            // fail if the id does not match the token 
-            String current = iter.next().toString();
-            PidTest.testCharMap(current, setting);
+            // fail if the length does not match
+            Pid current = iter.next();
+            PidTest.testCharMap(current.getName(), setting);
 
             if (prev != null) {
                 PidTest.testOrder(prev, current);
             }
+
+            prev = current;
+        }
+
+        Assert.assertEquals(sequentialSet.size(), amount);
+    }
+
+    /**
+     * Tests CustomIdGenerator for the presence of vowels through the
+     * sequentialMint method at an arbitrary starting value.
+     *
+     * @param prefix A sequence of characters that appear in the beginning of
+     * PIDs
+     * @param sansVowel Dictates whether or not vowels are allowed
+     * @param charMap A sequence of characters used to configure PIDs
+     * @param amount The number of PIDs to be created
+     */
+    @Test(dataProvider = "sansVowel")
+    public void testSequentialMintSansVowelsWithStartingValue(String prefix, boolean sansVowel,
+            String charMap, int amount) {
+        LOGGER.trace("inside testSequentialMintSansVowels");
+
+        // store parameters in a setting object
+        Setting setting = new Setting(prefix, null, charMap, 0, sansVowel);
+
+        // create a generator object
+        CustomIdGenerator generator = new CustomIdGenerator(prefix, sansVowel, charMap);
+        int startingValue = amount / 2;
+        Set<Pid> sequentialSet = generator.sequentialMint(amount, startingValue);
+
+        int counter = 0;
+        Pid prev = null;
+        Iterator<Pid> iter = sequentialSet.iterator();
+        while (iter.hasNext()) {
+            // fail if the length does not match
+            Pid current = iter.next();
+            PidTest.testCharMap(current.getName(), setting);
+
+            if (prev != null && counter != startingValue) {
+                PidTest.testOrder(prev, current);
+            }
+
+            counter++;
 
             prev = current;
         }
@@ -129,7 +172,7 @@ public class CustomIdGeneratorTest {
     @Test(dataProvider = "sansVowel")
     public void testRandomMintSansVowels(String prefix, boolean sansVowel,
             String charMap, int amount) {
-        Logger.debug("inside testRandomMintSansVowels");
+        LOGGER.debug("inside testRandomMintSansVowels");
 
         // store parameters in a setting object
         Setting setting = new Setting(prefix, null, charMap, 0, sansVowel);
@@ -158,7 +201,7 @@ public class CustomIdGeneratorTest {
     @Test(dataProvider = "prefix")
     public void testSequentialMintPrefix(String prefix, boolean sansVowel, String charMap,
             int amount) {
-        Logger.debug("inside testSequentialMintPrefix");
+        LOGGER.debug("inside testSequentialMintPrefix");
 
         // store parameters in a setting object
         Setting setting = new Setting(prefix, null, charMap, 0, sansVowel);
@@ -167,16 +210,60 @@ public class CustomIdGeneratorTest {
         CustomIdGenerator minter = new CustomIdGenerator(prefix, sansVowel, charMap);
         Set<Pid> sequentialSet = minter.sequentialMint(amount);
 
-        String prev = null;
+        Pid prev = null;
         Iterator<Pid> iter = sequentialSet.iterator();
         while (iter.hasNext()) {
-            String current = iter.next().toString();
-            PidTest.testPrefix(current, setting);
+            // fail if the length does not match
+            Pid current = iter.next();
+            PidTest.testPrefix(current.getName(), setting);
 
             if (prev != null) {
                 PidTest.testOrder(prev, current);
             }
 
+            prev = current;
+        }
+
+        // test to see if the amount matches the size of the generated set
+        Assert.assertEquals(sequentialSet.size(), amount);
+    }
+
+    /**
+     * Tests to see if the sequentialMint method will print the desired prefix
+     * at an arbitrary starting value.
+     *
+     * @param prefix A sequence of characters that appear in the beginning of
+     * PIDs
+     * @param sansVowel Dictates whether or not vowels are allowed
+     * @param charMap A sequence of characters used to configure PIDs
+     * @param amount The number of PIDs to be created
+     */
+    @Test(dataProvider = "prefix")
+    public void testSequentialMintPrefixWithStartingValue(String prefix, boolean sansVowel, 
+            String charMap, int amount) {
+        LOGGER.debug("inside testSequentialMintPrefix");
+
+        // store parameters in a setting object
+        Setting setting = new Setting(prefix, null, charMap, 0, sansVowel);
+
+        // create a generator object
+        CustomIdGenerator generator = new CustomIdGenerator(prefix, sansVowel, charMap);
+        int startingValue = amount / 2;
+        Set<Pid> sequentialSet = generator.sequentialMint(amount, startingValue);
+
+        int counter = 0;
+        Pid prev = null;
+        Iterator<Pid> iter = sequentialSet.iterator();
+        while (iter.hasNext()) {
+            // fail if the length does not match
+            Pid current = iter.next();
+            PidTest.testPrefix(current.getName(), setting);
+
+            if (prev != null && counter != startingValue) {
+                PidTest.testOrder(prev, current);
+            }
+
+            counter++;
             prev = current;
         }
 
@@ -196,7 +283,7 @@ public class CustomIdGeneratorTest {
     @Test(dataProvider = "prefix")
     public void testRandomMintPrefix(String prefix, boolean sansVowel,
             String charMap, int amount) {
-        Logger.debug("inside testRandomMintPrefix");
+        LOGGER.debug("inside testRandomMintPrefix");
 
         // store parameters in a setting object
         Setting setting = new Setting(prefix, null, charMap, 0, sansVowel);
@@ -225,25 +312,69 @@ public class CustomIdGeneratorTest {
     @Test(dataProvider = "rootLength")
     public void testSequentialLength(String prefix, boolean sansVowel, String charMap,
             int amount) {
-        Logger.debug("inside testSequentialLength");
-        
+        LOGGER.debug("inside testSequentialLength");
+
         // store parameters in a setting object
         Setting setting = new Setting(prefix, null, charMap, charMap.length(), sansVowel);
-        
+
         // create a generator object
         CustomIdGenerator minter = new CustomIdGenerator(prefix, sansVowel, charMap);
         Set<Pid> sequentialSet = minter.sequentialMint(amount);
 
-        String prev = null;
+        Pid prev = null;
         Iterator<Pid> iter = sequentialSet.iterator();
         while (iter.hasNext()) {
             // fail if the length does not match
-            String current = iter.next().toString();
-            PidTest.testPrefix(current, setting);
+            Pid current = iter.next();
+            PidTest.testRootLength(current.getName(), setting);
 
             if (prev != null) {
                 PidTest.testOrder(prev, current);
             }
+
+            prev = current;
+        }
+
+        // test to see if the amount matches the size of the generated set
+        Assert.assertEquals(sequentialSet.size(), amount);
+    }
+
+    /**
+     * Tests sequentialMint to see if it will produce the correct length of Pids
+     * at an arbitrary starting value.
+     *
+     * @param prefix A sequence of characters that appear in the beginning of
+     * PIDs
+     * @param sansVowel Dictates whether or not vowels are allowed
+     * @param charMap A sequence of characters used to configure PIDs
+     * @param amount The number of PIDs to be created
+     */
+    @Test(dataProvider = "rootLength")
+    public void testSequentialLengthWithStartingValue(String prefix, boolean sansVowel,
+            String charMap, int amount) {
+        LOGGER.debug("inside testSequentialLength");
+
+        // store parameters in a setting object
+        Setting setting = new Setting(prefix, null, charMap, charMap.length(), sansVowel);
+
+        // create a generator object
+        CustomIdGenerator generator = new CustomIdGenerator(prefix, sansVowel, charMap);
+        int startingValue = amount / 2;
+        Set<Pid> sequentialSet = generator.sequentialMint(amount, startingValue);
+
+        int counter = 0;
+        Pid prev = null;
+        Iterator<Pid> iter = sequentialSet.iterator();
+        while (iter.hasNext()) {
+            // fail if the length does not match
+            Pid current = iter.next();
+            PidTest.testRootLength(current.getName(), setting);
+
+            if (prev != null && counter < startingValue) {
+                PidTest.testOrder(prev, current);
+            }
+
+            counter++;
 
             prev = current;
         }
@@ -263,17 +394,17 @@ public class CustomIdGeneratorTest {
      */
     @Test(dataProvider = "rootLength")
     public void testRandomLength(String prefix, boolean sansVowel, String charMap, int amount) {
-        Logger.debug("inside testRandomLength");
-        
+        LOGGER.debug("inside testRandomLength");
+
         // store parameters in a setting object
         Setting setting = new Setting(prefix, null, charMap, charMap.length(), sansVowel);
-        
+
         // create a generator object
         CustomIdGenerator minter = new CustomIdGenerator(prefix, sansVowel, charMap);
         Set<Pid> randomSet = minter.randomMint(amount);
 
         for (Pid id : randomSet) {
-            PidTest.testPrefix(id.getName(), setting);
+            PidTest.testRootLength(id.getName(), setting);
         }
         // test to see if the amount matches the size of the generated set
         Assert.assertEquals(randomSet.size(), amount);
@@ -285,10 +416,10 @@ public class CustomIdGeneratorTest {
      */
     @Test(expectedExceptions = NotEnoughPermutationsException.class)
     public void testSequentialNotEnoughPermutationException() {
-        Logger.debug("inside testSequentialNotEnoughPermutationException");
+        LOGGER.debug("inside testSequentialNotEnoughPermutationException");
 
         IdGenerator minter = new CustomIdGenerator("", true, "ddddd");
-        long total = minter.calculatePermutations();
+        long total = minter.getMaxPermutation();
 
         Set<Pid> sequentialSet = minter.randomMint(total + 1);
     }
@@ -299,10 +430,10 @@ public class CustomIdGeneratorTest {
      */
     @Test(expectedExceptions = NotEnoughPermutationsException.class)
     public void testRandomNotEnoughPermutationException() {
-        Logger.debug("inside testRandomNotEnoughPermutationException");
+        LOGGER.debug("inside testRandomNotEnoughPermutationException");
 
         IdGenerator minter = new CustomIdGenerator("", true, "ddddd");
-        long total = minter.calculatePermutations();
+        long total = minter.getMaxPermutation();
 
         Set<Pid> randomSet = minter.randomMint(total + 1);
     }
@@ -313,7 +444,7 @@ public class CustomIdGeneratorTest {
      */
     @Test
     public void testRandomMintNegativeAmount() {
-        Logger.debug("inside testRandomMintNegativeAmount");
+        LOGGER.debug("inside testRandomMintNegativeAmount");
 
         IdGenerator minter = new CustomIdGenerator("", true, "ddddd");
 
@@ -327,10 +458,10 @@ public class CustomIdGeneratorTest {
      */
     @Test
     public void testSequentialMintNegativeAmount() {
-        Logger.debug("inside testSequentialMintNegativeAmount");
+        LOGGER.debug("inside testSequentialMintNegativeAmount");
 
         IdGenerator minter = new CustomIdGenerator("", true, "ddddd");
-        long total = minter.calculatePermutations();
+        long total = minter.getMaxPermutation();
 
         Set<Pid> sequentialSet = minter.sequentialMint(-1);
         Assert.assertEquals(sequentialSet.isEmpty(), true);
@@ -341,7 +472,7 @@ public class CustomIdGeneratorTest {
      */
     @Test
     public void testRandomMintZeroAmount() {
-        Logger.debug("inside testRandomMintZeroAmount");
+        LOGGER.debug("inside testRandomMintZeroAmount");
 
         IdGenerator minter = new CustomIdGenerator("", true, "ddddd");
 
@@ -354,7 +485,7 @@ public class CustomIdGeneratorTest {
      */
     @Test
     public void testSequentialMintZeroAmount() {
-        Logger.debug("inside testSequentialMintZeroAmount");
+        LOGGER.debug("inside testSequentialMintZeroAmount");
 
         IdGenerator minter = new CustomIdGenerator("", true, "ddddd");
 

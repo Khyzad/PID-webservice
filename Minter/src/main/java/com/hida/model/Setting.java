@@ -10,8 +10,7 @@ import javax.persistence.MappedSuperclass;
 import javax.validation.constraints.NotNull;
 
 /**
- * A POJO that contain all the fields and properties that should be recorded by
- * Hibernate.
+ * An object that references a list of values that are used to create a Pid.
  *
  * @author lruffin
  */
@@ -29,7 +28,7 @@ public class Setting {
 
     @Column(name = "TOKENTYPE")
     @Enumerated(EnumType.STRING)
-    private TokenType TokenType;
+    private Token TokenType;
 
     @Column(name = "CHARMAP")
     private String CharMap;
@@ -63,7 +62,7 @@ public class Setting {
      * @param RootLength Designates the length of the id's root
      * @param SansVowels Dictates whether or not vowels are allowed
      */
-    public Setting(String Prefix, TokenType TokenType, String CharMap, int RootLength,
+    public Setting(String Prefix, Token TokenType, String CharMap, int RootLength,
             boolean SansVowels) {
         this.Prefix = Prefix;
         this.TokenType = TokenType;
@@ -95,11 +94,11 @@ public class Setting {
         this.Prefix = Prefix;
     }
 
-    public TokenType getTokenType() {
+    public Token getTokenType() {
         return TokenType;
     }
 
-    public void setTokenType(TokenType TokenType) {
+    public void setTokenType(Token TokenType) {
         this.TokenType = TokenType;
     }
 
