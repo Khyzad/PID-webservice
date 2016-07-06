@@ -114,6 +114,9 @@ public abstract class IdGenerator {
         if (MaxPermutation < amount) {
             throw new NotEnoughPermutationsException(MaxPermutation, amount);
         }
+        if (MaxPermutation < startingValue) {
+            throw new NotEnoughPermutationsException(MaxPermutation, startingValue);
+        }
         if(amount < 0){
             throw new IllegalArgumentException("amount cannot be negative");
         }
