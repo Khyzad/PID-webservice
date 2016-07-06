@@ -54,8 +54,11 @@ public abstract class IdGenerator {
      */
     public Set<Pid> randomMint(long amount) {
         // checks to see if its possible to produce or add requested amount of
-        if (MaxPermutation < amount || amount < 0) {
+        if (MaxPermutation < amount) {
             throw new NotEnoughPermutationsException(MaxPermutation, amount);
+        }
+        if(amount < 0){
+            throw new IllegalArgumentException("amount cannot be negative");
         }
 
         // create sets to guarantee unique membership           

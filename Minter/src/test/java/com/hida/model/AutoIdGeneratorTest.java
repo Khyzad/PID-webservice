@@ -399,8 +399,8 @@ public class AutoIdGeneratorTest {
     }
 
     /**
-     * Tests to see if randomMint will throw NotEnoughPermutation exception
-     * when the amount exceeds the total permutations
+     * Tests to see if randomMint will throw NotEnoughPermutation exception when
+     * the amount exceeds the total permutations
      */
     @Test(expectedExceptions = NotEnoughPermutationsException.class)
     public void testRandomNotEnoughPermutationException() {
@@ -411,10 +411,10 @@ public class AutoIdGeneratorTest {
     }
 
     /**
-     * Tests to see if randomMint will throw NotEnoughPermutation exception
-     * when the amount is negative
+     * Tests to see if randomMint will throw IllegalArgumentException when the
+     * amount is negative
      */
-    @Test(expectedExceptions = NotEnoughPermutationsException.class)
+    @Test(expectedExceptions = IllegalArgumentException.class)
     public void testRandomMintNegativeAmount() {
         IdGenerator minter = new AutoIdGenerator("", Token.DIGIT, 5);
 
