@@ -24,7 +24,7 @@ public class DefaultSetting extends Setting {
 
     @Column(name = "ISRANDOM")
     private boolean Random;
-    
+
     @Column(name = "CACHESIZE")
     private long CacheSize;
 
@@ -44,7 +44,7 @@ public class DefaultSetting extends Setting {
      * used
      * @param Random Determines if the PIDs are created randomly or sequentially
      */
-    public DefaultSetting(String Prepend, String Prefix, long CacheSize, Token TokenType, 
+    public DefaultSetting(String Prepend, String Prefix, long CacheSize, Token TokenType,
             String CharMap, int RootLength, boolean SansVowels, boolean Auto, boolean Random) {
         super(Prefix, TokenType, CharMap, RootLength, SansVowels);
         this.Prepend = Prepend;
@@ -56,16 +56,15 @@ public class DefaultSetting extends Setting {
 
     @Override
     public int hashCode() {
-        int hash = 7;
-        hash = 43 * hash + Objects.hashCode(this.Prepend);
-        hash = 43 * hash + Objects.hashCode(this.getCharMap());
-        hash = 43 * hash + Objects.hashCode(this.getPrefix());
-        hash = 43 * hash + Objects.hashCode(this.getTokenType());
-        hash = 43 * hash + Objects.hashCode(this.getRootLength());
-        hash = 43 * hash + Objects.hashCode(this.isSansVowels());
-        hash = 43 * hash + (this.Auto ? 1 : 0);
-        hash = 43 * hash + (this.Random ? 1 : 0);
-        return hash;
+        return Objects.hash(this.getPrepend(),
+                this.getCacheSize(),
+                this.getCharMap(),
+                this.getPrefix(),
+                this.getTokenType(),
+                this.getRootLength(),
+                this.isAuto(),
+                this.isRandom(),
+                this.isSansVowels());
     }
 
     @Override
@@ -125,5 +124,5 @@ public class DefaultSetting extends Setting {
 
     public void setCacheSize(long CacheSize) {
         this.CacheSize = CacheSize;
-    }        
+    }
 }
