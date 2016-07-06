@@ -36,22 +36,19 @@ public class Pid implements Comparable<Pid> {
      *
      * @param id The Id to copy from.
      */
-    public Pid(Pid id) {        
+    public Pid(Pid id) {
         this.Name = id.Name;
     }
 
-   
     @Override
     public boolean equals(Object obj) {
-        if (obj == null) {
+        if (!(obj instanceof Pid)) {
             return false;
         }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
+        
         final Pid other = (Pid) obj;
         return Objects.equals(this.Name, other.Name);
-    }                
+    }
 
     @Override
     public int hashCode() {
@@ -68,7 +65,7 @@ public class Pid implements Comparable<Pid> {
      * @return ordering is as follows: [0-9] < [a-z] < [A-Z]
      */
     @Override
-    public int compareTo(Pid t) {        
+    public int compareTo(Pid t) {
         String name1 = this.Name;
         String name2 = t.Name;
         if (name1.length() < name2.length()) {
@@ -121,9 +118,9 @@ public class Pid implements Comparable<Pid> {
 
         Name = newName;
     }
-    
+
     @Override
-    public String toString(){
+    public String toString() {
         return this.Name;
     }
 
