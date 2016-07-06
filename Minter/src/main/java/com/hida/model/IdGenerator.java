@@ -22,12 +22,12 @@ public abstract class IdGenerator {
      * Creates and new random number generator to aid in the production of
      * non-deterministic ids.
      */
-    protected static final SecureRandom Rng = new SecureRandom();
+    private static final SecureRandom Rng = new SecureRandom();
 
     /**
      * LOGGER; logfile to be stored in resource folder
      */
-    protected static final Logger LOGGER = LoggerFactory.getLogger(IdGenerator.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(IdGenerator.class);
 
     /**
      * The string that will be at the front of every id

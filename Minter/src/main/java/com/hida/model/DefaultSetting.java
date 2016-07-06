@@ -24,7 +24,7 @@ public class DefaultSetting extends Setting {
 
     @Column(name = "ISRANDOM")
     private boolean Random;
-    
+
     @Column(name = "CACHESIZE")
     private long CacheSize;
 
@@ -44,7 +44,7 @@ public class DefaultSetting extends Setting {
      * used
      * @param Random Determines if the PIDs are created randomly or sequentially
      */
-    public DefaultSetting(String Prepend, String Prefix, long CacheSize, Token TokenType, 
+    public DefaultSetting(String Prepend, String Prefix, long CacheSize, Token TokenType,
             String CharMap, int RootLength, boolean SansVowels, boolean Auto, boolean Random) {
         super(Prefix, TokenType, CharMap, RootLength, SansVowels);
         this.Prepend = Prepend;
@@ -56,52 +56,33 @@ public class DefaultSetting extends Setting {
 
     @Override
     public int hashCode() {
-        int hash = 7;
-        hash = 43 * hash + Objects.hashCode(this.Prepend);
-        hash = 43 * hash + Objects.hashCode(this.getCharMap());
-        hash = 43 * hash + Objects.hashCode(this.getPrefix());
-        hash = 43 * hash + Objects.hashCode(this.getTokenType());
-        hash = 43 * hash + Objects.hashCode(this.getRootLength());
-        hash = 43 * hash + Objects.hashCode(this.isSansVowels());
-        hash = 43 * hash + (this.Auto ? 1 : 0);
-        hash = 43 * hash + (this.Random ? 1 : 0);
-        return hash;
+        return Objects.hash(this.getPrepend(),
+                this.getCacheSize(),
+                this.getCharMap(),
+                this.getPrefix(),
+                this.getTokenType(),
+                this.getRootLength(),
+                this.isAuto(),
+                this.isRandom(),
+                this.isSansVowels());
     }
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == null) {
+        if (!(obj instanceof DefaultSetting)) {
             return false;
         }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
+        
         final DefaultSetting other = (DefaultSetting) obj;
-        if (!Objects.equals(this.Prepend, other.Prepend)) {
-            return false;
-        }
-        if (!Objects.equals(this.getPrefix(), other.getPrefix())) {
-            return false;
-        }
-        if (!Objects.equals(this.getRootLength(), other.getRootLength())) {
-            return false;
-        }
-        if (!Objects.equals(this.getCharMap(), other.getCharMap())) {
-            return false;
-        }
-        if (!Objects.equals(this.getTokenType(), other.getTokenType())) {
-            return false;
-        }
-        if (!Objects.equals(this.isSansVowels(), other.isSansVowels())) {
-            return false;
-        }
-        if (this.Auto != other.Auto) {
-            return false;
-        }
-        if (this.Random != other.Random) {
-            return false;
-        }
-        return true;
+        
+        return Objects.equals(this.getPrepend(), other.getPrepend())
+                && Objects.equals(this.getPrefix(), other.getPrefix())
+                && Objects.equals(this.getRootLength(), other.getRootLength())
+                && Objects.equals(this.getCharMap(), other.getCharMap())
+                && Objects.equals(this.getTokenType(), other.getTokenType())
+                && this.isSansVowels() == other.isSansVowels()
+                && this.isAuto() == other.isAuto()
+                && this.isRandom() == other.isRandom();
     }
 
     /**
@@ -141,5 +122,5 @@ public class DefaultSetting extends Setting {
 
     public void setCacheSize(long CacheSize) {
         this.CacheSize = CacheSize;
-    }        
+    }
 }
