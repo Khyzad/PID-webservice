@@ -32,7 +32,7 @@ public class AutoIdGenerator extends IdGenerator {
         super(prefix);
         this.tokenType_ = tokenType;
         this.rootLength_ = rootLength;
-        this.raxPermutation_ = getMaxPermutation();
+        this.maxPermutation_ = getMaxPermutation();
     }
 
     /**
@@ -58,7 +58,7 @@ public class AutoIdGenerator extends IdGenerator {
      */
     @Override
     public void incrementPid(Pid pid) {
-        long next = (this.PidToLong(pid) + 1) % this.raxPermutation_;
+        long next = (this.PidToLong(pid) + 1) % this.maxPermutation_;
         pid.setName(this.longToName(next));
     }
 

@@ -53,7 +53,7 @@ public class CustomIdGenerator extends IdGenerator {
         this.charMap_ = charMap;
         this.tokenMap_ = new String[charMap.length()];
         this.sansVowel_ = sansVowel;
-        this.raxPermutation_ = getMaxPermutation();
+        this.maxPermutation_ = getMaxPermutation();
 
         initializeTokenMap();
     }
@@ -125,7 +125,7 @@ public class CustomIdGenerator extends IdGenerator {
      */
     @Override
     public void incrementPid(Pid pid) {
-        long next = (this.PidToLong(pid) + 1) % this.raxPermutation_;
+        long next = (this.PidToLong(pid) + 1) % this.maxPermutation_;
         pid.setName(this.longToName(next));
     }
 

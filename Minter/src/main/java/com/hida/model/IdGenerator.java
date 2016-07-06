@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class IdGenerator {
 
-    protected long raxPermutation_;
+    protected long maxPermutation_;
 
     /**
      * Creates and new random number generator to aid in the production of
@@ -52,15 +52,15 @@ public abstract class IdGenerator {
      */
     public Set<Pid> randomMint(long amount) {
         // checks to see if its possible to produce or add requested amount of
-        if (raxPermutation_ < amount) {
-            throw new NotEnoughPermutationsException(raxPermutation_, amount);
+        if (maxPermutation_ < amount) {
+            throw new NotEnoughPermutationsException(maxPermutation_, amount);
         }
         // generate ids        
         Set<Pid> pidSet = new LinkedHashSet<>();
 
         // randomly generate pids using a random number generator
         for (int i = 0; i < amount; i++) {
-            long value = Math.abs(rng_.nextLong()) % raxPermutation_;
+            long value = Math.abs(rng_.nextLong()) % maxPermutation_;
             Pid pid = new Pid(this.longToName(value));
 
             // create pid and add it to the set
@@ -82,8 +82,8 @@ public abstract class IdGenerator {
      */
     public Set<Pid> sequentialMint(long amount) {
         // checks to see if its possible to produce or add requested amount of
-        if (raxPermutation_ < amount) {
-            throw new NotEnoughPermutationsException(raxPermutation_, amount);
+        if (maxPermutation_ < amount) {
+            throw new NotEnoughPermutationsException(maxPermutation_, amount);
         }
 
         // create a set to contain Pids
@@ -115,8 +115,8 @@ public abstract class IdGenerator {
      * @return A set of Pids
      */
     public Set<Pid> sequentialMint(long amount, long startingValue) {
-        if (raxPermutation_ < amount) {
-            throw new NotEnoughPermutationsException(raxPermutation_, amount);
+        if (maxPermutation_ < amount) {
+            throw new NotEnoughPermutationsException(maxPermutation_, amount);
         }
 
         // create a set to contain Pids
