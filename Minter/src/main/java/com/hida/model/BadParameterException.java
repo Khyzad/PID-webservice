@@ -9,7 +9,7 @@ package com.hida.model;
 public class BadParameterException extends Exception {
 
     private Object parameter_;
-    private String rarameterType_;
+    private String parameterType_;
 
     /**
      * Creates a new instance of <code>BadParameterException</code> without
@@ -20,11 +20,11 @@ public class BadParameterException extends Exception {
 
     public BadParameterException(Object parameter, String parameterType) {
         parameter_ = parameter;
-        rarameterType_ = parameterType;
+        parameterType_ = parameterType;
     }
 
     @Override
     public String getMessage() {
-        return String.format("An invalid '%s' was detected: %s", rarameterType_, parameter_);
+        return String.format("An invalid '%s' was detected: %s", parameterType_, parameter_);
     }
 }
