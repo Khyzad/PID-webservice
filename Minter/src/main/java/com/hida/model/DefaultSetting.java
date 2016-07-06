@@ -83,9 +83,9 @@ public class DefaultSetting extends Setting {
                 && Objects.equals(this.getRootLength(), other.getRootLength())
                 && Objects.equals(this.getCharMap(), other.getCharMap())
                 && Objects.equals(this.getTokenType(), other.getTokenType())
-                && Objects.equals(this.isSansVowels(), other.isSansVowels())
-                && this.isAuto() != other.isAuto()
-                && this.isRandom() != other.isRandom();
+                && this.isSansVowels() == other.isSansVowels()
+                && this.isAuto() == other.isAuto()
+                && this.isRandom() == other.isRandom();
     }
 
     /**
