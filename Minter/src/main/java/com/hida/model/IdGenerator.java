@@ -114,6 +114,12 @@ public abstract class IdGenerator {
         if (MaxPermutation < amount) {
             throw new NotEnoughPermutationsException(MaxPermutation, amount);
         }
+        if(amount < 0){
+            throw new IllegalArgumentException("amount cannot be negative");
+        }
+        if(startingValue < 0){
+            throw new IllegalArgumentException("starting value cannot be negative");
+        }
 
         // create a set to contain Pids
         Set<Pid> pidSet = new LinkedHashSet<>();
