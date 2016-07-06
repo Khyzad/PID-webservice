@@ -78,12 +78,12 @@ public class DefaultSetting extends Setting {
         }
         final DefaultSetting other = (DefaultSetting) obj;
         
-        return !(!Objects.equals(this.getPrepend(), other.getPrepend())
-                && !Objects.equals(this.getPrefix(), other.getPrefix())
-                && !Objects.equals(this.getRootLength(), other.getRootLength())
-                && !Objects.equals(this.getCharMap(), other.getCharMap())
-                && !Objects.equals(this.getTokenType(), other.getTokenType())
-                && !Objects.equals(this.isSansVowels(), other.isSansVowels())
+        return (Objects.equals(this.getPrepend(), other.getPrepend())
+                && Objects.equals(this.getPrefix(), other.getPrefix())
+                && Objects.equals(this.getRootLength(), other.getRootLength())
+                && Objects.equals(this.getCharMap(), other.getCharMap())
+                && Objects.equals(this.getTokenType(), other.getTokenType())
+                && Objects.equals(this.isSansVowels(), other.isSansVowels())
                 && this.isAuto() != other.isAuto()
                 && this.isRandom() != other.isRandom());
     }
