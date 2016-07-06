@@ -69,12 +69,10 @@ public class DefaultSetting extends Setting {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == null) {
+        if (!(obj instanceof DefaultSetting)) {
             return false;
         }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
+        
         final DefaultSetting other = (DefaultSetting) obj;
         
         return Objects.equals(this.getPrepend(), other.getPrepend())
