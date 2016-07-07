@@ -1,3 +1,20 @@
+/*
+ * Copyright 2016 Lawrence Ruffin, Leland Lopez, Brittany Cruz, Stephen Anspach
+ *
+ * Developed in collaboration with the Hawaii State Digital Archives.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ */
 package com.hida.model;
 
 import java.util.Objects;
@@ -56,52 +73,33 @@ public class DefaultSetting extends Setting {
 
     @Override
     public int hashCode() {
-        int hash = 7;
-        hash = 43 * hash + Objects.hashCode(this.prepend_);
-        hash = 43 * hash + Objects.hashCode(this.getCharMap());
-        hash = 43 * hash + Objects.hashCode(this.getPrefix());
-        hash = 43 * hash + Objects.hashCode(this.getTokenType());
-        hash = 43 * hash + Objects.hashCode(this.getRootLength());
-        hash = 43 * hash + Objects.hashCode(this.isSansVowels());
-        hash = 43 * hash + (this.auto_ ? 1 : 0);
-        hash = 43 * hash + (this.random_ ? 1 : 0);
-        return hash;
+        return Objects.hash(this.getPrepend(),
+                this.getCacheSize(),
+                this.getCharMap(),
+                this.getPrefix(),
+                this.getTokenType(),
+                this.getRootLength(),
+                this.isAuto(),
+                this.isRandom(),
+                this.isSansVowels());
     }
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == null) {
+        if (!(obj instanceof DefaultSetting)) {
             return false;
         }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
+        
         final DefaultSetting other = (DefaultSetting) obj;
-        if (!Objects.equals(this.prepend_, other.prepend_)) {
-            return false;
-        }
-        if (!Objects.equals(this.getPrefix(), other.getPrefix())) {
-            return false;
-        }
-        if (!Objects.equals(this.getRootLength(), other.getRootLength())) {
-            return false;
-        }
-        if (!Objects.equals(this.getCharMap(), other.getCharMap())) {
-            return false;
-        }
-        if (!Objects.equals(this.getTokenType(), other.getTokenType())) {
-            return false;
-        }
-        if (!Objects.equals(this.isSansVowels(), other.isSansVowels())) {
-            return false;
-        }
-        if (this.auto_ != other.auto_) {
-            return false;
-        }
-        if (this.random_ != other.random_) {
-            return false;
-        }
-        return true;
+        
+        return Objects.equals(this.getPrepend(), other.getPrepend())
+                && Objects.equals(this.getPrefix(), other.getPrefix())
+                && Objects.equals(this.getRootLength(), other.getRootLength())
+                && Objects.equals(this.getCharMap(), other.getCharMap())
+                && Objects.equals(this.getTokenType(), other.getTokenType())
+                && this.isSansVowels() == other.isSansVowels()
+                && this.isAuto() == other.isAuto()
+                && this.isRandom() == other.isRandom();
     }
 
     /**
