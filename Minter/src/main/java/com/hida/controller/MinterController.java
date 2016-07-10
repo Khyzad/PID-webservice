@@ -282,7 +282,7 @@ public class MinterController {
         mav.addObject("status", 500);
         mav.addObject("exception", exception.getClass().getSimpleName());
         mav.addObject("message", exception.getMessage());
-        LOGGER.error("General Error: {}",  exception.getMessage());
+        LOGGER.error("General Error",  exception);
 
         StackTraceElement[] s = exception.getStackTrace();
         String trace = "";

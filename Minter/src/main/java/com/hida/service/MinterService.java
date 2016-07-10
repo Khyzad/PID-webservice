@@ -162,7 +162,7 @@ public class MinterService {
         if (remaining < amount) {
             NotEnoughPermutationsException exception
                     = new NotEnoughPermutationsException(remaining, amount);
-            LOGGER.error("Not enough remaining Permutations {} ", exception);
+            LOGGER.error("Not enough remaining permutations", exception);
             throw exception;
         }
         LOGGER.info("request is valid");
