@@ -57,7 +57,7 @@ public class DefaultSetting extends Setting {
      * @param CharMap A sequence of characters used to configure PIDs
      * @param RootLength Designates the length of the id's root
      * @param SansVowels Dictates whether or not vowels are allowed
-     * @param Auto Determines which generator, either auto_ or Custom, will be
+     * @param Auto Determines which generator, either Auto or Custom, will be
      * used
      * @param Random Determines if the PIDs are created randomly or sequentially
      */
