@@ -81,26 +81,7 @@ public abstract class IdGenerator {
      * @return A set of Pids
      */
     public Set<Pid> sequentialMint(long amount) {
-        // checks to see if its possible to produce or add requested amount of
-        if (MaxPermutation < amount) {
-            throw new NotEnoughPermutationsException(MaxPermutation, amount);
-        }
-        if(amount < 0){
-            throw new IllegalArgumentException("amount cannot be negative");
-        }
-
-        // create a set to contain Pids
-        Set<Pid> pidSet = new LinkedHashSet<>();
-
-        long startVal = 0;
-        for (int i = 0; i < amount; i++) {
-            Pid newPid = new Pid(longToName(startVal));
-            pidSet.add(newPid);
-            startVal++;
-
-            LOGGER.trace("Generated Custom Sequential ID: {}", newPid);
-        }
-        return pidSet;
+        return sequentialMint(amount, 0);
     }
 
     /**
