@@ -47,7 +47,7 @@ import org.testng.annotations.Test;
 public class PidRepositoryTest extends AbstractTestNGSpringContextTests {
 
     @Autowired
-    private PidRepository PidRepo;
+    private PidRepository pidRepo_;
 
     /**
      * A test that ensures that Pids with the same name cannot be added to the
@@ -58,10 +58,10 @@ public class PidRepositoryTest extends AbstractTestNGSpringContextTests {
         Pid pid1 = getSamplePid();
         Pid pid2 = getSamplePid();
 
-        PidRepo.save(pid1);
-        PidRepo.save(pid2);
+        pidRepo_.save(pid1);
+        pidRepo_.save(pid2);
 
-        long sizeBefore = PidRepo.count();
+        long sizeBefore = pidRepo_.count();
         Assert.assertEquals(sizeBefore, 1);
     }
 
@@ -72,14 +72,14 @@ public class PidRepositoryTest extends AbstractTestNGSpringContextTests {
     public void testSaveAndDelete() {
         Pid pid = getSamplePid();
 
-        PidRepo.save(pid);
+        pidRepo_.save(pid);
 
-        long sizeBefore = PidRepo.count();
+        long sizeBefore = pidRepo_.count();
         Assert.assertEquals(sizeBefore, 1);
 
-        PidRepo.delete(pid);
+        pidRepo_.delete(pid);
 
-        long sizeAfter = PidRepo.count();
+        long sizeAfter = pidRepo_.count();
         Assert.assertEquals(sizeAfter, 0);
     }
 
@@ -90,9 +90,9 @@ public class PidRepositoryTest extends AbstractTestNGSpringContextTests {
     public void testFindByName() {
         Pid pid = getSamplePid();
 
-        PidRepo.save(pid);
+        pidRepo_.save(pid);
 
-        Pid entity = PidRepo.findOne(pid.getName());
+        Pid entity = pidRepo_.findOne(pid.getName());
         Assert.assertNotNull(entity);
     }
 
@@ -107,6 +107,6 @@ public class PidRepositoryTest extends AbstractTestNGSpringContextTests {
      */
     @AfterMethod
     public void tearDown() {
-        PidRepo.deleteAll();
+        pidRepo_.deleteAll();
     }
 }

@@ -35,22 +35,22 @@ public class Citation {
 
     @Id
     @Column(name = "PURL")
-    private String Purl;
+    private String purl_;
 
     @Column(name = "URL")
-    private String Url;
+    private String url_;
 
     @Column(name = "ERC")
-    private String Erc;
+    private String erc_;
 
     @Column(name = "WHO")
-    private String Who;
+    private String who_;
 
     @Column(name = "WHAT")
-    private String What;
+    private String what_;
 
     @Column(name = "DATE")
-    private String Date;
+    private String date_;
 
     /**
      * Citation Constructor
@@ -58,16 +58,16 @@ public class Citation {
      * @param Purl Uniquely identifies a Citation
      */
     public Citation(String Purl) {
-        this.Purl = Purl;
+        this.purl_ = Purl;
     }
 
     public Citation(String Purl, String Url, String Erc, String Who, String What, String Date) {
-        this.Purl = Purl;
-        this.Url = Url;
-        this.Erc = Erc;
-        this.Who = Who;
-        this.What = What;
-        this.Date = Date;
+        this.purl_ = Purl;
+        this.url_ = Url;
+        this.erc_ = Erc;
+        this.who_ = Who;
+        this.what_ = What;
+        this.date_ = Date;
     }
 
     /**
@@ -78,51 +78,51 @@ public class Citation {
     }
 
     public String getUrl() {
-        return Url;
+        return url_;
     }
 
     public void setUrl(String Url) {
-        this.Url = Url;
+        this.url_ = Url;
     }
 
     public String getPurl() {
-        return Purl;
+        return purl_;
     }
 
     public void setPurl(String Purl) {
-        this.Purl = Purl;
+        this.purl_ = Purl;
     }
 
     public String getErc() {
-        return Erc;
+        return erc_;
     }
 
     public void setErc(String Erc) {
-        this.Erc = Erc;
+        this.erc_ = Erc;
     }
 
     public String getWho() {
-        return Who;
+        return who_;
     }
 
     public void setWho(String who) {
-        Who = who;
+        who_ = who;
     }
 
     public String getWhat() {
-        return What;
+        return what_;
     }
 
     public void setWhat(String what) {
-        What = what;
+        what_ = what;
     }
 
     public String getDate() {
-        return Date;
+        return date_;
     }
 
     public void setDate(String when) {
-        Date = when;
+        date_ = when;
     }
-    
+
 }

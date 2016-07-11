@@ -19,7 +19,7 @@ package com.hida.model;
 
 /**
  * A group of objects that uniquely identifies a sequence of possible and valid
- * characters that can be found in the name of a Pid.
+ * characters_ that can be found in the name of a Pid.
  *
  * @author lruffin
  */
@@ -39,13 +39,13 @@ public enum Token {
     UPPER_CONSONANTS_EXTENDED("0123456789BCDFGHJKLMNPQRSTVWXZ"),
     MIXED_CONSONANTS_EXTENDED("0123456789bcdfghjklmnpqrstvwxzBCDFGHJKLMNPQRSTVWXZ");
 
-    private final String characters;
+    private final String characters_;
 
     Token(final String characters) {
-        this.characters = characters;
+        this.characters_ = characters;
     }
 
     public String getCharacters() {
-        return characters;
+        return characters_;
     }
 }

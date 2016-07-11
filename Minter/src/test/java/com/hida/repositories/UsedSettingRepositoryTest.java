@@ -43,12 +43,12 @@ import org.testng.annotations.Test;
 @SpringApplicationConfiguration(classes = {RepositoryConfiguration.class})
 @TestPropertySource(locations = "classpath:testConfig.properties")
 @TestExecutionListeners(inheritListeners = false, listeners = {
-       DependencyInjectionTestExecutionListener.class,
-       DirtiesContextTestExecutionListener.class })
+    DependencyInjectionTestExecutionListener.class,
+    DirtiesContextTestExecutionListener.class})
 public class UsedSettingRepositoryTest extends AbstractTestNGSpringContextTests {
-    
+
     @Autowired
-    private UsedSettingRepository UsedSettingRepo;           
+    private UsedSettingRepository usedSettingRepo_;
 
     /**
      * Tests the functionality of UsedSettingDao save.
@@ -56,36 +56,36 @@ public class UsedSettingRepositoryTest extends AbstractTestNGSpringContextTests 
     @Test
     public void testSaveAndDelete() {
         final UsedSetting setting = getSampleUsedSetting();
-        
-        UsedSettingRepo.save(setting);
-        UsedSetting entity = UsedSettingRepo.findOne(setting.getId());
+
+        usedSettingRepo_.save(setting);
+        UsedSetting entity = usedSettingRepo_.findOne(setting.getId());
         Assert.assertNotNull(entity);
-        
-        UsedSettingRepo.delete(entity);
-        long size = UsedSettingRepo.count();
-        
+
+        usedSettingRepo_.delete(entity);
+        long size = usedSettingRepo_.count();
+
         Assert.assertEquals(0, size);
-    }   
-    
+    }
+
     @Test
-    public void testFindById(){
+    public void testFindById() {
         UsedSetting setting = getSampleUsedSetting();
         setting.setId(1);
-        UsedSettingRepo.save(setting);
-        
-        UsedSetting entity = UsedSettingRepo.findOne(setting.getId());
+        usedSettingRepo_.save(setting);
+
+        UsedSetting entity = usedSettingRepo_.findOne(setting.getId());
         Assert.assertNotNull(entity);
     }
-    
+
     /**
-     * Attempts to find a UsedSetting by the fields. 
+     * Attempts to find a UsedSetting by the fields.
      */
     @Test
     public void testSaveAndFindByUsedSetting() {
         UsedSetting sampleSetting = getSampleUsedSetting();
-        UsedSettingRepo.save(sampleSetting);
-        
-        UsedSetting entity = UsedSettingRepo.findUsedSetting(sampleSetting.getPrefix(),
+        usedSettingRepo_.save(sampleSetting);
+
+        UsedSetting entity = usedSettingRepo_.findUsedSetting(sampleSetting.getPrefix(),
                 sampleSetting.getTokenType(),
                 sampleSetting.getCharMap(),
                 sampleSetting.getRootLength(),
@@ -108,12 +108,12 @@ public class UsedSettingRepositoryTest extends AbstractTestNGSpringContextTests 
 
         return setting;
     }
-    
+
     /**
      * Deletes all entries in the in-memory database after each test
      */
     @AfterMethod
     public void tearDown() {
-        UsedSettingRepo.deleteAll();
+        usedSettingRepo_.deleteAll();
     }
 }

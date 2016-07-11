@@ -35,7 +35,7 @@ public class Pid implements Comparable<Pid> {
 
     @Id
     @Column(name = "NAME", updatable = false, nullable = false)
-    private String Name;
+    private String name_;
 
     /**
      * A no-arg constructor to be used by Hibernate
@@ -44,7 +44,7 @@ public class Pid implements Comparable<Pid> {
     }
 
     public Pid(String Name) {
-        this.Name = Name;
+        this.name_ = Name;
     }
 
     /**
@@ -54,7 +54,7 @@ public class Pid implements Comparable<Pid> {
      * @param id The Id to copy from.
      */
     public Pid(Pid id) {
-        this.Name = id.Name;
+        this.name_ = id.name_;
     }
 
     @Override
@@ -64,13 +64,13 @@ public class Pid implements Comparable<Pid> {
         }
         
         final Pid other = (Pid) obj;
-        return Objects.equals(this.Name, other.Name);
+        return Objects.equals(this.name_, other.name_);
     }
 
     @Override
     public int hashCode() {
         int hash = 7;
-        hash = 71 * hash + Objects.hashCode(this.Name);
+        hash = 71 * hash + Objects.hashCode(this.name_);
         return hash;
     }
 
@@ -83,8 +83,8 @@ public class Pid implements Comparable<Pid> {
      */
     @Override
     public int compareTo(Pid t) {
-        String name1 = this.Name;
-        String name2 = t.Name;
+        String name1 = this.name_;
+        String name2 = t.name_;
         if (name1.length() < name2.length()) {
             return -1;
         }
@@ -124,29 +124,29 @@ public class Pid implements Comparable<Pid> {
     public void replace(int i, char c) {
         String newName = "";
 
-        for (int j = 0; j < Name.length(); j++) {
+        for (int j = 0; j < name_.length(); j++) {
             if (j == i) {
                 newName += c;
             }
             else {
-                newName += Name.charAt(j);
+                newName += name_.charAt(j);
             }
         }
 
-        Name = newName;
+        name_ = newName;
     }
 
     @Override
     public String toString() {
-        return this.Name;
+        return this.name_;
     }
 
     /* getters and setters */
     public String getName() {
-        return Name;
+        return name_;
     }
 
     public void setName(String Name) {
-        this.Name = Name;
+        this.name_ = Name;
     }
 }

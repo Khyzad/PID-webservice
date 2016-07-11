@@ -63,16 +63,16 @@ public class MinterServiceTest {
     private final String TEST_FILE = "testDefaultSetting.properties";
 
     @Mock
-    private DefaultSettingRepository DefaultSettingRepo;
+    private DefaultSettingRepository defaultSettingRepo_;
 
     @Mock
-    private PidRepository PidRepo;
+    private PidRepository pidRepo_;
 
     @Mock
-    private UsedSettingRepository UsedSettingRepo;
+    private UsedSettingRepository usedSettingRepo_;
 
     @InjectMocks
-    private MinterService MinterService;
+    private MinterService minterService_;
 
     /**
      * Sets up Mockito
@@ -82,8 +82,8 @@ public class MinterServiceTest {
     @BeforeClass
     public void setUpClass() throws Exception {
         MockitoAnnotations.initMocks(this);
-        MinterService.setDefaultSettingPath(TEST_FILE);
-        MinterService.initializeStoredSetting();
+        minterService_.setDefaultSettingPath(TEST_FILE);
+        minterService_.initializeStoredSetting();
     }
 
     /**
@@ -118,28 +118,28 @@ public class MinterServiceTest {
         testSetting.setRandom(isRandom);
 
         // assume that any Pids created aren't already persisted and pretend to persist them
-        when(PidRepo.findOne(any(String.class))).thenReturn(null);
-        when(PidRepo.save(any(Pid.class))).thenReturn(null);
+        when(pidRepo_.findOne(any(String.class))).thenReturn(null);
+        when(pidRepo_.save(any(Pid.class))).thenReturn(null);
 
         // assume the UsedSetting isn't persisted and pretend to persist it
-        when(UsedSettingRepo.findUsedSetting(any(String.class),
+        when(usedSettingRepo_.findUsedSetting(any(String.class),
                 any(Token.class),
                 any(String.class),
                 anyInt(),
                 anyBoolean())).thenReturn(null);
 
-        when(UsedSettingRepo.save(any(UsedSetting.class))).thenReturn(null);
+        when(usedSettingRepo_.save(any(UsedSetting.class))).thenReturn(null);
 
         // retrieve a sample DefaultSetting entity
         int actualAmount = 5;
-        Set<Pid> testSet = MinterService.mint(actualAmount, testSetting);
+        Set<Pid> testSet = minterService_.mint(actualAmount, testSetting);
 
         // test behavior
         Assert.assertEquals(actualAmount, testSet.size());
-        verify(PidRepo, atLeast(actualAmount)).findOne(any(String.class));
-        verify(PidRepo, atLeast(actualAmount)).save(any(Pid.class));
-        verify(UsedSettingRepo, atLeastOnce()).save(any(UsedSetting.class));
-        verify(UsedSettingRepo, atLeastOnce()).findUsedSetting(any(String.class),
+        verify(pidRepo_, atLeast(actualAmount)).findOne(any(String.class));
+        verify(pidRepo_, atLeast(actualAmount)).save(any(Pid.class));
+        verify(usedSettingRepo_, atLeastOnce()).save(any(UsedSetting.class));
+        verify(usedSettingRepo_, atLeastOnce()).findUsedSetting(any(String.class),
                 any(Token.class),
                 any(String.class),
                 anyInt(),
@@ -166,29 +166,29 @@ public class MinterServiceTest {
         UsedSetting usedSetting = getSampleUsedSetting();
 
         // assume that any Pids created aren't already persisted and pretend to persist them
-        when(PidRepo.findOne(any(String.class))).thenReturn(null);
-        when(PidRepo.save(any(Pid.class))).thenReturn(null);
+        when(pidRepo_.findOne(any(String.class))).thenReturn(null);
+        when(pidRepo_.save(any(Pid.class))).thenReturn(null);
 
         // assume the UsedSetting isn't persisted and pretend to persist it        
-        when(UsedSettingRepo.findUsedSetting(any(String.class),
+        when(usedSettingRepo_.findUsedSetting(any(String.class),
                 any(Token.class),
                 any(String.class),
                 anyInt(),
                 anyBoolean())).thenReturn(usedSetting);
-        when(UsedSettingRepo.save(usedSetting)).thenReturn(null);
+        when(usedSettingRepo_.save(usedSetting)).thenReturn(null);
 
         int preTestAmount = (int) usedSetting.getAmount();
         int actualAmount = 5;
         int postTestAmount = actualAmount + preTestAmount;
-        Set<Pid> testSet = MinterService.mint(actualAmount, testSetting);
+        Set<Pid> testSet = minterService_.mint(actualAmount, testSetting);
 
         // test behavior
         Assert.assertEquals(actualAmount, testSet.size());
         Assert.assertEquals(postTestAmount, usedSetting.getAmount());
-        verify(PidRepo, atLeast(actualAmount)).findOne(any(String.class));
-        verify(PidRepo, atLeast(actualAmount)).save(any(Pid.class));
-        verify(UsedSettingRepo, never()).save(usedSetting);
-        verify(UsedSettingRepo, atLeastOnce()).findUsedSetting(any(String.class),
+        verify(pidRepo_, atLeast(actualAmount)).findOne(any(String.class));
+        verify(pidRepo_, atLeast(actualAmount)).save(any(Pid.class));
+        verify(usedSettingRepo_, never()).save(usedSetting);
+        verify(usedSettingRepo_, atLeastOnce()).findUsedSetting(any(String.class),
                 any(Token.class),
                 any(String.class),
                 anyInt(),
@@ -208,23 +208,23 @@ public class MinterServiceTest {
         UsedSetting usedSetting = getSampleUsedSetting();
 
         // assume that any Pids created aren't already persisted and pretend to persist them
-        when(PidRepo.findOne(any(String.class))).thenReturn(null);
-        when(PidRepo.save(any(Pid.class))).thenReturn(null);
+        when(pidRepo_.findOne(any(String.class))).thenReturn(null);
+        when(pidRepo_.save(any(Pid.class))).thenReturn(null);
 
         // assume the UsedSetting isn't persisted and pretend to persist it        
-        when(UsedSettingRepo.findUsedSetting(any(String.class),
+        when(usedSettingRepo_.findUsedSetting(any(String.class),
                 any(Token.class),
                 any(String.class),
                 anyInt(),
                 anyBoolean())).thenReturn(usedSetting);
-        when(UsedSettingRepo.save(any(UsedSetting.class))).thenReturn(null);
+        when(usedSettingRepo_.save(any(UsedSetting.class))).thenReturn(null);
 
         // check to see if all the Pids were created
         long amount = 5;
-        long lastAmount = MinterService.getLastSequentialAmount();
-        Set<Pid> testSet = MinterService.mint(amount, testSetting);
+        long lastAmount = minterService_.getLastSequentialAmount();
+        Set<Pid> testSet = minterService_.mint(amount, testSetting);
 
-        Assert.assertEquals(MinterService.getLastSequentialAmount(), (lastAmount + amount) % 10);
+        Assert.assertEquals(minterService_.getLastSequentialAmount(), (lastAmount + amount) % 10);
     }
 
     /**
@@ -249,19 +249,19 @@ public class MinterServiceTest {
         UsedSetting usedSetting = getSampleUsedSetting();
 
         // assume that any Pids created aren't already persisted and pretend to persist them
-        when(PidRepo.findOne(any(String.class))).thenReturn(null);
-        when(PidRepo.save(any(Pid.class))).thenReturn(null);
+        when(pidRepo_.findOne(any(String.class))).thenReturn(null);
+        when(pidRepo_.save(any(Pid.class))).thenReturn(null);
 
         // pretend to find and retrieve variable usedSetting
-        when(UsedSettingRepo.findUsedSetting(any(String.class),
+        when(usedSettingRepo_.findUsedSetting(any(String.class),
                 any(Token.class),
                 any(String.class),
                 anyInt(),
                 anyBoolean())).thenReturn(usedSetting);
-        when(UsedSettingRepo.findOne(anyInt())).thenReturn(usedSetting);
+        when(usedSettingRepo_.findOne(anyInt())).thenReturn(usedSetting);
 
         // try to mint an amount greater than what is available
-        Set<Pid> testSet = MinterService.mint(6, testSetting);
+        Set<Pid> testSet = minterService_.mint(6, testSetting);
     }
 
     /**
@@ -283,19 +283,19 @@ public class MinterServiceTest {
         testSetting.setRandom(isRandom);
 
         // assume that any Pids created aren't already persisted and pretend to persist them
-        when(PidRepo.findOne(any(String.class))).thenReturn(null);
-        when(PidRepo.save(any(Pid.class))).thenReturn(null);
+        when(pidRepo_.findOne(any(String.class))).thenReturn(null);
+        when(pidRepo_.save(any(Pid.class))).thenReturn(null);
 
         // assume that UsedSetting entity with the relevant parameters does not exist
-        when(UsedSettingRepo.findUsedSetting(any(String.class),
+        when(usedSettingRepo_.findUsedSetting(any(String.class),
                 any(Token.class),
                 any(String.class),
                 anyInt(),
                 anyBoolean())).thenReturn(null);
-        when(PidRepo.save(any(Pid.class))).thenReturn(null);
+        when(pidRepo_.save(any(Pid.class))).thenReturn(null);
 
         // try to mint an amount greater than what is possible
-        Set<Pid> testSet = MinterService.mint(11, testSetting);
+        Set<Pid> testSet = minterService_.mint(11, testSetting);
     }
 
     /**
@@ -319,19 +319,19 @@ public class MinterServiceTest {
 
         // pretend any Pid with the name "0" is the only Pid that exists
         Pid sentinelPid = new Pid("1");
-        when(PidRepo.findOne(any(String.class))).thenReturn(sentinelPid);
-        when(PidRepo.findOne("0")).thenReturn(null);
+        when(pidRepo_.findOne(any(String.class))).thenReturn(sentinelPid);
+        when(pidRepo_.findOne("0")).thenReturn(null);
 
         // assume that UsedSetting entity with the relevant parameters does not exist
-        when(UsedSettingRepo.findUsedSetting(any(String.class),
+        when(usedSettingRepo_.findUsedSetting(any(String.class),
                 any(Token.class),
                 any(String.class),
                 anyInt(),
                 anyBoolean())).thenReturn(null);
-        when(UsedSettingRepo.save(any(UsedSetting.class))).thenReturn(null);
+        when(usedSettingRepo_.save(any(UsedSetting.class))).thenReturn(null);
 
         // try to mint an amount greater than what is possible
-        Set<Pid> testSet = MinterService.mint(10, testSetting);
+        Set<Pid> testSet = minterService_.mint(10, testSetting);
     }
 
     /**
@@ -341,10 +341,10 @@ public class MinterServiceTest {
     @Test
     public void testInitializeStoredSetting() throws Exception {
         DefaultSetting testSetting = sampleDefaultSetting();
-        when(DefaultSettingRepo.findCurrentDefaultSetting()).thenReturn(testSetting);
+        when(defaultSettingRepo_.findCurrentDefaultSetting()).thenReturn(testSetting);
 
-        MinterService.initializeStoredSetting();
-        verify(DefaultSettingRepo, atLeastOnce()).findCurrentDefaultSetting();
+        minterService_.initializeStoredSetting();
+        verify(defaultSettingRepo_, atLeastOnce()).findCurrentDefaultSetting();
     }
 
     /**
@@ -355,8 +355,8 @@ public class MinterServiceTest {
     @Test
     public void testGetCurrentSettingWithoutExistingDefaultSetting() throws Exception {
         DefaultSetting testSetting = sampleDefaultSetting();
-        when(DefaultSettingRepo.findCurrentDefaultSetting()).thenReturn(null);
-        DefaultSetting actualSetting = MinterService.getStoredSetting();
+        when(defaultSettingRepo_.findCurrentDefaultSetting()).thenReturn(null);
+        DefaultSetting actualSetting = minterService_.getStoredSetting();
 
         Assert.assertEquals(actualSetting.getCharMap(), testSetting.getCharMap());
         Assert.assertEquals(actualSetting.getPrefix(), testSetting.getPrefix());
@@ -375,10 +375,10 @@ public class MinterServiceTest {
     @Test
     public void testUpdateCurrentSetting() throws Exception {
         DefaultSetting testSetting = sampleDefaultSetting();
-        when(DefaultSettingRepo.findCurrentDefaultSetting()).thenReturn(testSetting);
+        when(defaultSettingRepo_.findCurrentDefaultSetting()).thenReturn(testSetting);
 
-        MinterService.updateCurrentSetting(testSetting);
-        verify(DefaultSettingRepo, atLeastOnce()).findCurrentDefaultSetting();
+        minterService_.updateCurrentSetting(testSetting);
+        verify(defaultSettingRepo_, atLeastOnce()).findCurrentDefaultSetting();
     }
 
     /**
@@ -420,7 +420,7 @@ public class MinterServiceTest {
     @AfterTest
     private void resetTestReadDefaultProperties() throws Exception {
         DefaultSetting setting = readPropertiesFile(TEST_FILE);
-        
+
         Properties prop = new Properties();
         ClassLoader loader = Thread.currentThread().getContextClassLoader();
         URL url = loader.getResource(TEST_FILE);
@@ -443,7 +443,7 @@ public class MinterServiceTest {
         output.close();
 
     }
-    
+
     /**
      * Read a given properties file and return its values in the form of a
      * DefaultSetting object

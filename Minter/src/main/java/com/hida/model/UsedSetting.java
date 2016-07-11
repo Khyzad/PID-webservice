@@ -22,9 +22,9 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 
 /**
- * A type of Setting that references the exact values that were used to
- * create a set of Pids while recording the number of Pids that were created
- * using these values.
+ * A type of Setting that references the exact values that were used to create a
+ * set of Pids while recording the number of Pids that were created using these
+ * values.
  *
  * @author lruffin
  */
@@ -33,7 +33,7 @@ import javax.persistence.Table;
 public class UsedSetting extends Setting {
 
     @Column(name = "AMOUNT")
-    private long Amount;
+    private long amount_;
 
     /**
      * Constructor used to create a UsedSetting entity
@@ -49,7 +49,7 @@ public class UsedSetting extends Setting {
     public UsedSetting(String Prefix, Token TokenType, String CharMap,
             int RootLength, boolean SansVowels, long Amount) {
         super(Prefix, TokenType, CharMap, RootLength, SansVowels);
-        this.Amount = Amount;
+        this.amount_ = Amount;
 
     }
 
@@ -61,11 +61,11 @@ public class UsedSetting extends Setting {
     }
 
     public long getAmount() {
-        return Amount;
+        return amount_;
     }
 
     public void setAmount(long Amount) {
-        this.Amount = Amount;
+        this.amount_ = Amount;
     }
 
 }
