@@ -1,3 +1,20 @@
+/*
+ * Copyright 2016 Lawrence Ruffin, Leland Lopez, Brittany Cruz, Stephen Anspach
+ *
+ * Developed in collaboration with the Hawaii State Digital Archives.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ */
 package com.hida.service;
 
 import com.hida.repositories.DefaultSettingRepository;
@@ -46,36 +63,36 @@ public class MinterService {
     /**
      * Default setting values stored in resources folder
      */
-    private String DefaultSettingPath = "DefaultSetting.properties";
+    private String defaultSettingPath_ = "DefaultSetting.properties";
 
     @Autowired
-    private PidRepository PidRepo;
+    private PidRepository pidRepo_;
 
     @Autowired
-    private UsedSettingRepository UsedSettingRepo;
+    private UsedSettingRepository usedSettingRepo_;
 
     @Autowired
-    private DefaultSettingRepository DefaultSettingRepo;
+    private DefaultSettingRepository defaultSettingRepo_;
 
-    private ArrayList<Pid> CachedPid;
+    private ArrayList<Pid> cachedPid_;
 
-    private long LastSequentialAmount;
+    private long lastSequentialAmount_;
 
     /**
      * Declares a Generator object to manage
      */
-    private IdGenerator Generator;
+    private IdGenerator generator_;
 
     /**
      * The setting used to store the values of the current request
      */
-    private DefaultSetting CurrentSetting;
+    private DefaultSetting currentSetting_;
 
     /**
      * The default values that are currently stored in the properties file and
      * in the database.
      */
-    private DefaultSetting StoredSetting;
+    private DefaultSetting storedSetting_;
 
     /**
      * No-arg constructor
@@ -92,7 +109,7 @@ public class MinterService {
      */
     private long getRemainingPermutations() {
         LOGGER.info("in getRemainingPerumtations");
-        long totalPermutations = Generator.getMaxPermutation();
+        long totalPermutations = generator_.getMaxPermutation();
         long amountCreated = getAmountCreated();
 
         return totalPermutations - amountCreated;
@@ -118,19 +135,19 @@ public class MinterService {
      */
     private void createGenerator() {
         LOGGER.info("in createGenerator");
-        if (CurrentSetting.isAuto()) {
-            Generator = new AutoIdGenerator(
-                    CurrentSetting.getPrefix(),
-                    CurrentSetting.getTokenType(),
-                    CurrentSetting.getRootLength());
+        if (currentSetting_.isAuto()) {
+            generator_ = new AutoIdGenerator(
+                    currentSetting_.getPrefix(),
+                    currentSetting_.getTokenType(),
+                    currentSetting_.getRootLength());
 
             LOGGER.info("AutoGenerator created");
         }
         else {
-            Generator = new CustomIdGenerator(
-                    CurrentSetting.getPrefix(),
-                    CurrentSetting.isSansVowels(),
-                    CurrentSetting.getCharMap());
+            generator_ = new CustomIdGenerator(
+                    currentSetting_.getPrefix(),
+                    currentSetting_.isSansVowels(),
+                    currentSetting_.getCharMap());
             LOGGER.info("CustomIdGenerator created");
         }
     }
@@ -147,13 +164,13 @@ public class MinterService {
         LOGGER.info("in mint");
 
         // store the desired setting values 
-        this.CurrentSetting = setting;
+        this.currentSetting_ = setting;
 
         // create appropriate generator
         createGenerator();
 
         // calculate total number of permutations
-        long total = Generator.getMaxPermutation();
+        long total = generator_.getMaxPermutation();
 
         // determine remaining amount of permutations
         long remaining = getRemainingPermutations();
@@ -172,15 +189,15 @@ public class MinterService {
          otherwise, have the generator return a sequential set
          */
         Set<Pid> set;
-        if (CurrentSetting.isRandom()) {
-            set = Generator.randomMint(amount);
+        if (currentSetting_.isRandom()) {
+            set = generator_.randomMint(amount);
         }
-        else if (CurrentSetting.equals(StoredSetting)) {
-            set = Generator.sequentialMint(amount, LastSequentialAmount);
-            LastSequentialAmount = (LastSequentialAmount + amount) % total;
+        else if (currentSetting_.equals(storedSetting_)) {
+            set = generator_.sequentialMint(amount, lastSequentialAmount_);
+            lastSequentialAmount_ = (lastSequentialAmount_ + amount) % total;
         }
         else {
-            set = Generator.sequentialMint(amount);
+            set = generator_.sequentialMint(amount);
         }
 
         // check ids and increment them appropriately
@@ -202,16 +219,16 @@ public class MinterService {
         LOGGER.trace("in generateCache");
 
         // get default settings
-        CurrentSetting = this.getStoredSetting();
+        currentSetting_ = this.getStoredSetting();
 
         // create the generator
         createGenerator();
 
         // get the maximum number of permutations 
-        long maxPermutation = Generator.getMaxPermutation();
+        long maxPermutation = generator_.getMaxPermutation();
 
         // create all possible permutations
-        Set<Pid> cache = Generator.sequentialMint(500);
+        Set<Pid> cache = generator_.sequentialMint(500);
 
         // add each mmember of the set to CachedPid
         ArrayList<Pid> list = new ArrayList<>();
@@ -223,7 +240,7 @@ public class MinterService {
             LOGGER.info("adding {}", pid);
         }
 
-        CachedPid = list;
+        cachedPid_ = list;
         LOGGER.trace("cache generated");
     }
 
@@ -264,7 +281,7 @@ public class MinterService {
                     LOGGER.error("Not enough remaining Permutations {} ", exception);
                     throw exception;
                 }
-                Generator.incrementPid(currentId);
+                generator_.incrementPid(currentId);
                 counter++;
             }
             // unique ids are added to list and uniqueIdCounter is incremented.
@@ -291,7 +308,7 @@ public class MinterService {
         LOGGER.info("in addIdlIst");
 
         for (Pid pid : list) {
-            PidRepo.save(pid);
+            pidRepo_.save(pid);
         }
 
         LOGGER.info("DatabaseUpdated with new pids");
@@ -308,11 +325,11 @@ public class MinterService {
     private UsedSetting findUsedSetting() {
         LOGGER.info("in findUsedSetting");
 
-        return UsedSettingRepo.findUsedSetting(CurrentSetting.getPrefix(),
-                CurrentSetting.getTokenType(),
-                CurrentSetting.getCharMap(),
-                CurrentSetting.getRootLength(),
-                CurrentSetting.isSansVowels());
+        return usedSettingRepo_.findUsedSetting(currentSetting_.getPrefix(),
+                currentSetting_.getTokenType(),
+                currentSetting_.getCharMap(),
+                currentSetting_.getRootLength(),
+                currentSetting_.isSansVowels());
     }
 
     /**
@@ -327,14 +344,14 @@ public class MinterService {
         UsedSetting entity = findUsedSetting();
 
         if (entity == null) {
-            entity = new UsedSetting(CurrentSetting.getPrefix(),
-                    CurrentSetting.getTokenType(),
-                    CurrentSetting.getCharMap(),
-                    CurrentSetting.getRootLength(),
-                    CurrentSetting.isSansVowels(),
+            entity = new UsedSetting(currentSetting_.getPrefix(),
+                    currentSetting_.getTokenType(),
+                    currentSetting_.getCharMap(),
+                    currentSetting_.getRootLength(),
+                    currentSetting_.isSansVowels(),
                     amount);
 
-            UsedSettingRepo.save(entity);
+            usedSettingRepo_.save(entity);
         }
         else {
             long previousAmount = entity.getAmount();
@@ -351,7 +368,7 @@ public class MinterService {
      */
     private boolean isValidPid(Pid pid) {
         LOGGER.info("in isValidId");
-        Pid entity = this.PidRepo.findOne(pid.getName());
+        Pid entity = this.pidRepo_.findOne(pid.getName());
         return entity == null;
     }
 
@@ -366,37 +383,38 @@ public class MinterService {
     public void updateCurrentSetting(DefaultSetting newSetting) throws Exception {
         LOGGER.info("in updateCurrentSetting");
 
-        CurrentSetting = DefaultSettingRepo.findCurrentDefaultSetting();
-        CurrentSetting.setPrepend(newSetting.getPrepend());
-        CurrentSetting.setPrefix(newSetting.getPrefix());
-        CurrentSetting.setCharMap(newSetting.getCharMap());
-        CurrentSetting.setRootLength(newSetting.getRootLength());
-        CurrentSetting.setTokenType(newSetting.getTokenType());
-        CurrentSetting.setAuto(newSetting.isAuto());
-        CurrentSetting.setRandom(newSetting.isRandom());
-        CurrentSetting.setSansVowels(newSetting.isSansVowels());
+        currentSetting_ = defaultSettingRepo_.findCurrentDefaultSetting();
+        currentSetting_.setPrepend(newSetting.getPrepend());
+        currentSetting_.setPrefix(newSetting.getPrefix());
+        currentSetting_.setCharMap(newSetting.getCharMap());
+        currentSetting_.setRootLength(newSetting.getRootLength());
+        currentSetting_.setTokenType(newSetting.getTokenType());
+        currentSetting_.setAuto(newSetting.isAuto());
+        currentSetting_.setRandom(newSetting.isRandom());
+        currentSetting_.setSansVowels(newSetting.isSansVowels());
 
         // record Default Setting values into properties file
-        writeToPropertiesFile(DefaultSettingPath, newSetting);
+        writeToPropertiesFile(defaultSettingPath_, newSetting);
     }
 
     /**
-     * Initializes the StoredSetting field by reading its value in the database.
-     * If its null, then it is given initial values.
+     * Initializes the storedSetting_ field by reading its value in the
+     * database. If its null, then it is given initial values.
      *
      * @throws IOException Thrown when the file cannot be found
      */
     public void initializeStoredSetting() throws IOException {
-        StoredSetting = DefaultSettingRepo.findCurrentDefaultSetting();
-        if (StoredSetting == null) {
+        storedSetting_ = defaultSettingRepo_.findCurrentDefaultSetting();
+        if (storedSetting_ == null) {
             // read default values stored in properties file and save it
-            StoredSetting = readPropertiesFile(DefaultSettingPath);
-            DefaultSettingRepo.save(StoredSetting);
+            storedSetting_ = readPropertiesFile(defaultSettingPath_);
+            defaultSettingRepo_.save(storedSetting_);
         }
     }
 
     public DefaultSetting getStoredSetting() {
-        return StoredSetting;
+
+        return storedSetting_;
     }
 
     /**
@@ -465,14 +483,14 @@ public class MinterService {
     }
 
     public long getLastSequentialAmount() {
-        return LastSequentialAmount;
+        return lastSequentialAmount_;
     }
 
     public String getDefaultSettingPath() {
-        return DefaultSettingPath;
+        return defaultSettingPath_;
     }
 
     public void setDefaultSettingPath(String DefaultSettingPath) {
-        this.DefaultSettingPath = DefaultSettingPath;
+        this.defaultSettingPath_ = DefaultSettingPath;
     }
 }

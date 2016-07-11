@@ -1,3 +1,20 @@
+/*
+ * Copyright 2016 Lawrence Ruffin, Leland Lopez, Brittany Cruz, Stephen Anspach
+ *
+ * Developed in collaboration with the Hawaii State Digital Archives.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ */
 package com.hida.controller;
 
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,11 +45,11 @@ public class ResolverController {
     /* 
      * Logger; logfile to be stored in resource folder    
      */
-    private static final org.slf4j.Logger Logger
+    private static final org.slf4j.Logger LOGGER
             = LoggerFactory.getLogger(ResolverController.class);
 
     @Autowired
-    private ResolverService ResolverService;
+    private ResolverService resolverService_;
 
     /**
      * Maps to the home page.
@@ -56,11 +73,11 @@ public class ResolverController {
     @ResponseStatus(code = HttpStatus.OK)
     @RequestMapping("/retrieve")
     public Citation retrieve(@RequestParam(value = "purl", required = true) String purl) {
-        Logger.info("Retrieve was Called");
+        LOGGER.info("Retrieve was Called");
         // retrieve citation jsonString
-        Citation citation = ResolverService.retrieveCitation(purl);
+        Citation citation = resolverService_.retrieveCitation(purl);
 
-        Logger.info("Retrieve returned: {}", citation);
+        LOGGER.info("Retrieve returned: {}", citation);
         return citation;
     }
 
@@ -78,12 +95,12 @@ public class ResolverController {
     @RequestMapping("/edit")
     public String edit(@RequestParam(value = "purl", required = true) String purl,
             @RequestParam(value = "url", required = true) String url) throws IOException {
-        Logger.info("Edit was Called");
+        LOGGER.info("Edit was Called");
         // edit the purl and then retrieve its entire contents
-        ResolverService.editUrl(purl, url);
-        Citation citation = ResolverService.retrieveCitation(purl);
+        resolverService_.editUrl(purl, url);
+        Citation citation = resolverService_.retrieveCitation(purl);
 
-        Logger.info("Edit returned: {}", citation);
+        LOGGER.info("Edit returned: {}", citation);
         return "";
     }
 
@@ -110,14 +127,14 @@ public class ResolverController {
             @RequestParam(value = "what", required = true) String what,
             @RequestParam(value = "when", required = true) String when
     ) throws IOException {
-        Logger.info("Insert was Called");
+        LOGGER.info("Insert was Called");
         // create purl jsonString to store information
         Citation citation = new Citation(purl, url, erc, who, what, when);
 
         // insert purl
-        ResolverService.insertCitation(citation);
+        resolverService_.insertCitation(citation);
 
-        Logger.info("insert returned: {}", citation);
+        LOGGER.info("insert returned: {}", citation);
         return "";
     }
 
@@ -133,10 +150,10 @@ public class ResolverController {
     @RequestMapping("/delete")
     public String delete(@RequestParam(value = "purl", required = true) String purl)
             throws IOException {
-        Logger.info("Insert was Called");
+        LOGGER.info("Insert was Called");
 
         // delete Citation
-        ResolverService.deleteCitation(purl);
+        resolverService_.deleteCitation(purl);
 
         return "";
     }
@@ -155,7 +172,7 @@ public class ResolverController {
         mav.addObject("status", 500);
         mav.addObject("exception", exception.getClass().getSimpleName());
         mav.addObject("message", exception.getMessage());
-        Logger.error("Exception caught ", exception);
+        LOGGER.error("Exception caught ", exception);
 
         mav.setViewName("error");
         return mav;

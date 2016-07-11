@@ -1,3 +1,20 @@
+/*
+ * Copyright 2016 Lawrence Ruffin, Leland Lopez, Brittany Cruz, Stephen Anspach
+ *
+ * Developed in collaboration with the Hawaii State Digital Archives.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ */
 package com.hida.model;
 
 import java.util.Iterator;
@@ -16,7 +33,7 @@ import org.testng.annotations.Test;
 public class CustomIdGeneratorTest {
 
     protected static final Logger LOGGER = LoggerFactory.getLogger(CustomIdGeneratorTest.class);
-    private final PidTest PidTest = new PidTest();
+    private final PidTest pidTest_ = new PidTest();
 
     /**
      * Data set with varying charMap values
@@ -104,10 +121,10 @@ public class CustomIdGeneratorTest {
         while (iter.hasNext()) {
             // fail if the length does not match
             Pid current = iter.next();
-            PidTest.testCharMap(current.getName(), setting);
+            pidTest_.testCharMap(current.getName(), setting);
 
             if (prev != null) {
-                PidTest.testOrder(prev, current);
+                pidTest_.testOrder(prev, current);
             }
 
             prev = current;
@@ -145,10 +162,10 @@ public class CustomIdGeneratorTest {
         while (iter.hasNext()) {
             // fail if the length does not match
             Pid current = iter.next();
-            PidTest.testCharMap(current.getName(), setting);
+            pidTest_.testCharMap(current.getName(), setting);
 
             if (prev != null && counter != startingValue) {
-                PidTest.testOrder(prev, current);
+                pidTest_.testOrder(prev, current);
             }
 
             counter++;
@@ -183,7 +200,7 @@ public class CustomIdGeneratorTest {
 
         for (Pid id : randomSet) {
             // fail if the id does not match the token 
-            PidTest.testCharMap(id.getName(), setting);
+            pidTest_.testCharMap(id.getName(), setting);
         }
         // test to see if the amount matches the size of the generated set        
         Assert.assertEquals(randomSet.size(), amount);
@@ -215,10 +232,10 @@ public class CustomIdGeneratorTest {
         while (iter.hasNext()) {
             // fail if the length does not match
             Pid current = iter.next();
-            PidTest.testPrefix(current.getName(), setting);
+            pidTest_.testPrefix(current.getName(), setting);
 
             if (prev != null) {
-                PidTest.testOrder(prev, current);
+                pidTest_.testOrder(prev, current);
             }
 
             prev = current;
@@ -257,10 +274,10 @@ public class CustomIdGeneratorTest {
         while (iter.hasNext()) {
             // fail if the length does not match
             Pid current = iter.next();
-            PidTest.testPrefix(current.getName(), setting);
+            pidTest_.testPrefix(current.getName(), setting);
 
             if (prev != null && counter != startingValue) {
-                PidTest.testOrder(prev, current);
+                pidTest_.testOrder(prev, current);
             }
 
             counter++;
@@ -293,7 +310,7 @@ public class CustomIdGeneratorTest {
         Set<Pid> randomSet = minter.randomMint(amount);
 
         for (Pid id : randomSet) {
-            PidTest.testPrefix(id.getName(), setting);
+            pidTest_.testPrefix(id.getName(), setting);
         }
 
         // test to see if the amount matches the size of the generated set
@@ -326,10 +343,10 @@ public class CustomIdGeneratorTest {
         while (iter.hasNext()) {
             // fail if the length does not match
             Pid current = iter.next();
-            PidTest.testRootLength(current.getName(), setting);
+            pidTest_.testRootLength(current.getName(), setting);
 
             if (prev != null) {
-                PidTest.testOrder(prev, current);
+                pidTest_.testOrder(prev, current);
             }
 
             prev = current;
@@ -368,10 +385,10 @@ public class CustomIdGeneratorTest {
         while (iter.hasNext()) {
             // fail if the length does not match
             Pid current = iter.next();
-            PidTest.testRootLength(current.getName(), setting);
+            pidTest_.testRootLength(current.getName(), setting);
 
             if (prev != null && counter < startingValue) {
-                PidTest.testOrder(prev, current);
+                pidTest_.testOrder(prev, current);
             }
 
             counter++;
@@ -404,7 +421,7 @@ public class CustomIdGeneratorTest {
         Set<Pid> randomSet = minter.randomMint(amount);
 
         for (Pid id : randomSet) {
-            PidTest.testRootLength(id.getName(), setting);
+            pidTest_.testRootLength(id.getName(), setting);
         }
         // test to see if the amount matches the size of the generated set
         Assert.assertEquals(randomSet.size(), amount);

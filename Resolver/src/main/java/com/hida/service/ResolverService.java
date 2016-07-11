@@ -1,3 +1,20 @@
+/*
+ * Copyright 2016 Lawrence Ruffin, Leland Lopez, Brittany Cruz, Stephen Anspach
+ *
+ * Developed in collaboration with the Hawaii State Digital Archives.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ */
 package com.hida.service;
 
 import org.apache.log4j.Logger;
@@ -19,9 +36,9 @@ import org.springframework.transaction.annotation.Transactional;
 public class ResolverService {
 
     @Autowired
-    private CitationRepository CitationRepo;
+    private CitationRepository citationRepo_;
 
-    private final static Logger logger = Logger.getLogger(ResolverService.class);
+    private final static Logger LOGGER = Logger.getLogger(ResolverService.class);
 
     /**
      * Retrieves url of provided purlid
@@ -30,7 +47,7 @@ public class ResolverService {
      * @return String
      */
     public String retrieveUrl(String purl) {
-        Citation entity = CitationRepo.findOne(purl);
+        Citation entity = citationRepo_.findOne(purl);
         String url = entity.getUrl();
 
         return url;
@@ -42,7 +59,7 @@ public class ResolverService {
      * @param citation Citation to insert into database
      */
     public void insertCitation(Citation citation) {
-        CitationRepo.save(citation);
+        citationRepo_.save(citation);
     }
 
     /**
@@ -52,7 +69,7 @@ public class ResolverService {
      * @param url url that desired row url will be changed to
      */
     public void editUrl(String purl, String url) {
-        Citation entity = CitationRepo.findOne(purl);
+        Citation entity = citationRepo_.findOne(purl);
         entity.setUrl(url);
     }
 
@@ -62,8 +79,8 @@ public class ResolverService {
      * @param purl purlid of desired deleted row
      */
     public void deleteCitation(String purl) {
-        Citation entity = CitationRepo.findOne(purl);
-        CitationRepo.delete(entity);
+        Citation entity = citationRepo_.findOne(purl);
+        citationRepo_.delete(entity);
     }
 
     /**
@@ -73,7 +90,7 @@ public class ResolverService {
      * @return Citation
      */
     public Citation retrieveCitation(String purl) {
-        Citation entity = CitationRepo.findOne(purl);
+        Citation entity = citationRepo_.findOne(purl);
 
         return entity;
     }

@@ -1,3 +1,20 @@
+/*
+ * Copyright 2016 Lawrence Ruffin, Leland Lopez, Brittany Cruz, Stephen Anspach
+ *
+ * Developed in collaboration with the Hawaii State Digital Archives.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ */
 package com.hida.model;
 
 import java.util.Objects;
@@ -17,16 +34,16 @@ import javax.persistence.Table;
 public class DefaultSetting extends Setting {
 
     @Column(name = "PREPEND", nullable = false)
-    private String Prepend;
+    private String prepend_;
 
     @Column(name = "ISAUTO")
-    private boolean Auto;
+    private boolean auto_;
 
     @Column(name = "ISRANDOM")
-    private boolean Random;
-    
+    private boolean random_;
+
     @Column(name = "CACHESIZE")
-    private long CacheSize;
+    private long cacheSize_;
 
     /**
      * Constructor used to create a DefaultSetting entity
@@ -44,64 +61,45 @@ public class DefaultSetting extends Setting {
      * used
      * @param Random Determines if the PIDs are created randomly or sequentially
      */
-    public DefaultSetting(String Prepend, String Prefix, long CacheSize, Token TokenType, 
+    public DefaultSetting(String Prepend, String Prefix, long CacheSize, Token TokenType,
             String CharMap, int RootLength, boolean SansVowels, boolean Auto, boolean Random) {
         super(Prefix, TokenType, CharMap, RootLength, SansVowels);
-        this.Prepend = Prepend;
-        this.CacheSize = CacheSize;
-        this.Auto = Auto;
-        this.Random = Random;
+        this.prepend_ = Prepend;
+        this.cacheSize_ = CacheSize;
+        this.auto_ = Auto;
+        this.random_ = Random;
 
     }
 
     @Override
     public int hashCode() {
-        int hash = 7;
-        hash = 43 * hash + Objects.hashCode(this.Prepend);
-        hash = 43 * hash + Objects.hashCode(this.getCharMap());
-        hash = 43 * hash + Objects.hashCode(this.getPrefix());
-        hash = 43 * hash + Objects.hashCode(this.getTokenType());
-        hash = 43 * hash + Objects.hashCode(this.getRootLength());
-        hash = 43 * hash + Objects.hashCode(this.isSansVowels());
-        hash = 43 * hash + (this.Auto ? 1 : 0);
-        hash = 43 * hash + (this.Random ? 1 : 0);
-        return hash;
+        return Objects.hash(this.getPrepend(),
+                this.getCacheSize(),
+                this.getCharMap(),
+                this.getPrefix(),
+                this.getTokenType(),
+                this.getRootLength(),
+                this.isAuto(),
+                this.isRandom(),
+                this.isSansVowels());
     }
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == null) {
+        if (!(obj instanceof DefaultSetting)) {
             return false;
         }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
+        
         final DefaultSetting other = (DefaultSetting) obj;
-        if (!Objects.equals(this.Prepend, other.Prepend)) {
-            return false;
-        }
-        if (!Objects.equals(this.getPrefix(), other.getPrefix())) {
-            return false;
-        }
-        if (!Objects.equals(this.getRootLength(), other.getRootLength())) {
-            return false;
-        }
-        if (!Objects.equals(this.getCharMap(), other.getCharMap())) {
-            return false;
-        }
-        if (!Objects.equals(this.getTokenType(), other.getTokenType())) {
-            return false;
-        }
-        if (!Objects.equals(this.isSansVowels(), other.isSansVowels())) {
-            return false;
-        }
-        if (this.Auto != other.Auto) {
-            return false;
-        }
-        if (this.Random != other.Random) {
-            return false;
-        }
-        return true;
+        
+        return Objects.equals(this.getPrepend(), other.getPrepend())
+                && Objects.equals(this.getPrefix(), other.getPrefix())
+                && Objects.equals(this.getRootLength(), other.getRootLength())
+                && Objects.equals(this.getCharMap(), other.getCharMap())
+                && Objects.equals(this.getTokenType(), other.getTokenType())
+                && this.isSansVowels() == other.isSansVowels()
+                && this.isAuto() == other.isAuto()
+                && this.isRandom() == other.isRandom();
     }
 
     /**
@@ -112,34 +110,34 @@ public class DefaultSetting extends Setting {
     }
 
     public String getPrepend() {
-        return this.Prepend;
+        return this.prepend_;
     }
 
     public void setPrepend(String prepend) {
-        this.Prepend = prepend;
+        this.prepend_ = prepend;
     }
 
     public boolean isAuto() {
-        return Auto;
+        return auto_;
     }
 
     public void setAuto(boolean Auto) {
-        this.Auto = Auto;
+        this.auto_ = Auto;
     }
 
     public boolean isRandom() {
-        return Random;
+        return random_;
     }
 
     public void setRandom(boolean Random) {
-        this.Random = Random;
+        this.random_ = Random;
     }
 
     public long getCacheSize() {
-        return CacheSize;
+        return cacheSize_;
     }
 
     public void setCacheSize(long CacheSize) {
-        this.CacheSize = CacheSize;
-    }        
+        this.cacheSize_ = CacheSize;
+    }
 }

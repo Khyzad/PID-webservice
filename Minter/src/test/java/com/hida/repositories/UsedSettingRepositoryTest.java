@@ -1,3 +1,20 @@
+/*
+ * Copyright 2016 Lawrence Ruffin, Leland Lopez, Brittany Cruz, Stephen Anspach
+ *
+ * Developed in collaboration with the Hawaii State Digital Archives.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ */
 package com.hida.repositories;
 
 import com.hida.configuration.RepositoryConfiguration;
@@ -26,12 +43,12 @@ import org.testng.annotations.Test;
 @SpringApplicationConfiguration(classes = {RepositoryConfiguration.class})
 @TestPropertySource(locations = "classpath:testConfig.properties")
 @TestExecutionListeners(inheritListeners = false, listeners = {
-       DependencyInjectionTestExecutionListener.class,
-       DirtiesContextTestExecutionListener.class })
+    DependencyInjectionTestExecutionListener.class,
+    DirtiesContextTestExecutionListener.class})
 public class UsedSettingRepositoryTest extends AbstractTestNGSpringContextTests {
-    
+
     @Autowired
-    private UsedSettingRepository UsedSettingRepo;           
+    private UsedSettingRepository usedSettingRepo_;
 
     /**
      * Tests the functionality of UsedSettingDao save.
@@ -39,36 +56,36 @@ public class UsedSettingRepositoryTest extends AbstractTestNGSpringContextTests 
     @Test
     public void testSaveAndDelete() {
         final UsedSetting setting = getSampleUsedSetting();
-        
-        UsedSettingRepo.save(setting);
-        UsedSetting entity = UsedSettingRepo.findOne(setting.getId());
+
+        usedSettingRepo_.save(setting);
+        UsedSetting entity = usedSettingRepo_.findOne(setting.getId());
         Assert.assertNotNull(entity);
-        
-        UsedSettingRepo.delete(entity);
-        long size = UsedSettingRepo.count();
-        
+
+        usedSettingRepo_.delete(entity);
+        long size = usedSettingRepo_.count();
+
         Assert.assertEquals(0, size);
-    }   
-    
+    }
+
     @Test
-    public void testFindById(){
+    public void testFindById() {
         UsedSetting setting = getSampleUsedSetting();
         setting.setId(1);
-        UsedSettingRepo.save(setting);
-        
-        UsedSetting entity = UsedSettingRepo.findOne(setting.getId());
+        usedSettingRepo_.save(setting);
+
+        UsedSetting entity = usedSettingRepo_.findOne(setting.getId());
         Assert.assertNotNull(entity);
     }
-    
+
     /**
-     * Attempts to find a UsedSetting by the fields. 
+     * Attempts to find a UsedSetting by the fields.
      */
     @Test
     public void testSaveAndFindByUsedSetting() {
         UsedSetting sampleSetting = getSampleUsedSetting();
-        UsedSettingRepo.save(sampleSetting);
-        
-        UsedSetting entity = UsedSettingRepo.findUsedSetting(sampleSetting.getPrefix(),
+        usedSettingRepo_.save(sampleSetting);
+
+        UsedSetting entity = usedSettingRepo_.findUsedSetting(sampleSetting.getPrefix(),
                 sampleSetting.getTokenType(),
                 sampleSetting.getCharMap(),
                 sampleSetting.getRootLength(),
@@ -91,12 +108,12 @@ public class UsedSettingRepositoryTest extends AbstractTestNGSpringContextTests 
 
         return setting;
     }
-    
+
     /**
      * Deletes all entries in the in-memory database after each test
      */
     @AfterMethod
     public void tearDown() {
-        UsedSettingRepo.deleteAll();
+        usedSettingRepo_.deleteAll();
     }
 }

@@ -1,3 +1,20 @@
+/*
+ * Copyright 2016 Lawrence Ruffin, Leland Lopez, Brittany Cruz, Stephen Anspach
+ *
+ * Developed in collaboration with the Hawaii State Digital Archives.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ */
 package com.hida.model;
 
 import java.util.Objects;
@@ -18,7 +35,7 @@ public class Pid implements Comparable<Pid> {
 
     @Id
     @Column(name = "NAME", updatable = false, nullable = false)
-    private String Name;
+    private String name_;
 
     /**
      * A no-arg constructor to be used by Hibernate
@@ -27,7 +44,7 @@ public class Pid implements Comparable<Pid> {
     }
 
     public Pid(String Name) {
-        this.Name = Name;
+        this.name_ = Name;
     }
 
     /**
@@ -36,27 +53,24 @@ public class Pid implements Comparable<Pid> {
      *
      * @param id The Id to copy from.
      */
-    public Pid(Pid id) {        
-        this.Name = id.Name;
+    public Pid(Pid id) {
+        this.name_ = id.name_;
     }
 
-   
     @Override
     public boolean equals(Object obj) {
-        if (obj == null) {
+        if (!(obj instanceof Pid)) {
             return false;
         }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
+        
         final Pid other = (Pid) obj;
-        return Objects.equals(this.Name, other.Name);
-    }                
+        return Objects.equals(this.name_, other.name_);
+    }
 
     @Override
     public int hashCode() {
         int hash = 7;
-        hash = 71 * hash + Objects.hashCode(this.Name);
+        hash = 71 * hash + Objects.hashCode(this.name_);
         return hash;
     }
 
@@ -68,9 +82,9 @@ public class Pid implements Comparable<Pid> {
      * @return ordering is as follows: [0-9] < [a-z] < [A-Z]
      */
     @Override
-    public int compareTo(Pid t) {        
-        String name1 = this.Name;
-        String name2 = t.Name;
+    public int compareTo(Pid t) {
+        String name1 = this.name_;
+        String name2 = t.name_;
         if (name1.length() < name2.length()) {
             return -1;
         }
@@ -110,29 +124,29 @@ public class Pid implements Comparable<Pid> {
     public void replace(int i, char c) {
         String newName = "";
 
-        for (int j = 0; j < Name.length(); j++) {
+        for (int j = 0; j < name_.length(); j++) {
             if (j == i) {
                 newName += c;
             }
             else {
-                newName += Name.charAt(j);
+                newName += name_.charAt(j);
             }
         }
 
-        Name = newName;
+        name_ = newName;
     }
-    
+
     @Override
-    public String toString(){
-        return this.Name;
+    public String toString() {
+        return this.name_;
     }
 
     /* getters and setters */
     public String getName() {
-        return Name;
+        return name_;
     }
 
     public void setName(String Name) {
-        this.Name = Name;
+        this.name_ = Name;
     }
 }

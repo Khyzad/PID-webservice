@@ -1,0 +1,4 @@
+PID Web Service
+Copyright 2016 Lawrence Ruffin, Leland Lopez, Brittany Cruz, Stephen Anspach
+
+Developed in collaboration with the Hawaii State Digital Archives.

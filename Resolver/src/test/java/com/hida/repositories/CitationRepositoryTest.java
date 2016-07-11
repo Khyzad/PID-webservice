@@ -1,3 +1,20 @@
+/*
+ * Copyright 2016 Lawrence Ruffin, Leland Lopez, Brittany Cruz, Stephen Anspach
+ *
+ * Developed in collaboration with the Hawaii State Digital Archives.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ */
 package com.hida.repositories;
 
 import com.hida.configuration.RepositoryConfiguration;
@@ -11,8 +28,8 @@ import org.testng.annotations.Test;
 import org.testng.Assert;
 
 /**
- * Tests the functionality of CitationDaoTest and ensures that it properly interacts
- * with Hibernate.
+ * Tests the functionality of CitationDaoTest and ensures that it properly
+ * interacts with Hibernate.
  *
  * @author lruffin
  */
@@ -20,22 +37,22 @@ import org.testng.Assert;
 @SpringApplicationConfiguration(classes = {RepositoryConfiguration.class})
 @TestPropertySource(locations = "classpath:testConfig.properties")
 public class CitationRepositoryTest {
-    
+
     @Autowired
-    private CitationRepository CitationRepo;   
+    private CitationRepository citationRepo_;
 
     /**
      * Tests to see if a Citation entity is retrievable
      */
     @Test
     public void testFindByPurl() {
-        Citation entity1 = CitationRepo.findOne("abc123");
-        Citation entity2 = CitationRepo.findOne("xyz");
-        Citation entity3 = CitationRepo.findOne("null");
-        
+        Citation entity1 = citationRepo_.findOne("abc123");
+        Citation entity2 = citationRepo_.findOne("xyz");
+        Citation entity3 = citationRepo_.findOne("null");
+
         Assert.assertNotNull(entity1);
         Assert.assertNotNull(entity2);
-        Assert.assertNull(entity3);        
+        Assert.assertNull(entity3);
     }
 
     /**
@@ -43,10 +60,10 @@ public class CitationRepositoryTest {
      */
     @Test
     public void testSavePurl() {
-        Citation purl = new Citation("pid","url","erc","who","what","date");
-        CitationRepo.save(purl);
-        
-        Citation entity = CitationRepo.findOne("pid");
+        Citation purl = new Citation("pid", "url", "erc", "who", "what", "date");
+        citationRepo_.save(purl);
+
+        Citation entity = citationRepo_.findOne("pid");
         Assert.assertNotNull(entity);
     }
 
@@ -55,12 +72,12 @@ public class CitationRepositoryTest {
      */
     @Test
     public void testDeletePurl() {
-        Citation entity = CitationRepo.findOne("abc123");
-        
-        CitationRepo.delete(entity);
-        
-        Citation nullEntity = CitationRepo.findOne("abc123");
-        Assert.assertNull(nullEntity);       
+        Citation entity = citationRepo_.findOne("abc123");
+
+        citationRepo_.delete(entity);
+
+        Citation nullEntity = citationRepo_.findOne("abc123");
+        Assert.assertNull(nullEntity);
     }
 
 }

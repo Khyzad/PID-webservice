@@ -1,3 +1,20 @@
+/*
+ * Copyright 2016 Lawrence Ruffin, Leland Lopez, Brittany Cruz, Stephen Anspach
+ *
+ * Developed in collaboration with the Hawaii State Digital Archives.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ */
 package com.hida.model;
 
 import java.security.SecureRandom;
@@ -14,26 +31,26 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class IdGenerator {
 
-    protected long MaxPermutation;
+    protected long maxPermutation_;
 
     /**
      * Creates and new random number generator to aid in the production of
      * non-deterministic ids.
      */
-    protected static final SecureRandom Rng = new SecureRandom();
+    protected static final SecureRandom rng_ = new SecureRandom();
 
     /**
      * LOGGER; logfile to be stored in resource folder
      */
-    protected static final Logger LOGGER = LoggerFactory.getLogger(IdGenerator.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(IdGenerator.class);
 
     /**
      * The string that will be at the front of every id
      */
-    protected String Prefix;
+    protected String prefix_;
 
     public IdGenerator(String prefix) {
-        this.Prefix = prefix;
+        this.prefix_ = prefix;
     }
 
     public abstract long getMaxPermutation();
@@ -52,15 +69,15 @@ public abstract class IdGenerator {
      */
     public Set<Pid> randomMint(long amount) {
         // checks to see if its possible to produce or add requested amount of
-        if (MaxPermutation < amount) {
-            throw new NotEnoughPermutationsException(MaxPermutation, amount);
+        if (maxPermutation_ < amount) {
+            throw new NotEnoughPermutationsException(maxPermutation_, amount);
         }
         // generate ids        
         Set<Pid> pidSet = new LinkedHashSet<>();
 
         // randomly generate pids using a random number generator
         for (int i = 0; i < amount; i++) {
-            long value = Math.abs(Rng.nextLong()) % MaxPermutation;
+            long value = Math.abs(rng_.nextLong()) % maxPermutation_;
             Pid pid = new Pid(this.longToName(value));
 
             // create pid and add it to the set
@@ -82,8 +99,8 @@ public abstract class IdGenerator {
      */
     public Set<Pid> sequentialMint(long amount) {
         // checks to see if its possible to produce or add requested amount of
-        if (MaxPermutation < amount) {
-            throw new NotEnoughPermutationsException(MaxPermutation, amount);
+        if (maxPermutation_ < amount) {
+            throw new NotEnoughPermutationsException(maxPermutation_, amount);
         }
 
         // create a set to contain Pids
@@ -115,8 +132,8 @@ public abstract class IdGenerator {
      * @return A set of Pids
      */
     public Set<Pid> sequentialMint(long amount, long startingValue) {
-        if (MaxPermutation < amount) {
-            throw new NotEnoughPermutationsException(MaxPermutation, amount);
+        if (maxPermutation_ < amount) {
+            throw new NotEnoughPermutationsException(maxPermutation_, amount);
         }
 
         // create a set to contain Pids
@@ -186,10 +203,10 @@ public abstract class IdGenerator {
 
     /* typical getter and setter methods */
     public String getPrefix() {
-        return Prefix;
+        return prefix_;
     }
 
     public void setPrefix(String Prefix) {
-        this.Prefix = Prefix;
+        this.prefix_ = Prefix;
     }
 }

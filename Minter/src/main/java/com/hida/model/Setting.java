@@ -1,3 +1,20 @@
+/*
+ * Copyright 2016 Lawrence Ruffin, Leland Lopez, Brittany Cruz, Stephen Anspach
+ *
+ * Developed in collaboration with the Hawaii State Digital Archives.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ */
 package com.hida.model;
 
 import javax.persistence.Column;
@@ -20,24 +37,24 @@ public class Setting {
     @Id
     @Column(name = "ID", updatable = false, nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int Id;
+    private int id_;
 
     @NotNull
     @Column(name = "PID_PREFIX", nullable = false)
-    private String Prefix;
+    private String prefix_;
 
     @Column(name = "TOKENTYPE")
     @Enumerated(EnumType.STRING)
-    private Token TokenType;
+    private Token tokenType_;
 
     @Column(name = "CHARMAP")
-    private String CharMap;
+    private String charMap_;
 
     @Column(name = "ROOTLENGTH")
-    private int RootLength;
+    private int rootLength_;
 
     @Column(name = "SANSVOWELS")
-    private boolean SansVowels;
+    private boolean sansVowels_;
 
     /**
      * Copy constructor.
@@ -45,15 +62,16 @@ public class Setting {
      * @param s the CachedSetting to copy
      */
     public Setting(Setting s) {
-        Prefix = s.getPrefix();
-        TokenType = s.getTokenType();
-        CharMap = s.getCharMap();
-        RootLength = s.getRootLength();
-        SansVowels = s.isSansVowels();
+        prefix_ = s.getPrefix();
+        tokenType_ = s.getTokenType();
+        charMap_ = s.getCharMap();
+        rootLength_ = s.getRootLength();
+        sansVowels_ = s.isSansVowels();
     }
 
     /**
-     * Constructor that represents the necessary values all settings should contain
+     * Constructor that represents the necessary values all settings should
+     * contain
      *
      * @param Prefix A sequence of characters that appear in the beginning of
      * PIDs
@@ -64,11 +82,11 @@ public class Setting {
      */
     public Setting(String Prefix, Token TokenType, String CharMap, int RootLength,
             boolean SansVowels) {
-        this.Prefix = Prefix;
-        this.TokenType = TokenType;
-        this.CharMap = CharMap;
-        this.RootLength = RootLength;
-        this.SansVowels = SansVowels;
+        this.prefix_ = Prefix;
+        this.tokenType_ = TokenType;
+        this.charMap_ = CharMap;
+        this.rootLength_ = RootLength;
+        this.sansVowels_ = SansVowels;
     }
 
     /**
@@ -79,51 +97,51 @@ public class Setting {
 
     // Typical getters and setters    
     public int getId() {
-        return Id;
+        return id_;
     }
 
     public void setId(int Id) {
-        this.Id = Id;
+        this.id_ = Id;
     }
 
     public String getPrefix() {
-        return Prefix;
+        return prefix_;
     }
 
     public void setPrefix(String Prefix) {
-        this.Prefix = Prefix;
+        this.prefix_ = Prefix;
     }
 
     public Token getTokenType() {
-        return TokenType;
+        return tokenType_;
     }
 
     public void setTokenType(Token TokenType) {
-        this.TokenType = TokenType;
+        this.tokenType_ = TokenType;
     }
 
     public String getCharMap() {
-        return CharMap;
+        return charMap_;
     }
 
     public void setCharMap(String CharMap) {
-        this.CharMap = CharMap;
+        this.charMap_ = CharMap;
     }
 
     public int getRootLength() {
-        return RootLength;
+        return rootLength_;
     }
 
     public void setRootLength(int RootLength) {
-        this.RootLength = RootLength;
+        this.rootLength_ = RootLength;
     }
 
     public boolean isSansVowels() {
-        return SansVowels;
+        return sansVowels_;
     }
 
     public void setSansVowels(boolean SansVowels) {
-        this.SansVowels = SansVowels;
+        this.sansVowels_ = SansVowels;
     }
 
 }
