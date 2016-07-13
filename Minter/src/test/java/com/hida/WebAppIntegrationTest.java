@@ -16,14 +16,10 @@
 package com.hida;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.IntegrationTest;
 import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.test.context.TestExecutionListeners;
+import org.springframework.boot.test.WebIntegrationTest;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
-import org.springframework.test.context.support.DirtiesContextTestExecutionListener;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
-import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -32,18 +28,16 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import org.testng.Assert;
 
 /**
+ * An integration test of the entire application to ensure functionality
  *
  * @author lruffin
  */
-@WebAppConfiguration
-@IntegrationTest
+@WebIntegrationTest("server.port:9000")
 @SpringApplicationConfiguration(classes = {Application.class})
 @TestPropertySource(locations = "classpath:testConfig.properties")
-@TestExecutionListeners(inheritListeners = false, listeners = {
-    DependencyInjectionTestExecutionListener.class,
-    DirtiesContextTestExecutionListener.class})
 public class WebAppIntegrationTest extends AbstractTestNGSpringContextTests {
 
     @Autowired
@@ -55,13 +49,16 @@ public class WebAppIntegrationTest extends AbstractTestNGSpringContextTests {
     public void setup() {
         MockedContext = MockMvcBuilders.webAppContextSetup(webAppContext).build();
     }
-    
+
     @Test
-    public void testMint() throws Exception{
-        MvcResult result = MockedContext.perform(get("/Minter/mint/10").accept("application/json"))
+    public void testMint() throws Exception {
+        MvcResult result = MockedContext.perform(get("/Minter/mint/10")
+                .accept("application/json"))
                 .andExpect(status().isCreated())
                 .andReturn();
-        
+
         String content = result.getResponse().getContentAsString();
+        Assert.assertEquals("", content);
     }
+
 }
