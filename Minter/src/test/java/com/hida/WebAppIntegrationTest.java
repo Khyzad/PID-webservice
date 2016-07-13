@@ -41,7 +41,7 @@ import org.testng.annotations.BeforeClass;
 @TestExecutionListeners(inheritListeners = false, listeners = {
     DependencyInjectionTestExecutionListener.class,
     DirtiesContextTestExecutionListener.class})
-public class WebAppIntegrationTest {
+public class WebAppIntegrationTest extends AbstractTestNGSpringContextTests {
 
     @Autowired
     private WebApplicationContext webAppContext;
