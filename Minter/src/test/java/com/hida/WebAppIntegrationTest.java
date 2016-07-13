@@ -25,6 +25,7 @@ import org.springframework.test.context.support.DirtiesContextTestExecutionListe
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import org.testng.annotations.BeforeClass;
@@ -57,7 +58,10 @@ public class WebAppIntegrationTest extends AbstractTestNGSpringContextTests {
     
     @Test
     public void testMint() throws Exception{
-        MockedContext.perform(get("/Minter/mint/10").accept("application/json"))
-                .andExpect(status().isCreated());                               
+        MvcResult result = MockedContext.perform(get("/Minter/mint/10").accept("application/json"))
+                .andExpect(status().isCreated())
+                .andReturn();
+        
+        String content = result.getResponse().getContentAsString();
     }
 }
