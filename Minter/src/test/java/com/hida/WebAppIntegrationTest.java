@@ -15,7 +15,6 @@
  */
 package com.hida;
 
-import com.hida.configuration.RepositoryConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.IntegrationTest;
 import org.springframework.boot.test.SpringApplicationConfiguration;
@@ -36,7 +35,7 @@ import org.testng.annotations.BeforeClass;
  */
 @WebAppConfiguration
 @IntegrationTest
-@SpringApplicationConfiguration(classes = {RepositoryConfiguration.class})
+@SpringApplicationConfiguration(classes = {Application.class})
 @TestPropertySource(locations = "classpath:testConfig.properties")
 @TestExecutionListeners(inheritListeners = false, listeners = {
     DependencyInjectionTestExecutionListener.class,
