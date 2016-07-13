@@ -41,14 +41,15 @@ import org.testng.annotations.BeforeClass;
 @TestExecutionListeners(inheritListeners = false, listeners = {
     DependencyInjectionTestExecutionListener.class,
     DirtiesContextTestExecutionListener.class})
-public class IntegrationTest {
+public class WebAppIntegrationTest {
+
     @Autowired
     private WebApplicationContext webAppContext;
-    
+
     private MockMvc MockedContext;
 
     @BeforeClass
-    public void setup(){
+    public void setup() {
         MockedContext = MockMvcBuilders.webAppContextSetup(webAppContext).build();
     }
 }
