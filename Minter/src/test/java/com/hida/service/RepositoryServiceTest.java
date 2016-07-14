@@ -43,6 +43,7 @@ import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.testng.Assert;
 import org.testng.annotations.AfterTest;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 /**
@@ -71,7 +72,18 @@ public class RepositoryServiceTest extends AbstractTestNGSpringContextTests {
     private DefaultSettingRepository defaultSettingRepo_;
     
     @InjectMocks
-    private RepositoryService service_;        
+    private RepositoryService service_;      
+    
+    /**
+     * Sets up Mockito
+     *
+     * @throws Exception
+     */
+    @BeforeClass
+    public void setUpClass() throws Exception {
+        MockitoAnnotations.initMocks(this);
+        
+    }
     
     @Test
     public void testGeneratePids(){
