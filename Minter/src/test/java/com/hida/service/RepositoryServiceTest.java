@@ -18,9 +18,18 @@
 package com.hida.service;
 
 import com.hida.configuration.RepositoryConfiguration;
+import com.hida.model.DefaultSetting;
+import com.hida.model.Token;
 import com.hida.repositories.DefaultSettingRepository;
 import com.hida.repositories.PidRepository;
 import com.hida.repositories.UsedSettingRepository;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.URL;
+import java.util.Properties;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -33,6 +42,7 @@ import org.springframework.test.context.support.DirtiesContextTestExecutionListe
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.testng.Assert;
+import org.testng.annotations.AfterTest;
 import org.testng.annotations.Test;
 
 /**
@@ -48,6 +58,8 @@ import org.testng.annotations.Test;
     DependencyInjectionTestExecutionListener.class,
     DirtiesContextTestExecutionListener.class})
 public class RepositoryServiceTest extends AbstractTestNGSpringContextTests {
+    
+    private final String TEST_FILE = "testDefaultSetting.properties";
     
     @Mock
     private PidRepository pidRepo_;
@@ -84,6 +96,73 @@ public class RepositoryServiceTest extends AbstractTestNGSpringContextTests {
     @Test
     public void testInitializeStoredSetting(){
         Assert.fail("unimplemented");
+    }
+    
+        /**
+     * Set all the keys' values in testDefaultSettings to default values to
+     * ensure that the values are being changed during the updatedChangedSetting
+     * tests.
+     *
+     * @throws Exception
+     */
+    @AfterTest
+    private void resetTestReadDefaultProperties() throws Exception {
+        DefaultSetting setting = readPropertiesFile(TEST_FILE);
+
+        Properties prop = new Properties();
+        ClassLoader loader = Thread.currentThread().getContextClassLoader();
+        URL url = loader.getResource(TEST_FILE);
+        File file = new File(url.toURI());
+        OutputStream output = new FileOutputStream(file);
+
+        // set the properties value
+        prop.setProperty("prepend", setting.getPrepend());
+        prop.setProperty("prefix", setting.getPrefix());
+        prop.setProperty("cacheSize", setting.getCacheSize() + "");
+        prop.setProperty("charMap", setting.getCharMap());
+        prop.setProperty("rootLength", setting.getRootLength() + "");
+        prop.setProperty("tokenType", setting.getTokenType() + "");
+        prop.setProperty("sansVowel", setting.isSansVowels() + "");
+        prop.setProperty("auto", setting.isAuto() + "");
+        prop.setProperty("random", setting.isRandom() + "");
+
+        // save and close
+        prop.store(output, "");
+        output.close();
+
+    }
+
+    /**
+     * Read a given properties file and return its values in the form of a
+     * DefaultSetting object
+     *
+     * @return DefaultSetting object with read values
+     * @throws IOException Thrown when the file cannot be found
+     */
+    private DefaultSetting readPropertiesFile(String filename) throws IOException {
+        Properties prop = new Properties();
+        ClassLoader loader = Thread.currentThread().getContextClassLoader();
+        InputStream input = loader.getResourceAsStream(filename);
+
+        DefaultSetting setting = new DefaultSetting();
+
+        // load a properties file
+        prop.load(input);
+
+        // get the property value, store it, and return it
+        setting.setPrepend(prop.getProperty("prepend"));
+        setting.setPrefix(prop.getProperty("prefix"));
+        setting.setCacheSize(Long.parseLong(prop.getProperty("cacheSize")));
+        setting.setCharMap(prop.getProperty("charMap"));
+        setting.setTokenType(Token.valueOf(prop.getProperty("tokenType")));
+        setting.setRootLength(Integer.parseInt(prop.getProperty("rootLength")));
+        setting.setSansVowels(Boolean.parseBoolean(prop.getProperty("sansVowel")));
+        setting.setAuto(Boolean.parseBoolean(prop.getProperty("auto")));
+        setting.setRandom(Boolean.parseBoolean(prop.getProperty("random")));
+
+        // close and return
+        input.close();
+        return setting;
     }
     
 
