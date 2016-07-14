@@ -79,11 +79,14 @@ public class WebAppIntegrationTest extends AbstractTestNGSpringContextTests {
     
     @Test(dependsOnMethods = {"testInsert"})
     public void testRetrieve() throws Exception {
+        // get the persited citation
         String path = "/Resolver/retrieve?purl=" + citation_.getPurl();
         MvcResult result = mockedContext_.perform(get(path))
                 .andExpect(status().isOk())
                 .andReturn();
         
+        
+        // assert equality
         String content = result.getResponse().getContentAsString();
         JSONObject object = new JSONObject(content);
         
@@ -92,6 +95,36 @@ public class WebAppIntegrationTest extends AbstractTestNGSpringContextTests {
         Assert.assertEquals(citation_.getErc(), object.get("erc") + "");
         Assert.assertEquals(citation_.getWho(), object.get("who") + "");
         Assert.assertEquals(citation_.getDate(), object.get("date") + "");
+    }
+    
+    @Test(dependsOnMethods = {"testRetrieve"})
+    public void testEdit() throws Exception {
+        // create a new url value
+        String newUrl = "newTestUrl";
+        
+        // edit the persisted citation's url
+        String editPath = String.format("/Resolver/edit?purl=%s&url=%s", 
+                citation_.getPurl(), newUrl);
+        mockedContext_.perform(get(editPath))
+                .andExpect(status().isOk())
+                .andReturn();
+        
+        // get the persisted citation
+        String retrievePath = "/Resolver/retrieve?purl=" + citation_.getPurl();
+        MvcResult result = mockedContext_.perform(get(retrievePath))
+                .andExpect(status().isOk())
+                .andReturn();
+        
+        
+        // assert equality
+        String content = result.getResponse().getContentAsString();
+        JSONObject object = new JSONObject(content);
+        
+        Assert.assertEquals(citation_.getPurl(), object.get("purl") + "");
+        Assert.assertEquals(newUrl, object.get("url") + "");
+        Assert.assertEquals(citation_.getErc(), object.get("erc") + "");
+        Assert.assertEquals(citation_.getWho(), object.get("who") + "");
+        Assert.assertEquals(citation_.getDate(), object.get("date") + "");        
     }
 
     private void initCitation() {
