@@ -43,7 +43,7 @@ import org.springframework.test.context.web.WebAppConfiguration;
 public class CacheServiceTest extends AbstractTestNGSpringContextTests {
     
     @Autowired
-    private CacheService service_;
-        
+    private CacheService service_;        
+       
 
 }
