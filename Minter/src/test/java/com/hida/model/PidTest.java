@@ -151,4 +151,20 @@ public class PidTest {
     public void testOrder(Pid previous, Pid next) {
         Assert.assertEquals(-1, previous.compareTo(next));
     }      
+    
+    public void testAll(String name, DefaultSetting setting) {
+        // universal tests
+        this.testPrepend(name, setting);
+        this.testPrefix(name, setting);
+        this.testRootLength(name, setting);
+        
+        // tests specific for isAuto
+        if (setting.isAuto()) {
+            this.testTokenType(name, setting);                        
+        }
+        else {
+            this.testCharMap(name, setting);
+        }
+                
+    }
 }

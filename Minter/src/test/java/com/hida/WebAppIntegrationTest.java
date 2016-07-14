@@ -21,6 +21,8 @@ import com.hida.model.DefaultSetting;
 import com.hida.model.PidTest;
 import com.hida.service.PropertiesLoaderService;
 import java.io.IOException;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.SpringApplicationConfiguration;
@@ -61,6 +63,8 @@ public class WebAppIntegrationTest extends AbstractTestNGSpringContextTests {
     private MockMvc mockedContext_;
 
     private DefaultSetting defaultSetting_;
+    
+    private final int AMOUNT = 10;
         
     
     @BeforeClass
@@ -71,13 +75,20 @@ public class WebAppIntegrationTest extends AbstractTestNGSpringContextTests {
 
     @Test
     public void testMint() throws Exception {
-        MvcResult result = mockedContext_.perform(get("/Minter/mint/10")
+        MvcResult result = mockedContext_.perform(get("/Minter/mint/" + AMOUNT)
                 .accept("application/json"))
                 .andExpect(status().isCreated())
                 .andReturn();
 
         String content = result.getResponse().getContentAsString();
-        Assert.assertEquals("", content);
+        JSONArray testJsonArray = new JSONArray(content);
+
+        // test the pid and ensure that they match the used setting
+        for (int i = 0; i < AMOUNT; i++) {
+            JSONObject object = testJsonArray.getJSONObject(i);
+            String name = object.getString("name");
+            pidTest_.testAll(name, defaultSetting_);
+        }
     }
     
     private void initDefaultSetting() throws IOException{
