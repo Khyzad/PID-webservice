@@ -127,6 +127,14 @@ public class WebAppIntegrationTest extends AbstractTestNGSpringContextTests {
             pidTest_.testAll(name, setting);
         }
     }
+        
+    @Test
+    public void testMintWithNegativeAmount() throws Exception {
+        mockedContext_.perform(get("/Minter/mint/" + -1)
+                .accept("application/json"))
+                .andExpect(status().is4xxClientError())
+                .andReturn();
+    }
     
     private void initDefaultSetting() throws IOException{
         defaultSetting_ = propertiesService_.readPropertiesFile(defaultSettingPath_);
