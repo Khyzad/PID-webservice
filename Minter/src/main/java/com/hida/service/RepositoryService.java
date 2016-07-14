@@ -113,6 +113,19 @@ public class RepositoryService {
     }
     
     /**
+     * Checks to see if a Pid already exists in the database.
+     *
+     * @param pid Pid to be checked
+     * @return Returns true if a Pid with the same doesn't exist, false
+     * otherwise
+     */
+    private boolean isValidPid(Pid pid) {
+        LOGGER.info("in isValidId");
+        Pid entity = this.pidRepo_.findOne(pid.getName());
+        return entity == null;
+    }
+    
+    /**
      * Continuously increments a set of ids until the set is completely filled
      * with unique ids.
      *
