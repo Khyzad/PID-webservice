@@ -281,6 +281,7 @@ public class MinterController {
      *
      * @return
      */
+    @ResponseStatus(code = HttpStatus.OK)
     @RequestMapping(value = {""}, method = {RequestMethod.GET})
     public String displayIndex() {
         return "";
