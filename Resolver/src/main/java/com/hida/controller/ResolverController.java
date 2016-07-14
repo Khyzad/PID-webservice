@@ -76,7 +76,7 @@ public class ResolverController {
         LOGGER.info("Retrieve was Called");
         // retrieve citation jsonString
         Citation citation = resolverService_.retrieveCitation(purl);
-
+                
         LOGGER.info("Retrieve returned: {}", citation);
         return citation;
     }

@@ -69,14 +69,14 @@ public class WebAppIntegrationTest extends AbstractTestNGSpringContextTests {
     public void testInsert() throws Exception {
         // initialize path
         String path = String.format("/Resolver/insert?"
-                + "purl=%s&url=%s&erc=%s&who=%s&what=%s&when=%s", citation_.getPurl(), 
+                + "purl=%s&url=%s&erc=%s&who=%s&what=%s&when=%s", citation_.getPurl(),
                 citation_.getUrl(), citation_.getErc(), citation_.getWho(), citation_.getWhat(),
                 citation_.getDate());
-        
+
         mockedContext_.perform(get(path))
                 .andExpect(status().isCreated());
     }
-    
+
     @Test(dependsOnMethods = {"testInsert"})
     public void testRetrieve() throws Exception {
         // get the persited citation
@@ -84,47 +84,58 @@ public class WebAppIntegrationTest extends AbstractTestNGSpringContextTests {
         MvcResult result = mockedContext_.perform(get(path))
                 .andExpect(status().isOk())
                 .andReturn();
-        
-        
+
         // assert equality
         String content = result.getResponse().getContentAsString();
         JSONObject object = new JSONObject(content);
-        
+
         Assert.assertEquals(citation_.getPurl(), object.get("purl") + "");
         Assert.assertEquals(citation_.getUrl(), object.get("url") + "");
         Assert.assertEquals(citation_.getErc(), object.get("erc") + "");
         Assert.assertEquals(citation_.getWho(), object.get("who") + "");
         Assert.assertEquals(citation_.getDate(), object.get("date") + "");
     }
-    
+
     @Test(dependsOnMethods = {"testRetrieve"})
     public void testEdit() throws Exception {
         // create a new url value
         String newUrl = "newTestUrl";
-        
+
         // edit the persisted citation's url
-        String editPath = String.format("/Resolver/edit?purl=%s&url=%s", 
+        String editPath = String.format("/Resolver/edit?purl=%s&url=%s",
                 citation_.getPurl(), newUrl);
         mockedContext_.perform(get(editPath))
                 .andExpect(status().isOk())
                 .andReturn();
-        
+
         // get the persisted citation
         String retrievePath = "/Resolver/retrieve?purl=" + citation_.getPurl();
         MvcResult result = mockedContext_.perform(get(retrievePath))
                 .andExpect(status().isOk())
                 .andReturn();
-        
-        
+
         // assert equality
         String content = result.getResponse().getContentAsString();
         JSONObject object = new JSONObject(content);
-        
+
         Assert.assertEquals(citation_.getPurl(), object.get("purl") + "");
         Assert.assertEquals(newUrl, object.get("url") + "");
         Assert.assertEquals(citation_.getErc(), object.get("erc") + "");
         Assert.assertEquals(citation_.getWho(), object.get("who") + "");
-        Assert.assertEquals(citation_.getDate(), object.get("date") + "");        
+        Assert.assertEquals(citation_.getDate(), object.get("date") + "");
+    }
+
+    @Test(dependsOnMethods = {"testEdit"})
+    public void testDelete() throws Exception {
+        // delete the persisted citation
+        String deletePath = "/Resolver/delete?purl=" + citation_.getPurl();
+        mockedContext_.perform(get(deletePath))
+                .andExpect(status().isNoContent());
+        
+        // get the persisted citation
+        String retrievePath = "/Resolver/retrieve?purl=" + citation_.getPurl();
+        mockedContext_.perform(get(retrievePath))
+                .andExpect(status().is4xxClientError());        
     }
 
     private void initCitation() {
