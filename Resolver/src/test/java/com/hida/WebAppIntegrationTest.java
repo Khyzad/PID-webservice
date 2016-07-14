@@ -27,6 +27,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
  * An integration test of the entire application to ensure functionality
@@ -48,5 +51,10 @@ public class WebAppIntegrationTest extends AbstractTestNGSpringContextTests {
         mockedContext_ = MockMvcBuilders.webAppContextSetup(webAppContext_).build();
     }
 
-    
+    @Test
+    public void testIndex() throws Exception {
+        mockedContext_.perform(get("/Resolver/"))
+                .andExpect(status().isOk());
+    }
+
 }
