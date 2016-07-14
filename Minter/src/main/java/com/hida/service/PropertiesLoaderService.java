@@ -26,15 +26,16 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
 import java.util.Properties;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 /**
+ * A service class that gives the ability to read or change the contents of a
+ * properties file.
  *
  * @author lruffin
  */
 @Service("propertiesLoaderService")
-public class PropertiesLoaderService {   
+public class PropertiesLoaderService {
 
     /**
      * Read a given properties file and return its values in the form of a
