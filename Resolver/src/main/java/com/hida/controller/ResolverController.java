@@ -72,11 +72,16 @@ public class ResolverController {
      */
     @ResponseStatus(code = HttpStatus.OK)
     @RequestMapping("/retrieve")
-    public Citation retrieve(@RequestParam(value = "purl", required = true) String purl) {
+    public Citation retrieve(@RequestParam(value = "purl", required = true) String purl) 
+            throws Exception {
         LOGGER.info("Retrieve was Called");
         // retrieve citation jsonString
         Citation citation = resolverService_.retrieveCitation(purl);
-                
+        
+        if(citation == null){
+            throw new Exception("");
+        }
+        
         LOGGER.info("Retrieve returned: {}", citation);
         return citation;
     }
