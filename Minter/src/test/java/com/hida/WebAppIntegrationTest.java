@@ -51,21 +51,21 @@ public class WebAppIntegrationTest extends AbstractTestNGSpringContextTests {
 
     @Autowired
     private WebApplicationContext webAppContext_;
-    
+
     @Autowired
     private PropertiesLoaderService propertiesService_;
-    
+
     private PidTest pidTest_ = new PidTest();
-    
+
     @Value("${defaultSetting.path}")
     private String defaultSettingPath_;
 
-    private MockMvc mockedContext_;   
-    
+    private MockMvc mockedContext_;
+
     private DefaultSetting defaultSetting_;
-    
-    private final int AMOUNT = 10;           
-    
+
+    private final int AMOUNT = 10;
+
     @BeforeClass
     public void setup() throws IOException {
         mockedContext_ = MockMvcBuilders.webAppContextSetup(webAppContext_).build();
@@ -89,8 +89,8 @@ public class WebAppIntegrationTest extends AbstractTestNGSpringContextTests {
             pidTest_.testAll(name, defaultSetting_);
         }
     }
-    
-    @Test 
+
+    @Test
     public void testMintWithDifferentParameters() throws Exception {
         // create different values and set up a path
         String prepend = "http://";
@@ -106,16 +106,16 @@ public class WebAppIntegrationTest extends AbstractTestNGSpringContextTests {
                 + "&tokenType=%s"
                 + "&rootLength=%d"
                 + "&sansVowel=%b"
-                + "&auto=%b",AMOUNT,prepend,prefix,charMap,token,rootLength,isAuto,sansVowel);
-        
+                + "&auto=%b", AMOUNT, prepend, prefix, charMap, token, rootLength, isAuto, sansVowel);
+
         // check /mint path
         MvcResult result = mockedContext_.perform(get(path)
                 .accept("application/json"))
                 .andExpect(status().isCreated())
-                .andReturn();       
-        
+                .andReturn();
+
         DefaultSetting setting = new DefaultSetting(prepend, prefix, defaultSetting_.getCacheSize(),
-        token, charMap, rootLength, sansVowel, isAuto, defaultSetting_.isRandom());
+                token, charMap, rootLength, sansVowel, isAuto, defaultSetting_.isRandom());
 
         String content = result.getResponse().getContentAsString();
         JSONArray testJsonArray = new JSONArray(content);
@@ -127,7 +127,7 @@ public class WebAppIntegrationTest extends AbstractTestNGSpringContextTests {
             pidTest_.testAll(name, setting);
         }
     }
-        
+
     @Test
     public void testMintWithNegativeAmount() throws Exception {
         mockedContext_.perform(get("/Minter/mint/" + -1)
@@ -135,7 +135,7 @@ public class WebAppIntegrationTest extends AbstractTestNGSpringContextTests {
                 .andExpect(status().is4xxClientError())
                 .andReturn();
     }
-    
+
     @Test
     public void testMintWithTooManyPermutations() throws Exception {
         mockedContext_.perform(get("/Minter/mint/" + 11)
@@ -143,8 +143,16 @@ public class WebAppIntegrationTest extends AbstractTestNGSpringContextTests {
                 .andExpect(status().is4xxClientError())
                 .andReturn();
     }
-    
-    private void initDefaultSetting() throws IOException{
+
+    @Test(dependsOnMethods = {"testMintWithDifferentParameters"})
+    public void testMintWithDuplicatePids() throws Exception {
+        mockedContext_.perform(get("/Minter/mint/" + 5)
+                .accept("application/json"))
+                .andExpect(status().is4xxClientError())
+                .andReturn();
+    }
+
+    private void initDefaultSetting() throws IOException {
         defaultSetting_ = propertiesService_.readPropertiesFile(defaultSettingPath_);
     }
 
