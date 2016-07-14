@@ -19,12 +19,16 @@ package com.hida;
 
 import com.hida.model.Citation;
 import java.io.IOException;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.junit.Assert;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.boot.test.WebIntegrationTest;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import org.testng.annotations.BeforeClass;
@@ -71,6 +75,23 @@ public class WebAppIntegrationTest extends AbstractTestNGSpringContextTests {
         
         mockedContext_.perform(get(path))
                 .andExpect(status().isCreated());
+    }
+    
+    @Test(dependsOnMethods = {"testInsert"})
+    public void testRetrieve() throws Exception {
+        String path = "/Resolver/retrieve?purl=" + citation_.getPurl();
+        MvcResult result = mockedContext_.perform(get(path))
+                .andExpect(status().isOk())
+                .andReturn();
+        
+        String content = result.getResponse().getContentAsString();
+        JSONObject object = new JSONObject(content);
+        
+        Assert.assertEquals(citation_.getPurl(), object.get("purl") + "");
+        Assert.assertEquals(citation_.getUrl(), object.get("url") + "");
+        Assert.assertEquals(citation_.getErc(), object.get("erc") + "");
+        Assert.assertEquals(citation_.getWho(), object.get("who") + "");
+        Assert.assertEquals(citation_.getDate(), object.get("date") + "");
     }
 
     private void initCitation() {
