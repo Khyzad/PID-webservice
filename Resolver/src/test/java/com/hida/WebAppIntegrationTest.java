@@ -71,13 +71,13 @@ public class WebAppIntegrationTest extends AbstractTestNGSpringContextTests {
         String path = String.format("/Resolver/insert?"
                 + "purl=%s&url=%s&erc=%s&who=%s&what=%s&when=%s", citation_.getPurl(),
                 citation_.getUrl(), citation_.getErc(), citation_.getWho(), citation_.getWhat(),
-                citation_.getDate());
+                citation_.getDate());              
 
         mockedContext_.perform(get(path))
-                .andExpect(status().isCreated());
+                .andExpect(status().isCreated());        
     }
 
-    @Test(dependsOnMethods = {"testInsert"})
+    @Test(dependsOnMethods = {"testInsert"}, priority = 2)
     public void testRetrieve() throws Exception {
         // get the persited citation
         String path = "/Resolver/retrieve?purl=" + citation_.getPurl();
@@ -136,6 +136,18 @@ public class WebAppIntegrationTest extends AbstractTestNGSpringContextTests {
         String retrievePath = "/Resolver/retrieve?purl=" + citation_.getPurl();
         mockedContext_.perform(get(retrievePath))
                 .andExpect(status().is4xxClientError());        
+    }
+    
+    @Test(dependsOnMethods = {"testInsert"}, priority = 1)
+    public void testDuplicateCitation() throws Exception{
+        // initialize path
+        String path = String.format("/Resolver/insert?"
+                + "purl=%s&url=%s&erc=%s&who=%s&what=%s&when=%s", citation_.getPurl(),
+                citation_.getUrl(), citation_.getErc(), citation_.getWho(), citation_.getWhat(),
+                citation_.getDate());              
+
+        mockedContext_.perform(get(path))
+                .andExpect(status().is4xxClientError()); 
     }
 
     private void initCitation() {
