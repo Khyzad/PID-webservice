@@ -18,14 +18,16 @@
 package com.hida.model;
 
 /**
+ * This Exception is to be thrown whenever Hibernate attempts to save a Citation
+ * with a pre-existing primary key
  *
  * @author lruffin
  */
 public class DuplicateCitationException extends Exception {
-    
+
     private String purl_;
 
-    public DuplicateCitationException(Citation citation){
+    public DuplicateCitationException(Citation citation) {
         purl_ = citation.getPurl();
     }
 
@@ -38,9 +40,9 @@ public class DuplicateCitationException extends Exception {
     public DuplicateCitationException(String msg) {
         super(msg);
     }
-    
+
     @Override
     public String getMessage() {
-        return String.format("The citation with the given purl \"%s\" does not exist", purl_);
+        return String.format("The citation with the given purl \"%s\" already exists", purl_);
     }
 }
