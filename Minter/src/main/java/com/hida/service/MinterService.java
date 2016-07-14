@@ -42,6 +42,7 @@ import java.util.LinkedHashSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -63,7 +64,8 @@ public class MinterService {
     /**
      * Default setting values stored in resources folder
      */
-    private String DefaultSettingPath = "DefaultSetting.properties";
+    @Value("${defaultSetting.path}")
+    private String DefaultSettingPath;// = "DefaultSetting.properties";
 
     @Autowired
     private PidRepository PidRepo;
@@ -164,7 +166,7 @@ public class MinterService {
         LOGGER.info("in mint");
 
         // store the desired setting values 
-        this.CurrentSetting = setting;        
+        this.CurrentSetting = setting;
 
         // create appropriate generator
         createGenerator();
@@ -395,7 +397,7 @@ public class MinterService {
         // record Default Setting values into properties file
         writeToPropertiesFile(DefaultSettingPath, newSetting);
     }
-        
+
     /**
      * Initializes the StoredSetting field by reading its value in the database.
      * If its null, then it is given initial values.
@@ -410,10 +412,10 @@ public class MinterService {
             DefaultSettingRepo.save(StoredSetting);
         }
     }
-    
-    public DefaultSetting getStoredSetting() {        
+
+    public DefaultSetting getStoredSetting() {
         return StoredSetting;
-    }   
+    }
 
     /**
      * Read a given properties file and return its values in the form of a
@@ -449,9 +451,9 @@ public class MinterService {
     }
 
     /**
-     * Writes to a given properties file, updating its key-value pairs using
-     * the values stored in the setting parameter. If the file does not exist it
-     * is created.
+     * Writes to a given properties file, updating its key-value pairs using the
+     * values stored in the setting parameter. If the file does not exist it is
+     * created.
      *
      * @param setting The setting whose value needs to be stored
      * @throws Exception
@@ -490,5 +492,5 @@ public class MinterService {
 
     public void setDefaultSettingPath(String DefaultSettingPath) {
         this.DefaultSettingPath = DefaultSettingPath;
-    }        
+    }
 }
