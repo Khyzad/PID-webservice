@@ -18,6 +18,7 @@
 package com.hida.service;
 
 import com.hida.model.DefaultSetting;
+import com.hida.model.IdGenerator;
 import com.hida.model.NotEnoughPermutationsException;
 import com.hida.model.Pid;
 import com.hida.repositories.DefaultSettingRepository;
@@ -49,6 +50,8 @@ public class RepositoryService {
 
     @Autowired
     private DefaultSettingRepository defaultSettingRepo_;
+    
+    IdGenerator generator_;
     
     /**
      * Logger; logfile to be stored in resource folder
