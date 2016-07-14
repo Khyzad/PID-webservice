@@ -43,18 +43,18 @@ import org.testng.Assert;
 public class WebAppIntegrationTest extends AbstractTestNGSpringContextTests {
 
     @Autowired
-    private WebApplicationContext webAppContext;
+    private WebApplicationContext webAppContext_;
 
-    private MockMvc MockedContext;
+    private MockMvc mockedContext_;
 
     @BeforeClass
     public void setup() {
-        MockedContext = MockMvcBuilders.webAppContextSetup(webAppContext).build();
+        mockedContext_ = MockMvcBuilders.webAppContextSetup(webAppContext_).build();
     }
 
     @Test
     public void testMint() throws Exception {
-        MvcResult result = MockedContext.perform(get("/Minter/mint/10")
+        MvcResult result = mockedContext_.perform(get("/Minter/mint/10")
                 .accept("application/json"))
                 .andExpect(status().isCreated())
                 .andReturn();
