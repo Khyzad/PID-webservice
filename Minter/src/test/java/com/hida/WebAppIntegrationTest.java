@@ -19,6 +19,7 @@ package com.hida;
 
 import com.hida.model.DefaultSetting;
 import com.hida.model.PidTest;
+import com.hida.model.Token;
 import com.hida.service.PropertiesLoaderService;
 import java.io.IOException;
 import org.json.JSONArray;
@@ -37,7 +38,6 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import org.testng.Assert;
 
 /**
  * An integration test of the entire application to ensure functionality
@@ -60,12 +60,11 @@ public class WebAppIntegrationTest extends AbstractTestNGSpringContextTests {
     @Value("${defaultSetting.path}")
     private String defaultSettingPath_;
 
-    private MockMvc mockedContext_;
-
+    private MockMvc mockedContext_;   
+    
     private DefaultSetting defaultSetting_;
     
-    private final int AMOUNT = 10;
-        
+    private final int AMOUNT = 10;           
     
     @BeforeClass
     public void setup() throws IOException {
@@ -88,6 +87,44 @@ public class WebAppIntegrationTest extends AbstractTestNGSpringContextTests {
             JSONObject object = testJsonArray.getJSONObject(i);
             String name = object.getString("name");
             pidTest_.testAll(name, defaultSetting_);
+        }
+    }
+    
+    @Test 
+    public void testMintWithDifferentParameters() throws Exception {
+        // create different values and set up a path
+        String prepend = "http://";
+        String prefix = "abc";
+        String charMap = "ul";
+        Token token = Token.LOWER_ALPHABET;
+        int rootLength = 2;
+        boolean isAuto = false;
+        boolean sansVowel = false;
+        String path = String.format("/Minter/mint/%d?prepend=%s"
+                + "&prefix=%s"
+                + "&charMap=%s"
+                + "&tokenType=%s"
+                + "&rootLength=%d"
+                + "&sansVowel=%b"
+                + "&auto=%b",AMOUNT,prepend,prefix,charMap,token,rootLength,isAuto,sansVowel);
+        
+        // check /mint path
+        MvcResult result = mockedContext_.perform(get(path)
+                .accept("application/json"))
+                .andExpect(status().isCreated())
+                .andReturn();       
+        
+        DefaultSetting setting = new DefaultSetting(prepend, prefix, defaultSetting_.getCacheSize(),
+        token, charMap, rootLength, sansVowel, isAuto, defaultSetting_.isRandom());
+
+        String content = result.getResponse().getContentAsString();
+        JSONArray testJsonArray = new JSONArray(content);
+
+        // test the pid and ensure that they match the used setting
+        for (int i = 0; i < AMOUNT; i++) {
+            JSONObject object = testJsonArray.getJSONObject(i);
+            String name = object.getString("name");
+            pidTest_.testAll(name, setting);
         }
     }
     
