@@ -60,8 +60,15 @@ public class ResolverService {
      * Inserts PURL into database
      *
      * @param citation Citation to insert into database
+     * @throws CitationDoesNotExistException Thrown when the citation with the
+     * given purl does not exist
      */
-    public void insertCitation(Citation citation) {
+    public void insertCitation(Citation citation) throws Exception {
+        // check to see if the citation already exists
+        Citation entity = citationRepo_.findOne(citation.getPurl()); 
+        if(entity != null){
+            throw new Exception("Cannot insert citation with purl");
+        }
         citationRepo_.save(citation);
     }
 
