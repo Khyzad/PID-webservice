@@ -18,6 +18,7 @@
 package com.hida;
 
 import com.hida.model.DefaultSetting;
+import com.hida.model.PidTest;
 import com.hida.service.PropertiesLoaderService;
 import java.io.IOException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,13 +52,16 @@ public class WebAppIntegrationTest extends AbstractTestNGSpringContextTests {
     
     @Autowired
     private PropertiesLoaderService propertiesService_;
+    
+    private PidTest pidTest_ = new PidTest();
+    
+    @Value("${defaultSetting.path}")
+    private String defaultSettingPath_;
 
     private MockMvc mockedContext_;
 
     private DefaultSetting defaultSetting_;
-    
-    @Value("${defaultSetting.path}")
-    private String defaultSettingPath_;
+        
     
     @BeforeClass
     public void setup() throws IOException {
