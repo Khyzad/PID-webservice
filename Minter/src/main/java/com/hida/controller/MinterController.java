@@ -253,6 +253,7 @@ public class MinterController {
      * @throws Exception
      */
     @RequestMapping(value = {"/administration"}, method = {RequestMethod.GET})
+    @ResponseStatus(code = HttpStatus.OK)
     public ModelAndView displayAdministrationPanel() throws Exception {
         ModelAndView model = new ModelAndView();
 
