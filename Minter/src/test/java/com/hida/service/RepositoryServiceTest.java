@@ -18,7 +18,12 @@
 package com.hida.service;
 
 import com.hida.configuration.RepositoryConfiguration;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.hida.repositories.DefaultSettingRepository;
+import com.hida.repositories.PidRepository;
+import com.hida.repositories.UsedSettingRepository;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.IntegrationTest;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.TestExecutionListeners;
@@ -27,6 +32,8 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
 import org.springframework.test.context.support.DirtiesContextTestExecutionListener;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.springframework.test.context.web.WebAppConfiguration;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 /**
  * A test class designed to test the functionality of RepositoryService
@@ -42,8 +49,42 @@ import org.springframework.test.context.web.WebAppConfiguration;
     DirtiesContextTestExecutionListener.class})
 public class RepositoryServiceTest extends AbstractTestNGSpringContextTests {
     
-    @Autowired
+    @Mock
+    private PidRepository pidRepo_;
+
+    @Mock
+    private UsedSettingRepository usedSettingRepo_;
+
+    @Mock
+    private DefaultSettingRepository defaultSettingRepo_;
+    
+    @InjectMocks
     private RepositoryService service_;        
-       
+    
+    @Test
+    public void testGeneratePids(){
+        Assert.fail("unimplemented");
+    }
+    
+    @Test
+    public void testGetRemainingPermutations(){
+        Assert.fail("unimplemented");
+    }
+    
+    @Test
+    public void testPersistPids(){
+        Assert.fail("unimplemented");
+    }
+    
+    @Test
+    public void testUpdateCurrentSetting(){
+        Assert.fail("unimplemented");
+    }
+    
+    @Test
+    public void testInitializeStoredSetting(){
+        Assert.fail("unimplemented");
+    }
+    
 
 }
