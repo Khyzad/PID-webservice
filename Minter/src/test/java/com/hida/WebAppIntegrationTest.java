@@ -151,6 +151,13 @@ public class WebAppIntegrationTest extends AbstractTestNGSpringContextTests {
                 .andExpect(status().is4xxClientError())
                 .andReturn();
     }
+    
+    @Test
+    public void testAdministration() throws Exception {
+        mockedContext_.perform(get("/Minter/administration"))
+                .andExpect(status().isOk())
+                .andReturn();
+    }
 
     private void initDefaultSetting() throws IOException {
         defaultSetting_ = propertiesService_.readPropertiesFile(defaultSettingPath_);
