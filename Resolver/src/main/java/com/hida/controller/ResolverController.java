@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 import com.hida.model.Citation;
+import com.hida.model.CitationDoesNotExistException;
 import com.hida.service.ResolverService;
 import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
@@ -95,11 +96,14 @@ public class ResolverController {
      * @param url The url that the desired Citation will have
      * @return ModelAndView Holds resulting Model and view information
      * @throws IOException Thrown by Jackson library
+     * @throws CitationDoesNotExistException Thrown when the citation with the
+     * given purl does not exist
      */
     @ResponseStatus(code = HttpStatus.OK)
     @RequestMapping("/edit")
     public String edit(@RequestParam(value = "purl", required = true) String purl,
-            @RequestParam(value = "url", required = true) String url) throws IOException {
+            @RequestParam(value = "url", required = true) String url) throws IOException, 
+            CitationDoesNotExistException {
         LOGGER.info("Edit was Called");
         // edit the purl and then retrieve its entire contents
         resolverService_.editUrl(purl, url);
@@ -150,11 +154,13 @@ public class ResolverController {
      * @param purl purl of desired deleted row
      * @return ModelAndView Holds resulting Model and view information
      * @throws IOException Thrown by Jackson library
+     * @throws CitationDoesNotExistException Thrown when the citation with the
+     * given purl does not exist
      */
     @ResponseStatus(code = HttpStatus.NO_CONTENT)
     @RequestMapping("/delete")
     public String delete(@RequestParam(value = "purl", required = true) String purl)
-            throws IOException {
+            throws IOException, CitationDoesNotExistException {
         LOGGER.info("Insert was Called");
 
         // delete Citation

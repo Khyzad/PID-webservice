@@ -19,6 +19,7 @@ package com.hida.service;
 
 import org.apache.log4j.Logger;
 import com.hida.model.Citation;
+import com.hida.model.CitationDoesNotExistException;
 import com.hida.repositories.CitationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -45,9 +46,11 @@ public class ResolverService {
      *
      * @param purl purlid of desired row
      * @return String
+     * @throws CitationDoesNotExistException Thrown when the citation with the
+     * given purl does not exist
      */
-    public String retrieveUrl(String purl) {
-        Citation entity = citationRepo_.findOne(purl);
+    public String retrieveUrl(String purl) throws CitationDoesNotExistException {
+        Citation entity = retrieveCitation(purl);
         String url = entity.getUrl();
 
         return url;
@@ -67,9 +70,11 @@ public class ResolverService {
      *
      * @param purl purlid of desired edited row
      * @param url url that desired row url will be changed to
+     * @throws CitationDoesNotExistException Thrown when the citation with the
+     * given purl does not exist
      */
-    public void editUrl(String purl, String url) {
-        Citation entity = citationRepo_.findOne(purl);
+    public void editUrl(String purl, String url) throws CitationDoesNotExistException {
+        Citation entity = retrieveCitation(purl);
         entity.setUrl(url);
     }
 
@@ -77,9 +82,16 @@ public class ResolverService {
      * Deletes db row with corresponding purlid
      *
      * @param purl purlid of desired deleted row
+     * @throws CitationDoesNotExistException Thrown when the citation with the
+     * given purl does not exist
      */
-    public void deleteCitation(String purl) {
-        Citation entity = citationRepo_.findOne(purl);
+    public void deleteCitation(String purl) throws CitationDoesNotExistException {
+        Citation entity = retrieveCitation(purl);
+
+        if (entity == null) {
+            throw new CitationDoesNotExistException(entity);
+        }
+
         citationRepo_.delete(entity);
     }
 
@@ -88,9 +100,15 @@ public class ResolverService {
      *
      * @param purl purlid of desired row that will become Citation
      * @return Citation
+     * @throws CitationDoesNotExistException Thrown when the citation with the
+     * given purl does not exist
      */
-    public Citation retrieveCitation(String purl) {
+    public Citation retrieveCitation(String purl) throws CitationDoesNotExistException {
         Citation entity = citationRepo_.findOne(purl);
+
+        if (entity == null) {
+            throw new CitationDoesNotExistException(entity);
+        }
 
         return entity;
     }
