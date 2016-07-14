@@ -21,11 +21,15 @@ import com.hida.repositories.DefaultSettingRepository;
 import com.hida.repositories.PidRepository;
 import com.hida.repositories.UsedSettingRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * A service that directly creates transactions with Hibernate
  * @author lruffin
  */
+@Service("minterService")
+@Transactional
 public class RepositoryService {
     
     @Autowired
