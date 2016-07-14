@@ -44,7 +44,7 @@ public class WebAppIntegrationTest extends AbstractTestNGSpringContextTests {
 
     @Autowired
     private WebApplicationContext webAppContext_;
-    
+
     private Citation citation_;
 
     private MockMvc mockedContext_;
@@ -60,13 +60,25 @@ public class WebAppIntegrationTest extends AbstractTestNGSpringContextTests {
         mockedContext_.perform(get("/Resolver/"))
                 .andExpect(status().isOk());
     }
-    
-    private void initCitation(){
-        citation_ = new Citation("testPurl", 
-                "testUrl", 
-                "testErc", 
-                "testWho", 
-                "testWhat", 
+
+    @Test
+    public void testInsert() throws Exception {
+        // initialize path
+        String path = String.format("/Resolver/insert?"
+                + "purl=%s&url=%s&erc=%s&who=%s&what=%s&when=%s", citation_.getPurl(), 
+                citation_.getUrl(), citation_.getErc(), citation_.getWho(), citation_.getWhat(),
+                citation_.getDate());
+        
+        mockedContext_.perform(get(path))
+                .andExpect(status().isCreated());
+    }
+
+    private void initCitation() {
+        citation_ = new Citation("testPurl",
+                "testUrl",
+                "testErc",
+                "testWho",
+                "testWhat",
                 "testDate");
     }
 }
