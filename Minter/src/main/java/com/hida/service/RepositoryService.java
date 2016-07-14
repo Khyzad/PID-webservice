@@ -18,12 +18,16 @@
 package com.hida.service;
 
 import com.hida.model.DefaultSetting;
+import com.hida.model.NotEnoughPermutationsException;
 import com.hida.model.Pid;
 import com.hida.repositories.DefaultSettingRepository;
 import com.hida.repositories.PidRepository;
 import com.hida.repositories.UsedSettingRepository;
 import java.io.IOException;
+import java.util.LinkedHashSet;
 import java.util.Set;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -45,6 +49,11 @@ public class RepositoryService {
 
     @Autowired
     private DefaultSettingRepository defaultSettingRepo_;
+    
+    /**
+     * Logger; logfile to be stored in resource folder
+     */
+    private static final Logger LOGGER = LoggerFactory.getLogger(RepositoryService.class);
 
     /**
      * Creates a set of Pids that are guaranteed to be disjoint from the set of
@@ -101,6 +110,53 @@ public class RepositoryService {
      */
     public void initializeStoredSetting() throws IOException {
         
+    }
+    
+    /**
+     * Continuously increments a set of ids until the set is completely filled
+     * with unique ids.
+     *
+     * @param set the set of ids
+     * @param order determines whether or not the ids will be ordered
+     * @param isAuto determines whether or not the ids are AutoId or CustomId
+     * @param amount the amount of ids to be created.
+     * @return A set of unique ids database.
+     */
+    private Set<Pid> rollPidSet(Set<Pid> set, long totalPermutations, long amount) {
+        LOGGER.info("in rollIdSet");
+        // Used to count the number of unique ids. Size methods aren't used because int is returned
+        long uniqueIdCounter = 0;
+
+        // Declares and initializes a list that holds unique values.          
+        Set<Pid> uniqueList = new LinkedHashSet<>();
+
+        // iterate through every id 
+        for (Pid currentId : set) {
+            // counts the number of times an id has been rejected
+            long counter = 0;
+
+            // continuously increments invalid or non-unique ids
+            while (!isValidPid(currentId) || uniqueList.contains(currentId)) {
+                /* 
+                 if counter exceeds totalPermutations, then id has iterated through every 
+                 possible permutation. Related format is updated as a quick look-up reference
+                 with the number of ids that were inadvertedly been created using other formats.
+                 NotEnoughPermutationsException is thrown stating remaining number of ids.
+                 */
+                if (counter > totalPermutations) {
+                    LOGGER.error("Total number of Permutations Exceeded: Total Permutation Count="
+                            + totalPermutations);
+                    throw new NotEnoughPermutationsException(uniqueIdCounter, amount);
+                }
+                generator_.incrementPid(currentId);
+                counter++;
+            }
+            // unique ids are added to list and uniqueIdCounter is incremented.
+            // Size methods aren't used because int is returned
+            uniqueIdCounter++;
+            uniqueList.add(currentId);
+        }
+        return uniqueList;
     }
 
 }

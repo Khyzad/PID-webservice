@@ -32,9 +32,15 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
 import java.util.Properties;
+import java.util.Set;
 import org.mockito.InjectMocks;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.anyInt;
 import org.mockito.Mock;
+import static org.mockito.Mockito.atLeast;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.IntegrationTest;
@@ -101,7 +107,32 @@ public class RepositoryServiceTest extends AbstractTestNGSpringContextTests {
 
     @Test
     public void testGeneratePids() {
-        Assert.fail("unimplemented");
+        // assume that any Pids created aren't already persisted 
+        when(pidRepo_.findOne(any(String.class))).thenReturn(null);
+
+        // assume the UsedSetting isn't persisted and pretend to persist it
+        when(usedSettingRepo_.findUsedSetting(any(String.class),
+                any(Token.class),
+                any(String.class),
+                anyInt(),
+                anyBoolean())).thenReturn(null);
+
+        when(usedSettingRepo_.save(any(UsedSetting.class))).thenReturn(null);
+
+        // retrieve a sample DefaultSetting entity
+        int actualAmount = 5;
+        Set<Pid> testSet = service_.generatePids(defaultSetting_, actualAmount);
+
+        // test behavior
+        Assert.assertEquals(actualAmount, testSet.size());
+        verify(pidRepo_, atLeast(actualAmount)).findOne(any(String.class));
+        verify(pidRepo_, atLeast(actualAmount)).save(any(Pid.class));
+        verify(usedSettingRepo_, atLeastOnce()).save(any(UsedSetting.class));
+        verify(usedSettingRepo_, atLeastOnce()).findUsedSetting(any(String.class),
+                any(Token.class),
+                any(String.class),
+                anyInt(),
+                anyBoolean());
     }
 
     @Test
