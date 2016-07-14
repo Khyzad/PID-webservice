@@ -19,7 +19,9 @@ package com.hida.service;
 
 import com.hida.configuration.RepositoryConfiguration;
 import com.hida.model.DefaultSetting;
+import com.hida.model.Pid;
 import com.hida.model.Token;
+import com.hida.model.UsedSetting;
 import com.hida.repositories.DefaultSettingRepository;
 import com.hida.repositories.PidRepository;
 import com.hida.repositories.UsedSettingRepository;
@@ -31,7 +33,9 @@ import java.io.OutputStream;
 import java.net.URL;
 import java.util.Properties;
 import org.mockito.InjectMocks;
+import static org.mockito.Matchers.any;
 import org.mockito.Mock;
+import static org.mockito.Mockito.when;
 import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.IntegrationTest;
 import org.springframework.boot.test.SpringApplicationConfiguration;
@@ -83,8 +87,16 @@ public class RepositoryServiceTest extends AbstractTestNGSpringContextTests {
      */
     @BeforeClass
     public void setUpClass() throws Exception {
+        // set up Mockito
         MockitoAnnotations.initMocks(this);
+        
+        // get default setting values from test properties file
         defaultSetting_ = this.readPropertiesFile(TEST_FILE);
+        
+        // return null when any repository attempts to save
+        when(pidRepo_.save(any(Pid.class))).thenReturn(null);
+        when(usedSettingRepo_.save(any(UsedSetting.class))).thenReturn(null);
+        when(defaultSettingRepo_.save(any(DefaultSetting.class))).thenReturn(null);
     }
 
     @Test
