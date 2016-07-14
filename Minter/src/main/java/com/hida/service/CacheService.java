@@ -17,6 +17,7 @@
  */
 package com.hida.service;
 
+import com.hida.model.DefaultSetting;
 import com.hida.model.Pid;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -32,16 +33,35 @@ import org.springframework.stereotype.Service;
  */
 @Service("cacheService")
 public class CacheService {
-    
+
     /**
      * Logger; logfile to be stored in resource folder
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(CacheService.class);
 
     /**
-     * A set to hold a cache of Pids 
+     * A set to hold a cache of Pids
      */
     private final Set<Pid> cache_ = new LinkedHashSet<>();
-    
-    
+
+    /**
+     * Generates the cache
+     *
+     * @param setting The setting values to base the Pids off of
+     */
+    public void generateCache(DefaultSetting setting) {
+
+    }
+
+    /**
+     * Retrieves the requested amount of Pids from the cache. Also removes the
+     * selected Pids from the cache.
+     *
+     * @param amount The amount of Pids
+     * @return A set containing the requested amount of Pids
+     */
+    public Set<Pid> collectCache(long amount) {
+        return null;
+    }
+
 }
