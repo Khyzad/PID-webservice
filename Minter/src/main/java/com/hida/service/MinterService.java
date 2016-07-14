@@ -306,6 +306,7 @@ public class MinterService {
 
         for (Pid pid : list) {
             PidRepo.save(pid);
+            pid.setName(CurrentSetting.getPrepend() + pid.getName());
         }
 
         LOGGER.info("DatabaseUpdated with new pids");
