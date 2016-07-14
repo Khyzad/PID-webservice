@@ -37,7 +37,7 @@ import org.springframework.transaction.annotation.Transactional;
  *
  * @author lruffin
  */
-@Service("minterService")
+@Service("repositoryService")
 @Transactional
 public class RepositoryService {
 
