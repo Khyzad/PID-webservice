@@ -17,7 +17,11 @@
  */
 package com.hida;
 
+import com.hida.model.DefaultSetting;
+import com.hida.service.PropertiesLoaderService;
+import java.io.IOException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.boot.test.WebIntegrationTest;
 import org.springframework.test.context.TestPropertySource;
@@ -44,12 +48,21 @@ public class WebAppIntegrationTest extends AbstractTestNGSpringContextTests {
 
     @Autowired
     private WebApplicationContext webAppContext_;
+    
+    @Autowired
+    private PropertiesLoaderService propertiesService_;
 
     private MockMvc mockedContext_;
 
+    private DefaultSetting defaultSetting_;
+    
+    @Value("${defaultSetting.path}")
+    private String defaultSettingPath_;
+    
     @BeforeClass
-    public void setup() {
+    public void setup() throws IOException {
         mockedContext_ = MockMvcBuilders.webAppContextSetup(webAppContext_).build();
+        initDefaultSetting();
     }
 
     @Test
@@ -61,6 +74,10 @@ public class WebAppIntegrationTest extends AbstractTestNGSpringContextTests {
 
         String content = result.getResponse().getContentAsString();
         Assert.assertEquals("", content);
+    }
+    
+    private void initDefaultSetting() throws IOException{
+        defaultSetting_ = propertiesService_.readPropertiesFile(defaultSettingPath_);
     }
 
 }
