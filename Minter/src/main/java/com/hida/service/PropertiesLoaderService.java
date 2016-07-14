@@ -34,13 +34,7 @@ import org.springframework.stereotype.Service;
  * @author lruffin
  */
 @Service("propertiesLoaderService")
-public class PropertiesLoaderService {
-
-    /**
-     * Default setting values stored in resources folder
-     */
-    @Value("${defaultSetting.path}")
-    private String DefaultSettingPath;
+public class PropertiesLoaderService {   
 
     /**
      * Read a given properties file and return its values in the form of a
