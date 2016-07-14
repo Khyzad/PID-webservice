@@ -126,13 +126,6 @@ public class RepositoryServiceTest extends AbstractTestNGSpringContextTests {
         // test behavior
         Assert.assertEquals(actualAmount, testSet.size());
         verify(pidRepo_, atLeast(actualAmount)).findOne(any(String.class));
-        verify(pidRepo_, atLeast(actualAmount)).save(any(Pid.class));
-        verify(usedSettingRepo_, atLeastOnce()).save(any(UsedSetting.class));
-        verify(usedSettingRepo_, atLeastOnce()).findUsedSetting(any(String.class),
-                any(Token.class),
-                any(String.class),
-                anyInt(),
-                anyBoolean());
     }
 
     @Test
