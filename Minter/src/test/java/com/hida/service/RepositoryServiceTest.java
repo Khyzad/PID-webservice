@@ -110,15 +110,6 @@ public class RepositoryServiceTest extends AbstractTestNGSpringContextTests {
         // assume that any Pids created aren't already persisted 
         when(pidRepo_.findOne(any(String.class))).thenReturn(null);
 
-        // assume the UsedSetting isn't persisted and pretend to persist it
-        when(usedSettingRepo_.findUsedSetting(any(String.class),
-                any(Token.class),
-                any(String.class),
-                anyInt(),
-                anyBoolean())).thenReturn(null);
-
-        when(usedSettingRepo_.save(any(UsedSetting.class))).thenReturn(null);
-
         // retrieve a sample DefaultSetting entity
         int actualAmount = 5;
         Set<Pid> testSet = service_.generatePids(defaultSetting_, actualAmount);
