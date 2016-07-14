@@ -17,6 +17,8 @@
  */
 package com.hida.service;
 
+import com.hida.model.AutoIdGenerator;
+import com.hida.model.CustomIdGenerator;
 import com.hida.model.DefaultSetting;
 import com.hida.model.IdGenerator;
 import com.hida.model.NotEnoughPermutationsException;
@@ -50,9 +52,9 @@ public class RepositoryService {
 
     @Autowired
     private DefaultSettingRepository defaultSettingRepo_;
-    
+
     IdGenerator generator_;
-    
+
     /**
      * Logger; logfile to be stored in resource folder
      */
@@ -60,19 +62,34 @@ public class RepositoryService {
 
     /**
      * Creates a set of Pids that are guaranteed to be disjoint from the set of
-     * Pids persisted in the database.
+     * Pids persisted in the database. If the current setting is random, have
+     * the generator return a random set, otherwise, have the generator return a
+     * sequential set
      *
      * @param setting The settings the Pids are based off of
      * @param amount The requested amount of Pids
      * @return A set of Pids
      */
     public Set<Pid> generatePids(DefaultSetting setting, long amount) {
-        return null;
+        Set<Pid> set;
+        generator_ = getGenerator(setting);
+        if (setting.isRandom()) {
+            set = generator_.randomMint(amount);
+        }
+        else {
+            set = generator_.sequentialMint(amount);
+        }
+
+        long total = generator_.getMaxPermutation();
+
+        // check ids and increment them appropriately
+        set = rollPidSet(set, total, amount);
+
+        return set;
     }
 
     /**
-     * Persists a set of Pids in the database. Also adds the Prepend to the 
-     * Pids
+     * Persists a set of Pids in the database. Also adds the Prepend to the Pids
      *
      * @param setting The settings the Pids are based off of
      * @param set A set of Pids
@@ -80,7 +97,7 @@ public class RepositoryService {
     public void persistPids(DefaultSetting setting, Set<Pid> set) {
 
     }
-    
+
     /**
      * Returns the difference between the total permutations and the amount of
      * Pids that were already created using the requested settings.
@@ -89,10 +106,10 @@ public class RepositoryService {
      * @param amount The requested amount of Pids
      * @return The amount of permutations remaining
      */
-    public long getRemainingPermutations(DefaultSetting setting, long amount){
+    public long getRemainingPermutations(DefaultSetting setting, long amount) {
         return -1;
     }
-    
+
     /**
      * Updates the CurrentDefaultSetting to match the values in the given
      * DefaultSetting.
@@ -102,9 +119,9 @@ public class RepositoryService {
      * @throws IOException Thrown when the file cannot be found
      */
     public void updateCurrentSetting(DefaultSetting newSetting) throws IOException {
-        
+
     }
-    
+
     /**
      * Initializes the storedSetting_ field by reading its value in the
      * database. If its null, then it is given initial values.
@@ -112,9 +129,9 @@ public class RepositoryService {
      * @throws IOException Thrown when the file cannot be found
      */
     public void initializeStoredSetting() throws IOException {
-        
+
     }
-    
+
     /**
      * Checks to see if a Pid already exists in the database.
      *
@@ -127,7 +144,7 @@ public class RepositoryService {
         Pid entity = this.pidRepo_.findOne(pid.getName());
         return entity == null;
     }
-    
+
     /**
      * Continuously increments a set of ids until the set is completely filled
      * with unique ids.
@@ -173,6 +190,24 @@ public class RepositoryService {
             uniqueList.add(currentId);
         }
         return uniqueList;
+    }
+
+    private IdGenerator getGenerator(DefaultSetting setting) {
+        LOGGER.info("in createGenerator");
+        if (setting.isAuto()) {
+            LOGGER.info("AutoGenerator created");
+            return new AutoIdGenerator(
+                    setting.getPrefix(),
+                    setting.getTokenType(),
+                    setting.getRootLength());
+        }
+        else {
+            LOGGER.info("CustomIdGenerator created");
+            return new CustomIdGenerator(
+                    setting.getPrefix(),
+                    setting.isSansVowels(),
+                    setting.getCharMap());
+        }
     }
 
 }
