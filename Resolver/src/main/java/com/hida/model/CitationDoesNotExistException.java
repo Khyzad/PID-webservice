@@ -18,7 +18,8 @@
 package com.hida.model;
 
 /**
- *
+ * This Exception is thrown whenever an attempt has been made to edit or delete
+ * a non-persisted Citation in the database
  * @author lruffin
  */
 public class CitationDoesNotExistException extends Exception {
