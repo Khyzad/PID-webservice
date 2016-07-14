@@ -47,7 +47,7 @@ import org.testng.annotations.Test;
 public class DefaultSettingRepositoryTest extends AbstractTestNGSpringContextTests {
 
     @Autowired
-    private DefaultSettingRepository DefaultSettingRepo;
+    private DefaultSettingRepository defaultSettingRepo_;
 
     /**
      * Tests to see if DefaultSettingDao can find an entity with an id of 1.
@@ -55,9 +55,9 @@ public class DefaultSettingRepositoryTest extends AbstractTestNGSpringContextTes
     @Test
     public void testSaveAndFind() {
         DefaultSetting sample = getSampleDefaultSetting();
-        DefaultSettingRepo.save(sample);
+        defaultSettingRepo_.save(sample);
 
-        DefaultSetting entity = DefaultSettingRepo.findCurrentDefaultSetting();
+        DefaultSetting entity = defaultSettingRepo_.findCurrentDefaultSetting();
         Assert.assertNotNull(entity);
     }
 

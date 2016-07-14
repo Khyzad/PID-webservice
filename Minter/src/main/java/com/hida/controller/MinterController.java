@@ -59,13 +59,13 @@ public class MinterController {
     /**
      * A fair lock used to synchronize access to the minter service.
      */
-    private static final ReentrantLock RequestLock = new ReentrantLock(true);
+    private static final ReentrantLock requestLock_ = new ReentrantLock(true);
 
     /**
      * The service to use to mint IDs.
      */
     @Autowired
-    private MinterService MinterService;
+    private MinterService minterService_;
 
     /**
      * Using values sent from the /administration end point, this method updates
@@ -108,10 +108,10 @@ public class MinterController {
             throws Exception {
 
         // prevents other clients from accessing the database whenever the form is submitted            
-        RequestLock.lock();
+        requestLock_.lock();
         try {
 
-            DefaultSetting oldSetting = MinterService.getStoredSetting();
+            DefaultSetting oldSetting = minterService_.getStoredSetting();
             DefaultSetting newSetting;
 
             LOGGER.info("in handleForm");
@@ -190,11 +190,11 @@ public class MinterController {
                         random);
             }
 
-            MinterService.updateCurrentSetting(newSetting);
+            minterService_.updateCurrentSetting(newSetting);
         }
         finally {
             // unlocks RequestLock and gives access to longest waiting thread            
-            RequestLock.unlock();
+            requestLock_.unlock();
             LOGGER.warn("Request to update default settings finished, UNLOCKING MINTER");
         }
 
@@ -220,7 +220,7 @@ public class MinterController {
             @RequestParam Map<String, String> parameters) throws Exception {
 
         // ensure that only one thread access the minter at any given time
-        RequestLock.lock();
+        requestLock_.lock();
 
         Set<Pid> pidSet;
         try {
@@ -231,14 +231,14 @@ public class MinterController {
 
             // override default settings where applicable
             DefaultSetting tempSetting = overrideDefaultSetting(parameters,
-                    MinterService.getStoredSetting());
+                    minterService_.getStoredSetting());
 
             // create the set of ids
-            pidSet = MinterService.mint(requestedAmount, tempSetting);
+            pidSet = minterService_.mint(requestedAmount, tempSetting);
         }
         finally {
             // unlocks RequestLock and gives access to longest waiting thread            
-            RequestLock.unlock();
+            requestLock_.unlock();
             LOGGER.info("Request to Minter Finished, UNLOCKING MINTER");
         }
 
@@ -258,7 +258,7 @@ public class MinterController {
         ModelAndView model = new ModelAndView();
 
         // retrieve default values stored in the database
-        DefaultSetting defaultSetting = MinterService.getStoredSetting();
+        DefaultSetting defaultSetting = minterService_.getStoredSetting();
 
         // add the values to the settings page so that they can be displayed 
         LOGGER.info("index page called");

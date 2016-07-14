@@ -17,7 +17,6 @@
  */
 package com.hida.configuration;
 
-import com.hida.model.DefaultSetting;
 import com.hida.service.MinterService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,7 +35,7 @@ import org.springframework.stereotype.Component;
 public class ContextRefreshedListener implements ApplicationListener<ContextRefreshedEvent> {
 
     @Autowired
-    MinterService Service;
+    MinterService service_;
 
     /* 
      * Logger; logfile to be stored in resource folder    
@@ -46,9 +45,9 @@ public class ContextRefreshedListener implements ApplicationListener<ContextRefr
     @Override
     public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent) {
         try {
-            Service.initializeStoredSetting();
+            service_.initializeStoredSetting();
 
-            Service.generateCache();
+            service_.generateCache();
         }
         catch (Exception exception) {
             LOGGER.error("Exception caught during context refresh", exception);

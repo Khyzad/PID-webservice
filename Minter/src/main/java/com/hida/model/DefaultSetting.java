@@ -34,16 +34,16 @@ import javax.persistence.Table;
 public class DefaultSetting extends Setting {
 
     @Column(name = "PREPEND", nullable = false)
-    private String Prepend;
+    private String prepend_;
 
     @Column(name = "ISAUTO")
-    private boolean Auto;
+    private boolean auto_;
 
     @Column(name = "ISRANDOM")
-    private boolean Random;
+    private boolean random_;
 
     @Column(name = "CACHESIZE")
-    private long CacheSize;
+    private long cacheSize_;
 
     /**
      * Constructor used to create a DefaultSetting entity
@@ -64,10 +64,10 @@ public class DefaultSetting extends Setting {
     public DefaultSetting(String Prepend, String Prefix, long CacheSize, Token TokenType,
             String CharMap, int RootLength, boolean SansVowels, boolean Auto, boolean Random) {
         super(Prefix, TokenType, CharMap, RootLength, SansVowels);
-        this.Prepend = Prepend;
-        this.CacheSize = CacheSize;
-        this.Auto = Auto;
-        this.Random = Random;
+        this.prepend_ = Prepend;
+        this.cacheSize_ = CacheSize;
+        this.auto_ = Auto;
+        this.random_ = Random;
 
     }
 
@@ -110,34 +110,34 @@ public class DefaultSetting extends Setting {
     }
 
     public String getPrepend() {
-        return this.Prepend;
+        return this.prepend_;
     }
 
     public void setPrepend(String prepend) {
-        this.Prepend = prepend;
+        this.prepend_ = prepend;
     }
 
     public boolean isAuto() {
-        return Auto;
+        return auto_;
     }
 
     public void setAuto(boolean Auto) {
-        this.Auto = Auto;
+        this.auto_ = Auto;
     }
 
     public boolean isRandom() {
-        return Random;
+        return random_;
     }
 
     public void setRandom(boolean Random) {
-        this.Random = Random;
+        this.random_ = Random;
     }
 
     public long getCacheSize() {
-        return CacheSize;
+        return cacheSize_;
     }
 
     public void setCacheSize(long CacheSize) {
-        this.CacheSize = CacheSize;
+        this.cacheSize_ = CacheSize;
     }
 }
