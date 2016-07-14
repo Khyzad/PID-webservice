@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 import com.hida.model.Citation;
 import com.hida.model.CitationDoesNotExistException;
+import com.hida.model.DuplicateCitationException;
 import com.hida.service.ResolverService;
 import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
@@ -126,6 +127,8 @@ public class ResolverController {
      * @param when when to be insertd
      * @return ModelAndView Holds resulting Model and view information
      * @throws IOException Thrown by Jackson library
+     * @throws DuplicateCitationException Thrown when another citation with the
+     * given purl already exists in the database
      */
     @ResponseStatus(code = HttpStatus.CREATED)
     @RequestMapping("/insert")
@@ -135,7 +138,7 @@ public class ResolverController {
             @RequestParam(value = "who", required = true) String who,
             @RequestParam(value = "what", required = true) String what,
             @RequestParam(value = "when", required = true) String when
-    ) throws IOException {
+    ) throws IOException, DuplicateCitationException {
         LOGGER.info("Insert was Called");
         // create purl jsonString to store information
         Citation citation = new Citation(purl, url, erc, who, what, when);

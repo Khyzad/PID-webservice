@@ -20,6 +20,7 @@ package com.hida.service;
 import org.apache.log4j.Logger;
 import com.hida.model.Citation;
 import com.hida.model.CitationDoesNotExistException;
+import com.hida.model.DuplicateCitationException;
 import com.hida.repositories.CitationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -60,14 +61,14 @@ public class ResolverService {
      * Inserts PURL into database
      *
      * @param citation Citation to insert into database
-     * @throws CitationDoesNotExistException Thrown when the citation with the
-     * given purl does not exist
+     * @throws DuplicateCitationException Thrown when another citation with the
+     * given purl already exists in the database
      */
-    public void insertCitation(Citation citation) throws Exception {
+    public void insertCitation(Citation citation) throws DuplicateCitationException {
         // check to see if the citation already exists
         Citation entity = citationRepo_.findOne(citation.getPurl()); 
         if(entity != null){
-            throw new Exception("Cannot insert citation with purl");
+            throw new DuplicateCitationException("Cannot insert citation with purl");
         }
         citationRepo_.save(citation);
     }
