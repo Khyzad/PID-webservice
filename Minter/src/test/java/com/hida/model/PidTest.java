@@ -45,7 +45,7 @@ public class PidTest {
      * @param setting The desired setting used to create a Pid
      */
     public void testPrefix(String name, Setting setting) {
-        String prefix = setting.getPrefix();
+        String prefix = setting.getPrefix();        
 
         Assert.assertTrue(name + ", testing prefix: " + prefix, name.startsWith(prefix));
     }
@@ -155,6 +155,11 @@ public class PidTest {
     public void testAll(String name, DefaultSetting setting) {
         // universal tests
         this.testPrepend(name, setting);
+        
+        // remove prepend from name
+        int prependLength = setting.getPrepend().length();
+        name = name.substring(prependLength);
+        
         this.testPrefix(name, setting);
         this.testRootLength(name, setting);
         
