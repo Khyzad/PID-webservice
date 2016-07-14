@@ -17,6 +17,7 @@
  */
 package com.hida;
 
+import com.hida.model.Citation;
 import java.io.IOException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
@@ -43,12 +44,15 @@ public class WebAppIntegrationTest extends AbstractTestNGSpringContextTests {
 
     @Autowired
     private WebApplicationContext webAppContext_;
+    
+    private Citation citation_;
 
     private MockMvc mockedContext_;
 
     @BeforeClass
     public void setup() throws IOException {
         mockedContext_ = MockMvcBuilders.webAppContextSetup(webAppContext_).build();
+        initCitation();
     }
 
     @Test
@@ -56,5 +60,13 @@ public class WebAppIntegrationTest extends AbstractTestNGSpringContextTests {
         mockedContext_.perform(get("/Resolver/"))
                 .andExpect(status().isOk());
     }
-
+    
+    private void initCitation(){
+        citation_ = new Citation("testPurl", 
+                "testUrl", 
+                "testErc", 
+                "testWho", 
+                "testWhat", 
+                "testDate");
+    }
 }
