@@ -59,9 +59,9 @@ import org.testng.annotations.Test;
     DependencyInjectionTestExecutionListener.class,
     DirtiesContextTestExecutionListener.class})
 public class RepositoryServiceTest extends AbstractTestNGSpringContextTests {
-    
+
     private final String TEST_FILE = "testDefaultSetting.properties";
-    
+
     @Mock
     private PidRepository pidRepo_;
 
@@ -70,10 +70,12 @@ public class RepositoryServiceTest extends AbstractTestNGSpringContextTests {
 
     @Mock
     private DefaultSettingRepository defaultSettingRepo_;
-    
+
     @InjectMocks
-    private RepositoryService service_;      
+    private RepositoryService service_;
     
+    private DefaultSetting defaultSetting_;
+
     /**
      * Sets up Mockito
      *
@@ -82,35 +84,35 @@ public class RepositoryServiceTest extends AbstractTestNGSpringContextTests {
     @BeforeClass
     public void setUpClass() throws Exception {
         MockitoAnnotations.initMocks(this);
-        
+        defaultSetting_ = this.readPropertiesFile(TEST_FILE);
     }
-    
+
     @Test
-    public void testGeneratePids(){
+    public void testGeneratePids() {
         Assert.fail("unimplemented");
     }
-    
+
     @Test
-    public void testGetRemainingPermutations(){
+    public void testGetRemainingPermutations() {
         Assert.fail("unimplemented");
     }
-    
+
     @Test
-    public void testPersistPids(){
+    public void testPersistPids() {
         Assert.fail("unimplemented");
     }
-    
+
     @Test
-    public void testUpdateCurrentSetting(){
+    public void testUpdateCurrentSetting() {
         Assert.fail("unimplemented");
     }
-    
+
     @Test
-    public void testInitializeStoredSetting(){
+    public void testInitializeStoredSetting() {
         Assert.fail("unimplemented");
     }
-    
-        /**
+
+    /**
      * Set all the keys' values in testDefaultSettings to default values to
      * ensure that the values are being changed during the updatedChangedSetting
      * tests.
@@ -176,6 +178,6 @@ public class RepositoryServiceTest extends AbstractTestNGSpringContextTests {
         input.close();
         return setting;
     }
-    
+   
 
 }
