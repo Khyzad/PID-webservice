@@ -126,6 +126,11 @@ public class RepositoryService {
     public void persistPids(DefaultSetting setting, Set<Pid> set) {
 
     }
+    
+    public long getMaxPermutation(DefaultSetting setting){
+        generator_ = this.getGenerator(setting);
+        return generator_.getMaxPermutation();
+    }
 
     /**
      * Returns the difference between the total permutations and the amount of
