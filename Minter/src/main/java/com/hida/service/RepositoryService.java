@@ -71,6 +71,7 @@ public class RepositoryService {
      * @return A set of Pids
      */
     public Set<Pid> generatePids(DefaultSetting setting, long amount) {
+        // create a generator
         Set<Pid> set;
         generator_ = getGenerator(setting);
         if (setting.isRandom()) {
@@ -80,6 +81,34 @@ public class RepositoryService {
             set = generator_.sequentialMint(amount);
         }
 
+        // calculat maximum permutations
+        long total = generator_.getMaxPermutation();
+
+        // check ids and increment them appropriately
+        set = rollPidSet(set, total, amount);
+
+        return set;
+    }
+
+    /**
+     * Creates a set of Pids at a starting value that are guaranteed to be
+     * disjoint from the set of Pids persisted in the database. If the current
+     * setting is random, have the generator return a random set, otherwise,
+     * have the generator return a sequential set
+     *
+     * @param setting The settings the Pids are based off of
+     * @param amount The requested amount of Pids
+     * @param startingValue The value to start at
+     * @return A set of Pids
+     */
+    public Set<Pid> generatePids(DefaultSetting setting, long amount, long startingValue) {
+        // create a generator
+        generator_ = getGenerator(setting);
+
+        // generate a set of Pids at an arbitrary starting value
+        Set<Pid> set = generator_.sequentialMint(amount, startingValue);
+
+        // calculat maximum permutations
         long total = generator_.getMaxPermutation();
 
         // check ids and increment them appropriately
