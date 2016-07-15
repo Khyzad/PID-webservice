@@ -143,6 +143,32 @@ public class RepositoryServiceTest extends AbstractTestNGSpringContextTests {
             pidTest_.testOrder(pid1, pid2);
         }
     }
+    
+    @Test
+    public void testGeneratePidsWithRollOver(){
+        // pretend to persist all od 
+        int amount = 5;
+        for(int i = 0; i < amount; i++){
+            when(pidRepo_.findOne((2*i + 1 ) + "")).thenReturn(new Pid());
+        }
+        
+        // generate the set of Pids
+        Set<Pid> testSet = service_.generatePids(defaultSetting_, amount);
+        
+        // test behavior
+        Assert.assertEquals(amount, testSet.size());
+        verify(pidRepo_, atLeast(amount)).findOne(any(String.class));
+        
+        // check to see that only Pids with even names are contained
+        Iterator<Pid> iter = testSet.iterator();
+        while(iter.hasNext()){
+            Pid pid = iter.next();
+            
+            boolean isEven = Integer.parseInt(pid.getName()) % 2 == 0;
+            Assert.assertEquals(isEven, true, String.format("%s did not rollover", pid));
+            
+        }        
+    }
 
     @Test
     public void testGetRemainingPermutations() {
