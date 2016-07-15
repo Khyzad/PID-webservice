@@ -169,6 +169,20 @@ public class RepositoryServiceTest extends AbstractTestNGSpringContextTests {
             
         }        
     }
+        
+    @Test
+    public void testGeneratePidsWithWrapAround(){
+        // pretend to persist all od 
+        int amount = 10;
+        when(pidRepo_.findOne(any(String.class))).thenReturn(null);
+        
+        // generate the set of Pids
+        Set<Pid> testSet = service_.generatePids(defaultSetting_, amount, 5);
+        
+        // test behavior and ensure that the set contains the desired amonut
+        Assert.assertEquals(amount, testSet.size());
+        verify(pidRepo_, atLeast(amount)).findOne(any(String.class));              
+    }
 
     @Test
     public void testGetRemainingPermutations() {
