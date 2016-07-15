@@ -20,6 +20,7 @@ package com.hida.service;
 import com.hida.configuration.RepositoryConfiguration;
 import com.hida.model.DefaultSetting;
 import com.hida.model.Pid;
+import com.hida.model.PidTest;
 import com.hida.model.Token;
 import com.hida.model.UsedSetting;
 import com.hida.repositories.DefaultSettingRepository;
@@ -31,6 +32,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
+import java.util.Iterator;
 import java.util.Properties;
 import java.util.Set;
 import org.mockito.InjectMocks;
@@ -85,6 +87,8 @@ public class RepositoryServiceTest extends AbstractTestNGSpringContextTests {
     private RepositoryService service_;
     
     private DefaultSetting defaultSetting_;
+    
+    private PidTest pidTest_ = new PidTest();
 
     /**
      * Sets up Mockito
@@ -117,6 +121,27 @@ public class RepositoryServiceTest extends AbstractTestNGSpringContextTests {
         // test behavior
         Assert.assertEquals(actualAmount, testSet.size());
         verify(pidRepo_, atLeast(actualAmount)).findOne(any(String.class));
+    }
+    
+    @Test
+    public void testGeneratePidsWithStartingValue() {
+        // assume that any Pids created aren't already persisted 
+        when(pidRepo_.findOne(any(String.class))).thenReturn(null);
+
+        // retrieve a sample DefaultSetting entity
+        int actualAmount = 4;
+        Set<Pid> testSet = service_.generatePids(defaultSetting_, actualAmount, 5);
+
+        // test behavior                
+        Assert.assertEquals(actualAmount, testSet.size());
+        verify(pidRepo_, atLeast(actualAmount)).findOne(any(String.class));
+        
+        Iterator<Pid> iter = testSet.iterator();
+        while(iter.hasNext()){
+            Pid pid1 = iter.next();
+            Pid pid2 = iter.next();
+            pidTest_.testOrder(pid1, pid2);
+        }
     }
 
     @Test
