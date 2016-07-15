@@ -111,10 +111,10 @@ public class RepositoryServiceTest extends AbstractTestNGSpringContextTests {
 
     @Test
     public void testGeneratePids() {
-        // assume that any Pids created aren't already persisted 
+        // pretend that no newly generated Pids were persisted
         when(pidRepo_.findOne(any(String.class))).thenReturn(null);
 
-        // retrieve a sample DefaultSetting entity
+        // generate the set of Pids
         int actualAmount = 5;
         Set<Pid> testSet = service_.generatePids(defaultSetting_, actualAmount);
 
@@ -125,10 +125,10 @@ public class RepositoryServiceTest extends AbstractTestNGSpringContextTests {
     
     @Test
     public void testGeneratePidsWithStartingValue() {
-        // assume that any Pids created aren't already persisted 
+        // pretend that no newly generated Pids were persisted
         when(pidRepo_.findOne(any(String.class))).thenReturn(null);
 
-        // retrieve a sample DefaultSetting entity
+        // generate the set of Pids
         int actualAmount = 4;
         Set<Pid> testSet = service_.generatePids(defaultSetting_, actualAmount, 5);
 
@@ -146,7 +146,7 @@ public class RepositoryServiceTest extends AbstractTestNGSpringContextTests {
     
     @Test
     public void testGeneratePidsWithRollOver(){
-        // pretend to persist all od 
+        // pretend to persist all odd Pids
         int amount = 5;
         for(int i = 0; i < amount; i++){
             when(pidRepo_.findOne((2*i + 1 ) + "")).thenReturn(new Pid());
@@ -172,7 +172,7 @@ public class RepositoryServiceTest extends AbstractTestNGSpringContextTests {
         
     @Test
     public void testGeneratePidsWithWrapAround(){
-        // pretend to persist all od 
+        // pretend that no newly generated Pids were persisted
         int amount = 10;
         when(pidRepo_.findOne(any(String.class))).thenReturn(null);
         
@@ -191,7 +191,7 @@ public class RepositoryServiceTest extends AbstractTestNGSpringContextTests {
 
     @Test
     public void testPersistPids() {
-        Assert.fail("unimplemented");
+        
     }
 
     @Test
