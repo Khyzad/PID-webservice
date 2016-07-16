@@ -33,6 +33,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.Properties;
 import java.util.Set;
 import org.mockito.InjectMocks;
@@ -42,6 +43,7 @@ import static org.mockito.Matchers.anyInt;
 import org.mockito.Mock;
 import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.mockito.MockitoAnnotations;
@@ -85,9 +87,9 @@ public class RepositoryServiceTest extends AbstractTestNGSpringContextTests {
 
     @InjectMocks
     private RepositoryService service_;
-    
+
     private DefaultSetting defaultSetting_;
-    
+
     private PidTest pidTest_ = new PidTest();
 
     /**
@@ -99,10 +101,10 @@ public class RepositoryServiceTest extends AbstractTestNGSpringContextTests {
     public void setUpClass() throws Exception {
         // set up Mockito
         MockitoAnnotations.initMocks(this);
-        
+
         // get default setting values from test properties file
         defaultSetting_ = this.readPropertiesFile(TEST_FILE);
-        
+
         // return null when any repository attempts to save
         when(pidRepo_.save(any(Pid.class))).thenReturn(null);
         when(usedSettingRepo_.save(any(UsedSetting.class))).thenReturn(null);
@@ -122,7 +124,7 @@ public class RepositoryServiceTest extends AbstractTestNGSpringContextTests {
         Assert.assertEquals(actualAmount, testSet.size());
         verify(pidRepo_, atLeast(actualAmount)).findOne(any(String.class));
     }
-    
+
     @Test
     public void testGeneratePidsWithStartingValue() {
         // pretend that no newly generated Pids were persisted
@@ -135,53 +137,53 @@ public class RepositoryServiceTest extends AbstractTestNGSpringContextTests {
         // test behavior                
         Assert.assertEquals(actualAmount, testSet.size());
         verify(pidRepo_, atLeast(actualAmount)).findOne(any(String.class));
-        
+
         Iterator<Pid> iter = testSet.iterator();
-        while(iter.hasNext()){
+        while (iter.hasNext()) {
             Pid pid1 = iter.next();
             Pid pid2 = iter.next();
             pidTest_.testOrder(pid1, pid2);
         }
     }
-    
+
     @Test
-    public void testGeneratePidsWithRollOver(){
+    public void testGeneratePidsWithRollOver() {
         // pretend to persist all odd Pids
         int amount = 5;
-        for(int i = 0; i < amount; i++){
-            when(pidRepo_.findOne((2*i + 1 ) + "")).thenReturn(new Pid());
+        for (int i = 0; i < amount; i++) {
+            when(pidRepo_.findOne((2 * i + 1) + "")).thenReturn(new Pid());
         }
-        
+
         // generate the set of Pids
         Set<Pid> testSet = service_.generatePids(defaultSetting_, amount);
-        
+
         // test behavior
         Assert.assertEquals(amount, testSet.size());
         verify(pidRepo_, atLeast(amount)).findOne(any(String.class));
-        
+
         // check to see that only Pids with even names are contained
         Iterator<Pid> iter = testSet.iterator();
-        while(iter.hasNext()){
+        while (iter.hasNext()) {
             Pid pid = iter.next();
-            
+
             boolean isEven = Integer.parseInt(pid.getName()) % 2 == 0;
             Assert.assertEquals(isEven, true, String.format("%s did not rollover", pid));
-            
-        }        
+
+        }
     }
-        
+
     @Test
-    public void testGeneratePidsWithWrapAround(){
+    public void testGeneratePidsWithWrapAround() {
         // pretend that no newly generated Pids were persisted
         int amount = 10;
         when(pidRepo_.findOne(any(String.class))).thenReturn(null);
-        
+
         // generate the set of Pids
         Set<Pid> testSet = service_.generatePids(defaultSetting_, amount, 5);
-        
+
         // test behavior and ensure that the set contains the desired amonut
         Assert.assertEquals(amount, testSet.size());
-        verify(pidRepo_, atLeast(amount)).findOne(any(String.class));              
+        verify(pidRepo_, atLeast(amount)).findOne(any(String.class));
     }
 
     @Test
@@ -190,8 +192,48 @@ public class RepositoryServiceTest extends AbstractTestNGSpringContextTests {
     }
 
     @Test
-    public void testPersistPids() {
+    public void testPersistPidsWithNewUsedSettings() {
+        // create two identical sets to represent before and after persistPids is called
+        Set<Pid> oldSet = getSamplePidSet();
+        Set<Pid> set = getSamplePidSet();
         
+        // assume the UsedSetting isn't persisted and pretend to persist it
+        when(usedSettingRepo_.findUsedSetting(any(String.class),
+                any(Token.class),
+                any(String.class),
+                anyInt(),
+                anyBoolean())).thenReturn(null);
+
+        // copy defaultSetting_ and change the prepend to something other than empty string
+        String prepend = "http://";
+        DefaultSetting setting = new DefaultSetting(defaultSetting_);
+        setting.setPrepend(prepend);
+        service_.persistPids(setting, set, set.size());                
+
+        // ensure that the size is still the same
+        Assert.assertEquals(set.size(), oldSet.size());
+
+        // ensure that save was called exactly size of set times
+        verify(pidRepo_, times(oldSet.size())).save(any(Pid.class));
+        
+        // ensure that usedSettingRepo_.find was called once
+        verify(usedSettingRepo_, times(1)).findUsedSetting(any(String.class),
+                any(Token.class),
+                any(String.class),
+                anyInt(),
+                anyBoolean());
+        
+        verify(usedSettingRepo_, times(1)).save(any(UsedSetting.class));
+
+        // ensure that prepend was added to the front of the name
+        Iterator<Pid> newIter = set.iterator();
+        Iterator<Pid> oldIter = oldSet.iterator();
+        while (newIter.hasNext()) {
+            Pid newPid = newIter.next();
+            Pid oldPid = oldIter.next();
+            Assert.assertEquals(newPid.getName().startsWith(prepend), true);
+            Assert.assertEquals(newPid.getName().substring(prepend.length()), oldPid.getName());
+        }
     }
 
     @Test
@@ -202,6 +244,14 @@ public class RepositoryServiceTest extends AbstractTestNGSpringContextTests {
     @Test
     public void testInitializeStoredSetting() {
         Assert.fail("unimplemented");
+    }
+
+    private Set<Pid> getSamplePidSet() {
+        Set<Pid> set = new LinkedHashSet<>();
+        for (int i = 0; i < 10; i++) {
+            set.add(new Pid(i + ""));
+        }
+        return set;
     }
 
     /**
@@ -270,6 +320,5 @@ public class RepositoryServiceTest extends AbstractTestNGSpringContextTests {
         input.close();
         return setting;
     }
-   
 
 }
