@@ -58,6 +58,7 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import org.testng.Assert;
 import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 /**
@@ -93,18 +94,25 @@ public class RepositoryServiceTest extends AbstractTestNGSpringContextTests {
     private PidTest pidTest_ = new PidTest();
 
     /**
-     * Sets up Mockito
+     * Get default setting values from test properties file
      *
      * @throws Exception
      */
     @BeforeClass
-    public void setUpClass() throws Exception {
+    public void setUpClass() throws Exception {        
+        defaultSetting_ = this.readPropertiesFile(TEST_FILE);
+    }
+    
+    /**
+     * Refreshes the mocks after each test
+     *
+     * @throws Exception
+     */
+    @BeforeMethod
+    public void setUpMethod() throws Exception {
         // set up Mockito
         MockitoAnnotations.initMocks(this);
-
-        // get default setting values from test properties file
-        defaultSetting_ = this.readPropertiesFile(TEST_FILE);
-
+        
         // return null when any repository attempts to save
         when(pidRepo_.save(any(Pid.class))).thenReturn(null);
         when(usedSettingRepo_.save(any(UsedSetting.class))).thenReturn(null);
