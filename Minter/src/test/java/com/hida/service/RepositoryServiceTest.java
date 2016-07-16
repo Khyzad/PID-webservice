@@ -235,6 +235,48 @@ public class RepositoryServiceTest extends AbstractTestNGSpringContextTests {
             Assert.assertEquals(newPid.getName().substring(prepend.length()), oldPid.getName());
         }
     }
+    
+    
+    @Test
+    public void testPersistPidsWithOldUsedSettings() {
+        // create two identical sets to represent before and after persistPids is called
+        Set<Pid> oldSet = getSamplePidSet();
+        Set<Pid> set = getSamplePidSet();
+        
+        UsedSetting usedSetting = this.getSampleUsedSetting();
+        
+        // assume the UsedSetting isn't persisted and pretend to persist it
+        when(usedSettingRepo_.findUsedSetting(any(String.class),
+                any(Token.class),
+                any(String.class),
+                anyInt(),
+                anyBoolean())).thenReturn(usedSetting);
+
+        // copy defaultSetting_ and change the prepend to something other than empty string
+        String prepend = "http://";
+        DefaultSetting defaultSetting = new DefaultSetting(defaultSetting_);
+        defaultSetting.setPrepend(prepend);
+        service_.persistPids(defaultSetting, set, set.size());                
+
+        // ensure that the size is still the same
+        Assert.assertEquals(set.size(), oldSet.size());
+
+        // ensure that save was called exactly size of set times
+        verify(pidRepo_, times(oldSet.size())).save(any(Pid.class));
+        
+        // ensure that the amount stored in usedSetting is increased
+        Assert.assertEquals(usedSetting.getAmount(), oldSet.size());
+                
+        // ensure that prepend was added to the front of the name
+        Iterator<Pid> newIter = set.iterator();
+        Iterator<Pid> oldIter = oldSet.iterator();
+        while (newIter.hasNext()) {
+            Pid newPid = newIter.next();
+            Pid oldPid = oldIter.next();
+            Assert.assertEquals(newPid.getName().startsWith(prepend), true);
+            Assert.assertEquals(newPid.getName().substring(prepend.length()), oldPid.getName());
+        }
+    }
 
     @Test
     public void testUpdateCurrentSetting() {
@@ -252,6 +294,19 @@ public class RepositoryServiceTest extends AbstractTestNGSpringContextTests {
             set.add(new Pid(i + ""));
         }
         return set;
+    }
+    
+    private UsedSetting getSampleUsedSetting(){
+        UsedSetting setting = new UsedSetting();
+        
+        setting.setPrefix(defaultSetting_.getPrefix());
+        setting.setTokenType(defaultSetting_.getTokenType());
+        setting.setCharMap(defaultSetting_.getCharMap());
+        setting.setRootLength(defaultSetting_.getRootLength());
+        setting.setSansVowels(defaultSetting_.isSansVowels()); 
+        setting.setAmount(0); 
+        
+        return setting;
     }
 
     /**
