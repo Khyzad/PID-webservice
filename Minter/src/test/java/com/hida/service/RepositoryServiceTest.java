@@ -99,10 +99,10 @@ public class RepositoryServiceTest extends AbstractTestNGSpringContextTests {
      * @throws Exception
      */
     @BeforeClass
-    public void setUpClass() throws Exception {        
+    public void setUpClass() throws Exception {
         defaultSetting_ = this.readPropertiesFile(TEST_FILE);
     }
-    
+
     /**
      * Refreshes the mocks after each test
      *
@@ -112,7 +112,7 @@ public class RepositoryServiceTest extends AbstractTestNGSpringContextTests {
     public void setUpMethod() throws Exception {
         // set up Mockito
         MockitoAnnotations.initMocks(this);
-        
+
         // return null when any repository attempts to save
         when(pidRepo_.save(any(Pid.class))).thenReturn(null);
         when(usedSettingRepo_.save(any(UsedSetting.class))).thenReturn(null);
@@ -204,7 +204,7 @@ public class RepositoryServiceTest extends AbstractTestNGSpringContextTests {
         // create two identical sets to represent before and after persistPids is called
         Set<Pid> oldSet = getSamplePidSet();
         Set<Pid> set = getSamplePidSet();
-        
+
         // assume the UsedSetting isn't persisted and pretend to persist it
         when(usedSettingRepo_.findUsedSetting(any(String.class),
                 any(Token.class),
@@ -216,21 +216,21 @@ public class RepositoryServiceTest extends AbstractTestNGSpringContextTests {
         String prepend = "http://";
         DefaultSetting setting = new DefaultSetting(defaultSetting_);
         setting.setPrepend(prepend);
-        service_.persistPids(setting, set, set.size());                
+        service_.persistPids(setting, set, set.size());
 
         // ensure that the size is still the same
         Assert.assertEquals(set.size(), oldSet.size());
 
         // ensure that save was called exactly size of set times
         verify(pidRepo_, times(oldSet.size())).save(any(Pid.class));
-        
+
         // ensure that usedSettingRepo_.find was called once
         verify(usedSettingRepo_, times(1)).findUsedSetting(any(String.class),
                 any(Token.class),
                 any(String.class),
                 anyInt(),
                 anyBoolean());
-        
+
         verify(usedSettingRepo_, times(1)).save(any(UsedSetting.class));
 
         // ensure that prepend was added to the front of the name
@@ -243,16 +243,15 @@ public class RepositoryServiceTest extends AbstractTestNGSpringContextTests {
             Assert.assertEquals(newPid.getName().substring(prepend.length()), oldPid.getName());
         }
     }
-    
-    
+
     @Test
     public void testPersistPidsWithOldUsedSettings() {
         // create two identical sets to represent before and after persistPids is called
         Set<Pid> oldSet = getSamplePidSet();
         Set<Pid> set = getSamplePidSet();
-        
+
         UsedSetting usedSetting = this.getSampleUsedSetting();
-        
+
         // assume the UsedSetting isn't persisted and pretend to persist it
         when(usedSettingRepo_.findUsedSetting(any(String.class),
                 any(Token.class),
@@ -264,17 +263,17 @@ public class RepositoryServiceTest extends AbstractTestNGSpringContextTests {
         String prepend = "http://";
         DefaultSetting defaultSetting = new DefaultSetting(defaultSetting_);
         defaultSetting.setPrepend(prepend);
-        service_.persistPids(defaultSetting, set, set.size());                
+        service_.persistPids(defaultSetting, set, set.size());
 
         // ensure that the size is still the same
         Assert.assertEquals(set.size(), oldSet.size());
 
         // ensure that save was called exactly size of set times
         verify(pidRepo_, times(oldSet.size())).save(any(Pid.class));
-        
+
         // ensure that the amount stored in usedSetting is increased
         Assert.assertEquals(usedSetting.getAmount(), oldSet.size());
-                
+
         // ensure that prepend was added to the front of the name
         Iterator<Pid> newIter = set.iterator();
         Iterator<Pid> oldIter = oldSet.iterator();
@@ -287,8 +286,12 @@ public class RepositoryServiceTest extends AbstractTestNGSpringContextTests {
     }
 
     @Test
-    public void testUpdateCurrentSetting() {
-        Assert.fail("unimplemented");
+    public void testUpdateCurrentSetting() throws Exception {
+        DefaultSetting testSetting = new DefaultSetting(defaultSetting_);
+        when(defaultSettingRepo_.findCurrentDefaultSetting()).thenReturn(testSetting);
+
+        service_.updateCurrentSetting(testSetting);
+        verify(defaultSettingRepo_, times(1)).findCurrentDefaultSetting();
     }
 
     @Test
@@ -303,17 +306,17 @@ public class RepositoryServiceTest extends AbstractTestNGSpringContextTests {
         }
         return set;
     }
-    
-    private UsedSetting getSampleUsedSetting(){
+
+    private UsedSetting getSampleUsedSetting() {
         UsedSetting setting = new UsedSetting();
-        
+
         setting.setPrefix(defaultSetting_.getPrefix());
         setting.setTokenType(defaultSetting_.getTokenType());
         setting.setCharMap(defaultSetting_.getCharMap());
         setting.setRootLength(defaultSetting_.getRootLength());
-        setting.setSansVowels(defaultSetting_.isSansVowels()); 
-        setting.setAmount(0); 
-        
+        setting.setSansVowels(defaultSetting_.isSansVowels());
+        setting.setAmount(0);
+
         return setting;
     }
 
