@@ -195,8 +195,25 @@ public class RepositoryServiceTest extends AbstractTestNGSpringContextTests {
     }
 
     @Test
-    public void testGetRemainingPermutations() {
-        Assert.fail("unimplemented");
+    public void testGetCurrentAmount() {
+        UsedSetting usedSetting = this.getSampleUsedSetting();
+        
+        // find the matching usedSetting
+        when(usedSettingRepo_.findUsedSetting(any(String.class),
+                any(Token.class),
+                any(String.class),
+                anyInt(),
+                anyBoolean())).thenReturn(usedSetting);
+        
+        // call the method to test
+        service_.getCurrentAmount(defaultSetting_);
+        
+        // ensure that usedSettingRepo_.find was called once
+        verify(usedSettingRepo_, times(1)).findUsedSetting(any(String.class),
+                any(Token.class),
+                any(String.class),
+                anyInt(),
+                anyBoolean());
     }
 
     @Test
