@@ -134,9 +134,9 @@ public class RepositoryService {
         }
 
         LOGGER.info("DatabaseUpdated with new pids");
-        
+
         // update table format
-        recordSettings(setting ,amountCreated);
+        recordSettings(setting, amountCreated);
     }
 
     public long getMaxPermutation(DefaultSetting setting) {
@@ -162,10 +162,19 @@ public class RepositoryService {
      *
      * @param newSetting A DefaultSetting object that contains newly requested
      * values
-     * @throws IOException Thrown when the file cannot be found
      */
-    public void updateCurrentSetting(DefaultSetting newSetting) throws IOException {
-
+    public void updateCurrentSetting(DefaultSetting newSetting) {
+        LOGGER.info("in updateCurrentSetting");
+        
+        DefaultSetting oldSetting = defaultSettingRepo_.findCurrentDefaultSetting();
+        oldSetting.setPrepend(newSetting.getPrepend());
+        oldSetting.setPrefix(newSetting.getPrefix());
+        oldSetting.setCharMap(newSetting.getCharMap());
+        oldSetting.setRootLength(newSetting.getRootLength());
+        oldSetting.setTokenType(newSetting.getTokenType());
+        oldSetting.setAuto(newSetting.isAuto());
+        oldSetting.setRandom(newSetting.isRandom());
+        oldSetting.setSansVowels(newSetting.isSansVowels());
     }
 
     /**
@@ -177,7 +186,7 @@ public class RepositoryService {
     public void initializeStoredSetting() throws IOException {
 
     }
-    
+
     /**
      * Checks to see if a Pid already exists in the database.
      *
@@ -282,7 +291,7 @@ public class RepositoryService {
             entity.setAmount(previousAmount + amount);
         }
     }
-    
+
     /**
      * Attempts to find a UsedSetting based on the currently used DefaultSetting
      *
