@@ -23,6 +23,7 @@ import com.hida.model.DefaultSetting;
 import com.hida.model.IdGenerator;
 import com.hida.model.NotEnoughPermutationsException;
 import com.hida.model.Pid;
+import com.hida.model.Token;
 import com.hida.model.UsedSetting;
 import com.hida.repositories.DefaultSettingRepository;
 import com.hida.repositories.PidRepository;
@@ -145,15 +146,15 @@ public class RepositoryService {
     }
 
     /**
-     * Returns the difference between the total permutations and the amount of
-     * Pids that were already created using the requested settings.
+     * Returns the amount of Pids that were created using the settings
      *
      * @param setting The settings the Pids are based off of
-     * @param amount The requested amount of Pids
      * @return The amount of permutations remaining
      */
-    public long getRemainingPermutations(DefaultSetting setting, long amount) {
-        return -1;
+    public long getCurrentAmount(DefaultSetting setting) {
+        UsedSetting entity = this.findUsedSetting(setting);
+        
+        return entity.getAmount();
     }
 
     /**
