@@ -73,6 +73,12 @@ public class MinterService {
 
     @Autowired
     private DefaultSettingRepository defaultSettingRepo_;
+    
+    @Autowired
+    private CacheService cacheService_;
+    
+    @Autowired
+    private RepositoryService repoService_;   
 
     private ArrayList<Pid> cachedPid_;
 
