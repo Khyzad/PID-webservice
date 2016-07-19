@@ -55,7 +55,7 @@ public class RepositoryService {
     @Autowired
     private DefaultSettingRepository defaultSettingRepo_;
 
-    IdGenerator generator_;
+    private IdGenerator generator_;
 
     /**
      * Logger; logfile to be stored in resource folder
