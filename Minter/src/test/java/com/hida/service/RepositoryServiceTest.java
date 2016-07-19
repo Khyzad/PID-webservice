@@ -19,6 +19,7 @@ package com.hida.service;
 
 import com.hida.configuration.RepositoryConfiguration;
 import com.hida.model.DefaultSetting;
+import com.hida.model.NotEnoughPermutationsException;
 import com.hida.model.Pid;
 import com.hida.model.PidTest;
 import com.hida.model.Token;
@@ -309,7 +310,7 @@ public class RepositoryServiceTest extends AbstractTestNGSpringContextTests {
 
         service_.updateCurrentSetting(testSetting);
         verify(defaultSettingRepo_, times(1)).findCurrentDefaultSetting();
-    }
+    }   
 
     @Test
     public void testInitializeStoredSetting() {

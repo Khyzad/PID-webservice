@@ -153,7 +153,7 @@ public class RepositoryService {
      */
     public long getCurrentAmount(DefaultSetting setting) {
         UsedSetting entity = this.findUsedSetting(setting);
-        
+
         return entity.getAmount();
     }
 
@@ -166,7 +166,7 @@ public class RepositoryService {
      */
     public void updateCurrentSetting(DefaultSetting newSetting) {
         LOGGER.info("in updateCurrentSetting");
-        
+
         DefaultSetting oldSetting = defaultSettingRepo_.findCurrentDefaultSetting();
         oldSetting.setPrepend(newSetting.getPrepend());
         oldSetting.setPrefix(newSetting.getPrefix());
@@ -213,9 +213,6 @@ public class RepositoryService {
      */
     private Set<Pid> rollPidSet(Set<Pid> set, long totalPermutations, long amount) {
         LOGGER.info("in rollIdSet");
-        // Used to count the number of unique ids. Size methods aren't used because int is returned
-        long uniqueIdCounter = 0;
-
         // Declares and initializes a list that holds unique values.          
         Set<Pid> uniqueList = new LinkedHashSet<>();
 
@@ -226,23 +223,15 @@ public class RepositoryService {
 
             // continuously increments invalid or non-unique ids
             while (!isValidPid(currentId) || uniqueList.contains(currentId)) {
-                /* 
-                 if counter exceeds totalPermutations, then id has iterated through every 
-                 possible permutation. Related format is updated as a quick look-up reference
-                 with the number of ids that were inadvertedly been created using other formats.
-                 NotEnoughPermutationsException is thrown stating remaining number of ids.
-                 */
+                // return a partially complete unique set if needed
                 if (counter > totalPermutations) {
-                    LOGGER.error("Total number of Permutations Exceeded: Total Permutation Count="
-                            + totalPermutations);
-                    throw new NotEnoughPermutationsException(uniqueIdCounter, amount);
+                    return uniqueList;
                 }
                 generator_.incrementPid(currentId);
                 counter++;
             }
-            // unique ids are added to list and uniqueIdCounter is incremented.
-            // Size methods aren't used because int is returned
-            uniqueIdCounter++;
+            
+            // a unique Pid has been found, add it to the list
             uniqueList.add(currentId);
         }
         return uniqueList;
