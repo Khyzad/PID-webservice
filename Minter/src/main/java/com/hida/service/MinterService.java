@@ -73,12 +73,12 @@ public class MinterService {
 
     @Autowired
     private DefaultSettingRepository defaultSettingRepo_;
-    
+
     @Autowired
     private CacheService cacheService_;
-    
+
     @Autowired
-    private RepositoryService repoService_;   
+    private RepositoryService repoService_;
 
     private ArrayList<Pid> cachedPid_;
 
@@ -168,52 +168,22 @@ public class MinterService {
      */
     public Set<Pid> mint(long amount, DefaultSetting setting) throws IOException {
         LOGGER.info("in mint");
+        Set<Pid> set = repoService_.generatePids(setting, amount);
 
-        // store the desired setting values 
-        this.currentSetting_ = setting;
-
-        // create appropriate generator
-        createGenerator();
-
-        // calculate total number of permutations
-        long total = generator_.getMaxPermutation();
-
-        // determine remaining amount of permutations
-        long remaining = getRemainingPermutations();
-
-        // determine if its possible to create the requested amount of ids
-        if (remaining < amount) {
+        if (set.size() != amount) {
             LOGGER.error("Not enough remaining Permutations, "
                     + "Requested Amount=" + amount + " --> "
-                    + "Amount Remaining=" + remaining);
-            throw new NotEnoughPermutationsException(remaining, amount);
-        }
-        LOGGER.info("request is valid");
-
-        /* 
-         if the current setting is random, have the generator return a random set,
-         otherwise, have the generator return a sequential set
-         */
-        Set<Pid> set;
-        if (currentSetting_.isRandom()) {
-            set = generator_.randomMint(amount);
-        }
-        else if (currentSetting_.equals(storedSetting_)) {
-            set = generator_.sequentialMint(amount, lastSequentialAmount_);
-            lastSequentialAmount_ = (lastSequentialAmount_ + amount) % total;
+                    + "Amount Remaining=" + set.size());
+            throw new NotEnoughPermutationsException(set.size(), amount);
         }
         else {
-            set = generator_.sequentialMint(amount);
+            // persist the set of Pids
+            repoService_.persistPids(setting, set, amount);
+                       
+            // return the set of ids
+            return set;
         }
 
-        // check ids and increment them appropriately
-        set = rollPidSet(set, total, amount);
-
-        // add the set of ids to the id table in the database and their formats
-        addPidSet(set, amount);
-
-        // return the set of ids
-        return set;
     }
 
     /**
