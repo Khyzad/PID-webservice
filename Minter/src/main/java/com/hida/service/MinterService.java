@@ -108,57 +108,6 @@ public class MinterService {
     }
 
     /**
-     * Returns the difference between the total permutations and the amount of
-     * Pids that were already created using the requested settings.
-     *
-     * @return The amount of permutations remaining
-     */
-    private long getRemainingPermutations() {
-        LOGGER.info("in getRemainingPerumtations");
-        long totalPermutations = generator_.getMaxPermutation();
-        long amountCreated = getAmountCreated();
-
-        return totalPermutations - amountCreated;
-    }
-
-    /**
-     * Returns the amount of Pids that were created using the requested settings
-     *
-     * @return amount of Pids
-     */
-    private long getAmountCreated() {
-        UsedSetting entity = findUsedSetting();
-        if (entity == null) {
-            return 0;
-        }
-        else {
-            return entity.getAmount();
-        }
-    }
-
-    /**
-     * Creates a generator to be used in accordance to the setting
-     */
-    private void createGenerator() {
-        LOGGER.info("in createGenerator");
-        if (currentSetting_.isAuto()) {
-            generator_ = new AutoIdGenerator(
-                    currentSetting_.getPrefix(),
-                    currentSetting_.getTokenType(),
-                    currentSetting_.getRootLength());
-
-            LOGGER.info("AutoGenerator created");
-        }
-        else {
-            generator_ = new CustomIdGenerator(
-                    currentSetting_.getPrefix(),
-                    currentSetting_.isSansVowels(),
-                    currentSetting_.getCharMap());
-            LOGGER.info("CustomIdGenerator created");
-        }
-    }
-
-    /**
      * Attempts to create a number of Pids and store them in database
      *
      * @param amount The number of PIDs to be created
@@ -179,7 +128,7 @@ public class MinterService {
         else {
             // persist the set of Pids
             repoService_.persistPids(setting, set, amount);
-                       
+
             // return the set of ids
             return set;
         }
@@ -196,9 +145,6 @@ public class MinterService {
 
         // get default settings
         currentSetting_ = this.getStoredSetting();
-
-        // create the generator
-        createGenerator();
 
         // get the maximum number of permutations 
         long maxPermutation = generator_.getMaxPermutation();
@@ -218,133 +164,6 @@ public class MinterService {
 
         cachedPid_ = list;
         LOGGER.trace("cache generated");
-    }
-
-    /**
-     * Continuously increments a set of ids until the set is completely filled
-     * with unique ids.
-     *
-     * @param set the set of ids
-     * @param order determines whether or not the ids will be ordered
-     * @param isAuto determines whether or not the ids are AutoId or CustomId
-     * @param amount the amount of ids to be created.
-     * @return A set of unique ids database.
-     */
-    private Set<Pid> rollPidSet(Set<Pid> set, long totalPermutations, long amount) {
-        LOGGER.info("in rollIdSet");
-        // Used to count the number of unique ids. Size methods aren't used because int is returned
-        long uniqueIdCounter = 0;
-
-        // Declares and initializes a list that holds unique values.          
-        Set<Pid> uniqueList = new LinkedHashSet<>();
-
-        // iterate through every id 
-        for (Pid currentId : set) {
-            // counts the number of times an id has been rejected
-            long counter = 0;
-
-            // continuously increments invalid or non-unique ids
-            while (!isValidPid(currentId) || uniqueList.contains(currentId)) {
-                /* 
-                 if counter exceeds totalPermutations, then id has iterated through every 
-                 possible permutation. Related format is updated as a quick look-up reference
-                 with the number of ids that were inadvertedly been created using other formats.
-                 NotEnoughPermutationsException is thrown stating remaining number of ids.
-                 */
-                if (counter > totalPermutations) {
-                    LOGGER.error("Total number of Permutations Exceeded: Total Permutation Count="
-                            + totalPermutations);
-                    throw new NotEnoughPermutationsException(uniqueIdCounter, amount);
-                }
-                generator_.incrementPid(currentId);
-                counter++;
-            }
-            // unique ids are added to list and uniqueIdCounter is incremented.
-            // Size methods aren't used because int is returned
-            uniqueIdCounter++;
-            uniqueList.add(currentId);
-        }
-        return uniqueList;
-    }
-
-    /**
-     * Adds a requested amount of formatted ids to the database.
-     *
-     * @param list list of ids to check.
-     * @param amountCreated Holds the true size of the list as list.size method
-     * can only return the maximum possible value of an integer.
-     * @param prefix The string that will be at the front of every id.
-     * @param tokenType Designates what characters are contained in the id's
-     * root.
-     * @param sansVowel Designates whether or not the id's root contains vowels.
-     * @param rootLength Designates the length of the id's root.
-     */
-    private void addPidSet(Set<Pid> list, long amountCreated) {
-        LOGGER.info("in addIdlIst");
-
-        for (Pid pid : list) {
-            pidRepo_.save(pid);
-        }
-
-        LOGGER.info("DatabaseUpdated with new pids");
-        // update table format
-        recordSettings(amountCreated);
-
-    }
-
-    /**
-     * Attempts to find a UsedSetting based on the currently used DefaultSetting
-     *
-     * @return Returns a UsedSetting entity if found, null otherwise
-     */
-    private UsedSetting findUsedSetting() {
-        LOGGER.info("in findUsedSetting");
-
-        return usedSettingRepo_.findUsedSetting(currentSetting_.getPrefix(),
-                currentSetting_.getTokenType(),
-                currentSetting_.getCharMap(),
-                currentSetting_.getRootLength(),
-                currentSetting_.isSansVowels());
-    }
-
-    /**
-     * Attempts to record the setting that were used to create the current set
-     * of Pids
-     *
-     * @param amount The number of PIDs that were created
-     */
-    private void recordSettings(long amount) {
-        LOGGER.info("in recordSettings");
-
-        UsedSetting entity = findUsedSetting();
-
-        if (entity == null) {
-            entity = new UsedSetting(currentSetting_.getPrefix(),
-                    currentSetting_.getTokenType(),
-                    currentSetting_.getCharMap(),
-                    currentSetting_.getRootLength(),
-                    currentSetting_.isSansVowels(),
-                    amount);
-
-            usedSettingRepo_.save(entity);
-        }
-        else {
-            long previousAmount = entity.getAmount();
-            entity.setAmount(previousAmount + amount);
-        }
-    }
-
-    /**
-     * Checks to see if a Pid already exists in the database.
-     *
-     * @param pid Pid to be checked
-     * @return Returns true if a Pid with the same doesn't exist, false
-     * otherwise
-     */
-    private boolean isValidPid(Pid pid) {
-        LOGGER.info("in isValidId");
-        Pid entity = this.pidRepo_.findOne(pid.getName());
-        return entity == null;
     }
 
     /**
