@@ -87,7 +87,7 @@ public class RepositoryService {
         long total = generator_.getMaxPermutation();
 
         // check ids and increment them appropriately
-        set = rollPidSet(set, total, amount);
+        set = rollPidSet(set, total);
 
         return set;
     }
@@ -114,7 +114,7 @@ public class RepositoryService {
         long total = generator_.getMaxPermutation();
 
         // check ids and increment them appropriately
-        set = rollPidSet(set, total, amount);
+        set = rollPidSet(set, total);
 
         return set;
     }
@@ -211,7 +211,7 @@ public class RepositoryService {
      * @param amount the amount of ids to be created.
      * @return A set of unique ids database.
      */
-    private Set<Pid> rollPidSet(Set<Pid> set, long totalPermutations, long amount) {
+    private Set<Pid> rollPidSet(Set<Pid> set, long totalPermutations) {
         LOGGER.info("in rollIdSet");
         // Declares and initializes a list that holds unique values.          
         Set<Pid> uniqueList = new LinkedHashSet<>();
