@@ -54,6 +54,8 @@ public class RepositoryService {
 
     @Autowired
     private DefaultSettingRepository defaultSettingRepo_;
+        
+    private final Set<Pid> cache_ = new LinkedHashSet<>();
 
     private IdGenerator generator_;
 
@@ -176,7 +178,28 @@ public class RepositoryService {
         oldSetting.setAuto(newSetting.isAuto());
         oldSetting.setRandom(newSetting.isRandom());
         oldSetting.setSansVowels(newSetting.isSansVowels());
+    }       
+
+    /**
+     * Generates the cache
+     *
+     * @param setting The setting values to base the Pids off of
+     */
+    public void generateCache(DefaultSetting setting) {
+
     }
+
+    /**
+     * Retrieves the requested amount of Pids from the cache. Also removes the
+     * selected Pids from the cache.
+     *
+     * @param amount The amount of Pids
+     * @return A set containing the requested amount of Pids
+     */
+    public Set<Pid> collectCache(long amount) {
+        return null;
+    }
+
 
     /**
      * Initializes the storedSetting_ field by reading its value in the
