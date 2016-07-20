@@ -185,8 +185,8 @@ public class RepositoryService {
      *
      * @param setting The setting values to base the Pids off of
      */
-    public void generateCache(DefaultSetting setting) {
-
+    public void generateCache(DefaultSetting setting) {        
+        cache_.addAll(this.generatePids(setting, cache_.size() - setting.getCacheSize()));
     }
 
     /**
