@@ -295,43 +295,7 @@ public class RepositoryService {
             uniqueList.add(currentId);
         }
         return uniqueList;
-    }
-
-    /**
-     * Continuously increments a set of ids until the set is completely filled
-     * with unique ids.
-     *
-     * @param baseSet the set of ids
-     * @param order determines whether or not the ids will be ordered
-     * @param isAuto determines whether or not the ids are AutoId or CustomId
-     * @param amount the amount of ids to be created.
-     * @return A set of unique ids database.
-     */
-    private Set<Pid> rollPidSet(Set<Pid> baseSet, Set<Pid> set2, long totalPermutations) {
-        LOGGER.info("in rollIdSet");
-        // Declares and initializes a list that holds unique values.          
-        Set<Pid> uniqueList = new LinkedHashSet<>();
-
-        // iterate through every id 
-        for (Pid currentId : set2) {
-            // counts the number of times an id has been rejected
-            long counter = 0;
-
-            // continuously increments invalid or non-unique ids
-            while (!isValidPid(currentId) || baseSet.contains(currentId)) {
-                // return a partially complete unique set if needed
-                if (counter > totalPermutations) {
-                    return uniqueList;
-                }
-                generator_.incrementPid(currentId);
-                counter++;
-            }
-
-            // a unique Pid has been found, add it to the list
-            uniqueList.add(currentId);
-        }
-        return uniqueList;
-    }
+    }   
 
     private IdGenerator getGenerator(DefaultSetting setting) {
         LOGGER.info("in createGenerator");
