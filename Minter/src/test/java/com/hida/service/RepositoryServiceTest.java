@@ -311,6 +311,12 @@ public class RepositoryServiceTest extends AbstractTestNGSpringContextTests {
         service_.updateCurrentSetting(testSetting);
         verify(defaultSettingRepo_, times(1)).findCurrentDefaultSetting();
     }   
+    
+    @Test
+    public void testGenerateCache() {
+        service_.generateCache(defaultSetting_);
+        Assert.assertEquals(service_.getCache().size(), defaultSetting_.getCacheSize());
+    }
 
     @Test
     public void testInitializeStoredSetting() {
