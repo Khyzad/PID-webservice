@@ -142,27 +142,7 @@ public class MinterService {
      */
     public void generateCache() throws IOException {
         LOGGER.trace("in generateCache");
-
-        // get default settings
-        currentSetting_ = this.getStoredSetting();
-
-        // get the maximum number of permutations 
-        long maxPermutation = generator_.getMaxPermutation();
-
-        // create all possible permutations
-        Set<Pid> cache = generator_.sequentialMint(500);
-
-        // add each mmember of the set to CachedPid
-        ArrayList<Pid> list = new ArrayList<>();
-
-        Iterator<Pid> iter = cache.iterator();
-        while (iter.hasNext()) {
-            Pid pid = iter.next();
-            list.add(pid);
-            LOGGER.info("adding " + pid);
-        }
-
-        cachedPid_ = list;
+        repoService_.generateCache(storedSetting_);
         LOGGER.trace("cache generated");
     }
 
