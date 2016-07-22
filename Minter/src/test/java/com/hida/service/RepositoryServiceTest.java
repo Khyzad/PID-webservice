@@ -329,6 +329,22 @@ public class RepositoryServiceTest extends AbstractTestNGSpringContextTests {
         long max = service_.getMaxPermutation(defaultSetting_);
         Assert.assertEquals(service_.getCache().size(), max);
     }
+    
+    @Test
+    public void testGenerateCacheNonEmptyCache() {
+        DefaultSetting setting = new DefaultSetting(defaultSetting_);
+        long size = 5;
+        setting.setCacheSize(size);
+        
+        // generate intitial content for cache
+        service_.generateCache(setting);
+        
+        // raise the cache size to simulate pids being collected
+        long max = service_.getMaxPermutation(setting);
+        setting.setCacheSize(max);
+        service_.generateCache(setting);        
+        Assert.assertEquals(service_.getCache().size(), max);
+    }
 
     @Test
     public void testInitializeStoredSetting() {
