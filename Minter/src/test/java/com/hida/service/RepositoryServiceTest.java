@@ -57,6 +57,7 @@ import org.springframework.test.context.support.DirtiesContextTestExecutionListe
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.testng.Assert;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
@@ -320,6 +321,13 @@ public class RepositoryServiceTest extends AbstractTestNGSpringContextTests {
         service_.generateCache(defaultSetting_);
         Assert.assertEquals(service_.getCache().size(), defaultSetting_.getCacheSize());
     }
+    
+    @Test
+    public void testGenerateCacheBeyondMaxPermutation() {        
+        service_.generateCache(defaultSetting_);
+        long max = service_.getMaxPermutation(defaultSetting_);
+        Assert.assertEquals(service_.getCache().size(), max);
+    }
 
     @Test
     public void testInitializeStoredSetting() {
@@ -381,6 +389,11 @@ public class RepositoryServiceTest extends AbstractTestNGSpringContextTests {
 
     }
 
+    @AfterMethod
+    private void emptyCache(){
+        service_.getCache().clear();
+    }
+    
     /**
      * Read a given properties file and return its values in the form of a
      * DefaultSetting object
