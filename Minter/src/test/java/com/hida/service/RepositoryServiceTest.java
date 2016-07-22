@@ -313,7 +313,10 @@ public class RepositoryServiceTest extends AbstractTestNGSpringContextTests {
     }   
     
     @Test
-    public void testGenerateCache() {
+    public void testGenerateCacheWithinMaxPermutation() {
+        DefaultSetting setting = new DefaultSetting(defaultSetting_);
+        setting.setCacheSize(5);
+        
         service_.generateCache(defaultSetting_);
         Assert.assertEquals(service_.getCache().size(), defaultSetting_.getCacheSize());
     }
