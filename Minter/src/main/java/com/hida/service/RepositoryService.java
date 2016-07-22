@@ -188,10 +188,14 @@ public class RepositoryService {
      */
     public void generateCache(DefaultSetting setting) {
         // try to fulfill the requested cache size
-        long totalPermutations = this.getMaxPermutation(setting);        
-        long amount = (totalPermutations > setting.getCacheSize())? 
-                setting.getCacheSize() - cache_.size() : 
-                totalPermutations - cache_.size();
+        long totalPermutations = this.getMaxPermutation(setting);
+        long amount;        
+        if (totalPermutations > setting.getCacheSize()) {
+            amount = setting.getCacheSize() - cache_.size();
+        }
+        else {
+            amount = totalPermutations - cache_.size();
+        }
         Set<Pid> set = this.generatePids(setting, amount);
 
         boolean flag = true;
