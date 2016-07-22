@@ -59,6 +59,8 @@ public class RepositoryService {
     private final Set<Pid> cache_ = new LinkedHashSet<>();
 
     private IdGenerator generator_;
+    
+    private DefaultSetting cacheSetting_;
 
     /**
      * Logger; logfile to be stored in resource folder
@@ -187,6 +189,9 @@ public class RepositoryService {
      * @param setting The setting values to base the Pids off of
      */
     public void generateCache(DefaultSetting setting) {
+        // store the setting
+        this.cacheSetting_ = setting;
+        
         // try to fulfill the requested cache size
         long totalPermutations = this.getMaxPermutation(setting);
         long amount;        
@@ -233,17 +238,22 @@ public class RepositoryService {
      * @return A set containing the requested amount of Pids
      */
     public Set<Pid> collectCache(long amount) {
-        Set<Pid> set = new LinkedHashSet<>();
+        Set<Pid> set1 = new LinkedHashSet<>();
 
         Iterator<Pid> iter = cache_.iterator();
         for (long i = 0; i < amount && iter.hasNext(); i++) {
             Pid pid = iter.next();
-            set.add(pid);
+            set1.add(pid);
         }
 
-        cache_.removeAll(set);
+        cache_.removeAll(set1);
+        
+        if(amount > set1.size()){
+            Set<Pid> set2 = this.generatePids(cacheSetting_, amount - set1.size());
+            combinePidSet(set1, set2, this.getMaxPermutation(cacheSetting_));
+        }
 
-        return set;
+        return set1;
     }
 
     /**
@@ -307,6 +317,43 @@ public class RepositoryService {
             uniqueList.add(currentId);
         }
         return uniqueList;
+    }
+
+    /**
+     * Continuously increments a set of ids until the set is completely filled
+     * with unique ids.
+     *
+     * @param set1 the set of pids to add into
+     * @param set2 the set of pids to add from
+     * @param order determines whether or not the ids will be ordered
+     * @param isAuto determines whether or not the ids are AutoId or CustomId
+     * @param amount the amount of ids to be created.
+     * @return A set of unique ids database.
+     */
+    private void combinePidSet(Set<Pid> set1, Set<Pid> set2, long totalPermutations) {
+        boolean flag = true;
+        Iterator<Pid> iter = set2.iterator();
+        // iterate through every id 
+        while (iter.hasNext() && flag) {
+            Pid pid = iter.next();
+
+            // counts the number of times an id has been rejected
+            long counter = 0;
+
+            // continuously increments invalid or non-unique ids
+            while (!isValidPid(pid) || !set1.add(pid)) {
+
+                if (counter > totalPermutations) {
+                    return;
+                }
+                else {
+                    // all possible permutations have not been checked, increment
+                    generator_.incrementPid(pid);
+                    counter++;
+                }
+
+            }
+        }
     }
 
     private IdGenerator getGenerator(DefaultSetting setting) {
