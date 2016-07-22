@@ -247,6 +247,10 @@ public class RepositoryService {
     public void initializeStoredSetting() throws IOException {
 
     }
+    
+    public Set<Pid> getCache(){
+        return this.cache_;
+    }
 
     /**
      * Checks to see if a Pid already exists in the database.
