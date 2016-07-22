@@ -59,7 +59,7 @@ public class RepositoryService {
     private final Set<Pid> cache_ = new LinkedHashSet<>();
 
     private IdGenerator generator_;
-    
+
     private DefaultSetting cacheSetting_;
 
     /**
@@ -191,10 +191,10 @@ public class RepositoryService {
     public void generateCache(DefaultSetting setting) {
         // store the setting
         this.cacheSetting_ = setting;
-        
+
         // try to fulfill the requested cache size
         long totalPermutations = this.getMaxPermutation(setting);
-        long amount;        
+        long amount;
         if (totalPermutations > setting.getCacheSize()) {
             amount = setting.getCacheSize() - cache_.size();
         }
@@ -247,8 +247,8 @@ public class RepositoryService {
         }
 
         cache_.removeAll(set1);
-        
-        if(amount > set1.size()){
+
+        if (amount > set1.size()) {
             Set<Pid> set2 = this.generatePids(cacheSetting_, amount - set1.size());
             combinePidSet(set1, set2, this.getMaxPermutation(cacheSetting_));
         }
@@ -320,8 +320,9 @@ public class RepositoryService {
     }
 
     /**
-     * Continuously increments a set of ids until the set is completely filled
-     * with unique ids.
+     * Combines two sets by continuously incrementing non-unique pids in set2
+     * until set1 is completely filled with unique ids. If the all possile Pids
+     * have been iterated through then the method returns.
      *
      * @param set1 the set of pids to add into
      * @param set2 the set of pids to add from
