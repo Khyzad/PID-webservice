@@ -117,7 +117,14 @@ public class MinterService {
      */
     public Set<Pid> mint(long amount, DefaultSetting setting) throws IOException {
         LOGGER.info("in mint");
-        Set<Pid> set = repoService_.generatePids(setting, amount);
+        
+        // generate pids at a recorded starting value whenever possible
+        Set<Pid> set;
+        if(setting.equals(storedSetting_) && !setting.isRandom()){
+            set = repoService_.generatePids(setting, amount, lastSequentialAmount_);
+        }else{
+            set = repoService_.generatePids(setting, amount);
+        }
 
         if (set.size() != amount) {
             LOGGER.error("Not enough remaining Permutations, "
