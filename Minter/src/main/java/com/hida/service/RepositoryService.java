@@ -187,8 +187,12 @@ public class RepositoryService {
      * @param setting The setting values to base the Pids off of
      */
     public void generateCache(DefaultSetting setting) {
-        Set<Pid> set = this.generatePids(setting, cache_.size() - setting.getCacheSize());
-        long totalPermutations = generator_.getMaxPermutation();
+        // try to fulfill the requested cache size
+        long totalPermutations = this.getMaxPermutation(setting);        
+        long amount = (totalPermutations > setting.getCacheSize())? 
+                setting.getCacheSize() - cache_.size() : 
+                totalPermutations - cache_.size();
+        Set<Pid> set = this.generatePids(setting, amount);
 
         boolean flag = true;
         Iterator<Pid> iter = set.iterator();
@@ -201,7 +205,7 @@ public class RepositoryService {
 
             // continuously increments invalid or non-unique ids
             while (!isValidPid(pid) || !cache_.add(pid)) {
-                
+
                 if (counter > totalPermutations) {
                     // all possible permutations have been checked, raise flag
                     flag = false;
@@ -226,15 +230,15 @@ public class RepositoryService {
      */
     public Set<Pid> collectCache(long amount) {
         Set<Pid> set = new LinkedHashSet<>();
-        
+
         Iterator<Pid> iter = cache_.iterator();
-        for(long i = 0; i < amount && iter.hasNext(); i++){
+        for (long i = 0; i < amount && iter.hasNext(); i++) {
             Pid pid = iter.next();
             set.add(pid);
         }
-        
+
         cache_.removeAll(set);
-        
+
         return set;
     }
 
@@ -247,8 +251,8 @@ public class RepositoryService {
     public void initializeStoredSetting() throws IOException {
 
     }
-    
-    public Set<Pid> getCache(){
+
+    public Set<Pid> getCache() {
         return this.cache_;
     }
 
@@ -299,7 +303,7 @@ public class RepositoryService {
             uniqueList.add(currentId);
         }
         return uniqueList;
-    }   
+    }
 
     private IdGenerator getGenerator(DefaultSetting setting) {
         LOGGER.info("in createGenerator");
