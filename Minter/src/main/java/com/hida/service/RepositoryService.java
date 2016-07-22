@@ -29,6 +29,7 @@ import com.hida.repositories.DefaultSettingRepository;
 import com.hida.repositories.PidRepository;
 import com.hida.repositories.UsedSettingRepository;
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import org.slf4j.Logger;
@@ -54,7 +55,7 @@ public class RepositoryService {
 
     @Autowired
     private DefaultSettingRepository defaultSettingRepo_;
-        
+
     private final Set<Pid> cache_ = new LinkedHashSet<>();
 
     private IdGenerator generator_;
@@ -178,15 +179,43 @@ public class RepositoryService {
         oldSetting.setAuto(newSetting.isAuto());
         oldSetting.setRandom(newSetting.isRandom());
         oldSetting.setSansVowels(newSetting.isSansVowels());
-    }       
+    }
 
     /**
      * Generates the cache
      *
      * @param setting The setting values to base the Pids off of
      */
-    public void generateCache(DefaultSetting setting) {        
-        cache_.addAll(this.generatePids(setting, cache_.size() - setting.getCacheSize()));
+    public void generateCache(DefaultSetting setting) {
+        Set<Pid> set = this.generatePids(setting, cache_.size() - setting.getCacheSize());
+        long totalPermutations = generator_.getMaxPermutation();
+
+        boolean flag = true;
+        Iterator<Pid> iter = set.iterator();
+        // iterate through every id 
+        while (iter.hasNext() && flag) {
+            Pid pid = iter.next();
+
+            // counts the number of times an id has been rejected
+            long counter = 0;
+
+            // continuously increments invalid or non-unique ids
+            while (!isValidPid(pid) || !cache_.add(pid)) {
+                
+                if (counter > totalPermutations) {
+                    // all possible permutations have been checked, raise flag
+                    flag = false;
+                    break;
+                }
+                else {
+                    // all possible permutations have not been checked, increment
+                    generator_.incrementPid(pid);
+                    counter++;
+                }
+
+            }
+        }
+
     }
 
     /**
@@ -199,7 +228,6 @@ public class RepositoryService {
     public Set<Pid> collectCache(long amount) {
         return null;
     }
-
 
     /**
      * Initializes the storedSetting_ field by reading its value in the
@@ -253,7 +281,43 @@ public class RepositoryService {
                 generator_.incrementPid(currentId);
                 counter++;
             }
-            
+
+            // a unique Pid has been found, add it to the list
+            uniqueList.add(currentId);
+        }
+        return uniqueList;
+    }
+
+    /**
+     * Continuously increments a set of ids until the set is completely filled
+     * with unique ids.
+     *
+     * @param baseSet the set of ids
+     * @param order determines whether or not the ids will be ordered
+     * @param isAuto determines whether or not the ids are AutoId or CustomId
+     * @param amount the amount of ids to be created.
+     * @return A set of unique ids database.
+     */
+    private Set<Pid> rollPidSet(Set<Pid> baseSet, Set<Pid> set2, long totalPermutations) {
+        LOGGER.info("in rollIdSet");
+        // Declares and initializes a list that holds unique values.          
+        Set<Pid> uniqueList = new LinkedHashSet<>();
+
+        // iterate through every id 
+        for (Pid currentId : set2) {
+            // counts the number of times an id has been rejected
+            long counter = 0;
+
+            // continuously increments invalid or non-unique ids
+            while (!isValidPid(currentId) || baseSet.contains(currentId)) {
+                // return a partially complete unique set if needed
+                if (counter > totalPermutations) {
+                    return uniqueList;
+                }
+                generator_.incrementPid(currentId);
+                counter++;
+            }
+
             // a unique Pid has been found, add it to the list
             uniqueList.add(currentId);
         }
