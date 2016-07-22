@@ -215,7 +215,6 @@ public class RepositoryService {
 
             }
         }
-
     }
 
     /**
@@ -226,7 +225,17 @@ public class RepositoryService {
      * @return A set containing the requested amount of Pids
      */
     public Set<Pid> collectCache(long amount) {
-        return null;
+        Set<Pid> set = new LinkedHashSet<>();
+        
+        Iterator<Pid> iter = cache_.iterator();
+        for(long i = 0; i < amount && iter.hasNext(); i++){
+            Pid pid = iter.next();
+            set.add(pid);
+        }
+        
+        cache_.removeAll(set);
+        
+        return set;
     }
 
     /**
