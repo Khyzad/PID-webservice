@@ -31,7 +31,7 @@ public class Cache<T> {
     long size_;
     Set<T> set_ = new LinkedHashSet<>();
     
-    public void add(T value){
+    public boolean add(T value){
         
     }
     
