@@ -109,22 +109,7 @@ public class MinterServiceTest extends AbstractTestNGSpringContextTests {
     @BeforeMethod
     public void setUpMethod(){
         MockitoAnnotations.initMocks(this);
-    }
-
-    /**
-     * Test the various mint settings (auto/random and random/sequential)
-     *
-     * @return An array of values
-     */
-    @DataProvider(name = "mintSettings")
-    public Object[][] mintSettings() {
-        return new Object[][]{
-            {true, true},
-            {true, false},
-            {false, true},
-            {false, false}
-        };
-    }
+    }   
 
     /**
      * Tests the MinterService by assuming that the settings aren't currently
