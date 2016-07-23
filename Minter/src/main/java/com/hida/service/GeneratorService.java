@@ -92,11 +92,8 @@ public class GeneratorService {
             this.combinePidSet(set1, set2, amount);
         }
 
-        if (set1.size() != amount) {
-            NotEnoughPermutationsException exc
-                    = new NotEnoughPermutationsException(set1.size(), amount - set1.size());
-            LOGGER.error("Exception caught: ", exc);
-            throw exc;
+        if (set1.size() != amount) {            
+            throw new NotEnoughPermutationsException(set1.size(), amount - set1.size());
         }
         else {
             return set1;
