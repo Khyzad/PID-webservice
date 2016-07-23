@@ -17,6 +17,7 @@
  */
 package com.hida.model;
 
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 /**
@@ -25,33 +26,33 @@ import org.testng.annotations.Test;
  */
 public class CacheTest {
        
-    @Test
+    @Test(dependsOnMethods = {"testAdd"})
     public void testIsEmpty(){
-        
+        Assert.fail("unimplemented");
     }
     
     @Test(dependsOnMethods = {"testAdd"})
     public void testGetSize(){
-        
+        Assert.fail("unimplemented");
     }
     
     @Test
     public void testAdd(){
-        
+        Assert.fail("unimplemented");
     }
     
     @Test(dependsOnMethods = {"testAdd"})
     public void testPeek(){
-        
+        Assert.fail("unimplemented");
     }
     
     @Test(dependsOnMethods = {"testAdd"})
     public void testCollect(){
-        
+        Assert.fail("unimplemented");
     }
     
     @Test(dependsOnMethods = {"testAdd"})
     public void testRemoveAll(){
-        
+        Assert.fail("unimplemented");
     }
 }
