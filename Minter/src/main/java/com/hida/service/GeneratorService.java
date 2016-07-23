@@ -21,6 +21,7 @@ import com.hida.model.AutoIdGenerator;
 import com.hida.model.CustomIdGenerator;
 import com.hida.model.DefaultSetting;
 import com.hida.model.IdGenerator;
+import com.hida.model.NotEnoughPermutationsException;
 import com.hida.model.Pid;
 import com.hida.repositories.PidRepository;
 import java.util.Iterator;
@@ -67,7 +68,8 @@ public class GeneratorService {
      * @param amount The requested amount of Pids
      * @return A set of Pids
      */
-    public Set<Pid> generatePids(DefaultSetting setting, long amount) {
+    public Set<Pid> generatePids(DefaultSetting setting, long amount)
+            throws NotEnoughPermutationsException {
         // create a generator
         generator_ = getGenerator(setting);
         long max = generator_.getMaxPermutation();
@@ -90,7 +92,15 @@ public class GeneratorService {
             this.combinePidSet(set1, set2, amount);
         }
 
-        return set1;
+        if (set1.size() != amount) {
+            NotEnoughPermutationsException exc
+                    = new NotEnoughPermutationsException(set1.size(), amount - set1.size());
+            LOGGER.error("Exception caught: ", exc);
+            throw exc;
+        }
+        else {
+            return set1;
+        }
     }
 
     public long getMaxPermutation(DefaultSetting setting) {
@@ -133,7 +143,7 @@ public class GeneratorService {
             }
             cache_ = createSet(setting, amount);
             this.rollPidSet(cache_, max);
-            
+
             // reset startingValue_
             startingValue_ = 0;
         }
@@ -162,7 +172,7 @@ public class GeneratorService {
 
     public Set<Pid> getCache() {
         return this.cache_;
-    }        
+    }
 
     public void savePid(Pid pid) {
         pidRepo_.save(pid);
@@ -174,7 +184,7 @@ public class GeneratorService {
 
     public void setStartingValue(long startingValue) {
         this.startingValue_ = startingValue;
-    }        
+    }
 
     /**
      * Creates a set of Pids based on desired values.
