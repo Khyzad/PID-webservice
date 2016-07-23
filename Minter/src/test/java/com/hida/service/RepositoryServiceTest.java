@@ -353,7 +353,7 @@ public class RepositoryServiceTest extends AbstractTestNGSpringContextTests {
         
         // collect
         long max = service_.getMaxPermutation(defaultSetting_);
-        Set<Pid> set = service_.collectCache(max);
+        Set<Pid> set = service_.collectCache(defaultSetting_, max);
         
         Assert.assertEquals(set.size(), max);
         Assert.assertEquals(service_.getCache().size(), 0);

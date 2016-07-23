@@ -78,23 +78,25 @@ public class RepositoryService {
      * @return A set of Pids
      */
     public Set<Pid> generatePids(DefaultSetting setting, long amount) {
+        // collect the cache when possible
+        Set<Pid> set1 = collectCache(setting, amount);
+
         // create a generator
-        Set<Pid> set;
+        Set<Pid> set2;
         generator_ = getGenerator(setting);
-        if (setting.isRandom()) {
-            set = generator_.randomMint(amount);
+
+        if (amount > set1.size()) {
+            if (setting.isRandom()) {
+                set2 = generator_.randomMint(amount);
+            }
+            else {
+                set2 = generator_.sequentialMint(amount);
+            }
+            
+            this.combinePidSet(set1, set2, amount);
         }
-        else {
-            set = generator_.sequentialMint(amount);
-        }
 
-        // calculat maximum permutations
-        long total = generator_.getMaxPermutation();
-
-        // check ids and increment them appropriately
-        set = rollPidSet(set, total);
-
-        return set;
+        return set1;
     }
 
     /**
@@ -237,20 +239,17 @@ public class RepositoryService {
      * @param amount The amount of Pids
      * @return A set containing the requested amount of Pids
      */
-    public Set<Pid> collectCache(long amount) {
+    public Set<Pid> collectCache(DefaultSetting setting, long amount) {
         Set<Pid> set1 = new LinkedHashSet<>();
 
-        Iterator<Pid> iter = cache_.iterator();
-        for (long i = 0; i < amount && iter.hasNext(); i++) {
-            Pid pid = iter.next();
-            set1.add(pid);
-        }
+        if (setting.equals(cacheSetting_)) {
+            Iterator<Pid> iter = cache_.iterator();
+            for (long i = 0; i < amount && iter.hasNext(); i++) {
+                Pid pid = iter.next();
+                set1.add(pid);
+            }
 
-        cache_.removeAll(set1);
-
-        if (amount > set1.size()) {
-            Set<Pid> set2 = this.generatePids(cacheSetting_, amount - set1.size());
-            combinePidSet(set1, set2, this.getMaxPermutation(cacheSetting_));
+            cache_.removeAll(set1);
         }
 
         return set1;
