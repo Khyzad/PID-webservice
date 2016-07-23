@@ -199,6 +199,30 @@ public class MinterService {
     }
     
     /**
+     * Returns the amount of Pids that were created using the settings
+     *
+     * @param setting The settings the Pids are based off of
+     * @return The amount of permutations remaining
+     */
+    public long getCurrentAmount(DefaultSetting setting) {
+        UsedSetting entity = this.findUsedSetting(setting);
+
+        return entity.getAmount();
+    }
+    
+    public long getLastSequentialAmount() {
+        return lastSequentialAmount_;
+    }
+
+    public String getDefaultSettingPath() {
+        return defaultSettingPath_;
+    }
+
+    public void setDefaultSettingPath(String DefaultSettingPath) {
+        this.defaultSettingPath_ = DefaultSettingPath;
+    }
+    
+    /**
      * Attempts to record the setting that were used to create the current set
      * of Pids
      *
@@ -239,18 +263,6 @@ public class MinterService {
                 setting.getRootLength(),
                 setting.isSansVowels());
     }
-    
-    /**
-     * Returns the amount of Pids that were created using the settings
-     *
-     * @param setting The settings the Pids are based off of
-     * @return The amount of permutations remaining
-     */
-    public long getCurrentAmount(DefaultSetting setting) {
-        UsedSetting entity = this.findUsedSetting(setting);
-
-        return entity.getAmount();
-    }        
 
     /**
      * Read a given properties file and return its values in the form of a
@@ -315,17 +327,5 @@ public class MinterService {
         // save and close
         prop.store(output, "");
         output.close();
-    }
-
-    public long getLastSequentialAmount() {
-        return lastSequentialAmount_;
-    }
-
-    public String getDefaultSettingPath() {
-        return defaultSettingPath_;
-    }
-
-    public void setDefaultSettingPath(String DefaultSettingPath) {
-        this.defaultSettingPath_ = DefaultSettingPath;
-    }
+    }   
 }
