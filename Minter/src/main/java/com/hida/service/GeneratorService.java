@@ -233,6 +233,10 @@ public class GeneratorService {
     public Set<Pid> getCache() {
         return this.cache_;
     }
+    
+    public void savePid(Pid pid){
+        pidRepo_.save(pid);
+    }
 
     /**
      * Creates a set of Pids based on desired values.

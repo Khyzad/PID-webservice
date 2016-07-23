@@ -184,7 +184,7 @@ public class MinterService {
         LOGGER.info("in persistPids");
 
         for (Pid pid : set) {
-            pidRepo_.save(pid);
+            repoService_.savePid(pid);
             pid.setName(setting.getPrepend() + pid.getName());
         }
 
