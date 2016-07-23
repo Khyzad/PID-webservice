@@ -19,31 +19,20 @@ package com.hida.service;
 
 import com.hida.configuration.RepositoryConfiguration;
 import com.hida.model.DefaultSetting;
-import com.hida.model.NotEnoughPermutationsException;
 import com.hida.model.Pid;
 import com.hida.model.PidTest;
 import com.hida.model.Token;
-import com.hida.model.UsedSetting;
-import com.hida.repositories.DefaultSettingRepository;
 import com.hida.repositories.PidRepository;
-import com.hida.repositories.UsedSettingRepository;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.URL;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Properties;
 import java.util.Set;
 import org.mockito.InjectMocks;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyInt;
 import org.mockito.Mock;
 import static org.mockito.Mockito.atLeast;
-import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -58,7 +47,6 @@ import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
-import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -81,12 +69,6 @@ public class GeneratorServiceTest extends AbstractTestNGSpringContextTests {
 
     @Mock
     private PidRepository pidRepo_;
-
-    @Mock
-    private UsedSettingRepository usedSettingRepo_;
-
-    @Mock
-    private DefaultSettingRepository defaultSettingRepo_;
 
     @InjectMocks
     private GeneratorService service_;
@@ -116,9 +98,7 @@ public class GeneratorServiceTest extends AbstractTestNGSpringContextTests {
         MockitoAnnotations.initMocks(this);
 
         // return null when any repository attempts to save
-        when(pidRepo_.save(any(Pid.class))).thenReturn(null);
-        when(usedSettingRepo_.save(any(UsedSetting.class))).thenReturn(null);
-        when(defaultSettingRepo_.save(any(DefaultSetting.class))).thenReturn(null);
+        when(pidRepo_.save(any(Pid.class))).thenReturn(null);        
     }
     
     @Test
@@ -201,15 +181,6 @@ public class GeneratorServiceTest extends AbstractTestNGSpringContextTests {
         Assert.assertEquals(amount, testSet.size());
         verify(pidRepo_, atLeast(amount)).findOne(any(String.class));
     }
-
-    @Test
-    public void testUpdateCurrentSetting() throws Exception {
-        DefaultSetting testSetting = new DefaultSetting(defaultSetting_);
-        when(defaultSettingRepo_.findCurrentDefaultSetting()).thenReturn(testSetting);
-
-        service_.updateCurrentSetting(testSetting);
-        verify(defaultSettingRepo_, times(1)).findCurrentDefaultSetting();
-    }   
     
     @Test
     public void testGenerateCacheWithinMaxPermutation() {
@@ -302,54 +273,7 @@ public class GeneratorServiceTest extends AbstractTestNGSpringContextTests {
             set.add(new Pid(i + ""));
         }
         return set;
-    }
-
-    private UsedSetting getSampleUsedSetting() {
-        UsedSetting setting = new UsedSetting();
-
-        setting.setPrefix(defaultSetting_.getPrefix());
-        setting.setTokenType(defaultSetting_.getTokenType());
-        setting.setCharMap(defaultSetting_.getCharMap());
-        setting.setRootLength(defaultSetting_.getRootLength());
-        setting.setSansVowels(defaultSetting_.isSansVowels());
-        setting.setAmount(0);
-
-        return setting;
-    }
-
-    /**
-     * Set all the keys' values in testDefaultSettings to default values to
-     * ensure that the values are being changed during the updatedChangedSetting
-     * tests.
-     *
-     * @throws Exception
-     */
-    @AfterTest
-    private void resetTestReadDefaultProperties() throws Exception {
-        DefaultSetting setting = readPropertiesFile(TEST_FILE);
-
-        Properties prop = new Properties();
-        ClassLoader loader = Thread.currentThread().getContextClassLoader();
-        URL url = loader.getResource(TEST_FILE);
-        File file = new File(url.toURI());
-        OutputStream output = new FileOutputStream(file);
-
-        // set the properties value
-        prop.setProperty("prepend", setting.getPrepend());
-        prop.setProperty("prefix", setting.getPrefix());
-        prop.setProperty("cacheSize", setting.getCacheSize() + "");
-        prop.setProperty("charMap", setting.getCharMap());
-        prop.setProperty("rootLength", setting.getRootLength() + "");
-        prop.setProperty("tokenType", setting.getTokenType() + "");
-        prop.setProperty("sansVowel", setting.isSansVowels() + "");
-        prop.setProperty("auto", setting.isAuto() + "");
-        prop.setProperty("random", setting.isRandom() + "");
-
-        // save and close
-        prop.store(output, "");
-        output.close();
-
-    }
+    }   
 
     @AfterMethod
     private void emptyCache(){

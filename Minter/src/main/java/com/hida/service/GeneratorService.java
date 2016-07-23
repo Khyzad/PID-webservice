@@ -48,12 +48,6 @@ public class GeneratorService {
     @Autowired
     private PidRepository pidRepo_;
 
-    @Autowired
-    private UsedSettingRepository usedSettingRepo_;
-
-    @Autowired
-    private DefaultSettingRepository defaultSettingRepo_;
-
     private Set<Pid> cache_ = new LinkedHashSet<>();
 
     private IdGenerator generator_;
@@ -138,28 +132,7 @@ public class GeneratorService {
     public long getMaxPermutation(DefaultSetting setting) {
         generator_ = this.getGenerator(setting);
         return generator_.getMaxPermutation();
-    }   
-
-    /**
-     * Updates the CurrentDefaultSetting to match the values in the given
-     * DefaultSetting.
-     *
-     * @param newSetting A DefaultSetting object that contains newly requested
-     * values
-     */
-    public void updateCurrentSetting(DefaultSetting newSetting) {
-        LOGGER.info("in updateCurrentSetting");
-
-        DefaultSetting oldSetting = defaultSettingRepo_.findCurrentDefaultSetting();
-        oldSetting.setPrepend(newSetting.getPrepend());
-        oldSetting.setPrefix(newSetting.getPrefix());
-        oldSetting.setCharMap(newSetting.getCharMap());
-        oldSetting.setRootLength(newSetting.getRootLength());
-        oldSetting.setTokenType(newSetting.getTokenType());
-        oldSetting.setAuto(newSetting.isAuto());
-        oldSetting.setRandom(newSetting.isRandom());
-        oldSetting.setSansVowels(newSetting.isSansVowels());
-    }
+    }     
 
     /**
      * Generates the cache. The method will check to see if the values passed in

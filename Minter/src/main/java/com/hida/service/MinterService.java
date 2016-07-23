@@ -250,7 +250,7 @@ public class MinterService {
         UsedSetting entity = this.findUsedSetting(setting);
 
         return entity.getAmount();
-    }
+    }        
 
     /**
      * Read a given properties file and return its values in the form of a
