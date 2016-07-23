@@ -187,7 +187,7 @@ public class RepositoryService {
     /**
      * Generates the cache. The method will check to see if the values passed in
      * setting matches the setting of the cache. If it does it'll attempt to
-     * regenerate the cache, otherwsie it'll create an entirely new cache.
+     * regenerate the cache, otherwise it'll create an entirely new cache.
      *
      * @param setting The setting values to base the Pids off of
      */
