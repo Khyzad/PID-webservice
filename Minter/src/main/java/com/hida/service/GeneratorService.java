@@ -23,7 +23,6 @@ import com.hida.model.DefaultSetting;
 import com.hida.model.IdGenerator;
 import com.hida.model.Pid;
 import com.hida.repositories.PidRepository;
-import java.io.IOException;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -188,16 +187,6 @@ public class GeneratorService {
         cache_.removeAll(set1);
 
         return set1;
-    }
-
-    /**
-     * Initializes the storedSetting_ field by reading its value in the
-     * database. If its null, then it is given initial values.
-     *
-     * @throws IOException Thrown when the file cannot be found
-     */
-    public void initializeStoredSetting() throws IOException {
-
     }
 
     public Set<Pid> getCache() {

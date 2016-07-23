@@ -26,7 +26,6 @@ import com.hida.repositories.PidRepository;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.Properties;
 import java.util.Set;
 import org.mockito.InjectMocks;
@@ -260,20 +259,7 @@ public class GeneratorServiceTest extends AbstractTestNGSpringContextTests {
         service_.generateCache(setting2);
         Iterator<Pid> iter2 = service_.getCache().iterator();
         pidTest_.testTokenType(iter2.next().getName(), setting2);
-    }
-
-    @Test
-    public void testInitializeStoredSetting() {
-        Assert.fail("unimplemented");
-    }
-
-    private Set<Pid> getSamplePidSet() {
-        Set<Pid> set = new LinkedHashSet<>();
-        for (int i = 0; i < 10; i++) {
-            set.add(new Pid(i + ""));
-        }
-        return set;
-    }   
+    }    
 
     @AfterMethod
     private void emptyCache(){
