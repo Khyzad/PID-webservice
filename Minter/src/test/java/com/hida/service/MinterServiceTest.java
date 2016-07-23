@@ -93,18 +93,7 @@ public class MinterServiceTest extends AbstractTestNGSpringContextTests {
     private UsedSettingRepository usedSettingRepo_;
 
     @InjectMocks
-    private MinterService minterService_;
-
-    /**
-     * Sets up Mockito
-     *
-     * @throws Exception
-     */
-    @BeforeClass
-    public void setUpClass() throws Exception {
-        //minterService_.setDefaultSettingPath(TEST_FILE);
-        //minterService_.initializeStoredSetting();
-    }
+    private MinterService minterService_;   
     
     @BeforeMethod
     public void setUpMethod(){
