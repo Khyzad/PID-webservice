@@ -19,7 +19,6 @@ package com.hida.service;
 
 import com.hida.configuration.RepositoryConfiguration;
 import com.hida.model.DefaultSetting;
-import com.hida.model.NotEnoughPermutationsException;
 import com.hida.model.Pid;
 import com.hida.model.PidTest;
 import com.hida.model.Token;
@@ -43,7 +42,6 @@ import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyInt;
 import org.mockito.Mock;
 import static org.mockito.Mockito.atLeast;
-import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
