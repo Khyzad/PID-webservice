@@ -373,6 +373,25 @@ public class RepositoryServiceTest extends AbstractTestNGSpringContextTests {
         
         Assert.assertEquals(set.size(), size * 2);
     }
+    
+    @Test
+    public void testCacheReplacement(){
+        DefaultSetting setting1 = new DefaultSetting(defaultSetting_);
+        DefaultSetting setting2 = new DefaultSetting(defaultSetting_);
+        
+        setting1.setTokenType(Token.DIGIT);       
+        setting2.setTokenType(Token.LOWER_ALPHABET);
+        
+        // test the first pid in the first cache to ensure it matches Token.DIGIT
+        service_.generateCache(setting1);
+        Iterator<Pid> iter1 = service_.getCache().iterator();
+        pidTest_.testTokenType(iter1.next().getName(), setting1);
+        
+        // test the first pid in the second cache to ensure it matches Token.LOWER_ALPHABET
+        service_.generateCache(setting2);
+        Iterator<Pid> iter2 = service_.getCache().iterator();
+        pidTest_.testTokenType(iter2.next().getName(), setting2);
+    }
 
     @Test
     public void testInitializeStoredSetting() {
