@@ -18,12 +18,10 @@
 package com.hida.service;
 
 import com.hida.repositories.DefaultSettingRepository;
-import com.hida.repositories.PidRepository;
 import com.hida.model.Token;
 import com.hida.repositories.UsedSettingRepository;
 import com.hida.model.DefaultSetting;
 import com.hida.model.Pid;
-import com.hida.model.IdGenerator;
 import com.hida.model.NotEnoughPermutationsException;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -31,7 +29,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Properties;
 import java.util.Set;
 import org.slf4j.Logger;
