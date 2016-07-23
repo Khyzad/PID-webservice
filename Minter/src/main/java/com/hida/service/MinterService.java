@@ -59,10 +59,7 @@ public class MinterService {
      * Default setting values stored in resources folder
      */
     private String defaultSettingPath_ = "DefaultSetting.properties";
-
-    @Autowired
-    private PidRepository pidRepo_;
-
+    
     @Autowired
     private UsedSettingRepository usedSettingRepo_;
 
@@ -72,14 +69,7 @@ public class MinterService {
     @Autowired
     private RepositoryService repoService_;
 
-    private ArrayList<Pid> cachedPid_;
-
-    private long lastSequentialAmount_;
-
-    /**
-     * Declares a Generator object to manage
-     */
-    private IdGenerator generator_;
+    private long lastSequentialAmount_;    
 
     /**
      * The setting used to store the values of the current request
