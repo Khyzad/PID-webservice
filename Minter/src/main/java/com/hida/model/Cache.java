@@ -28,8 +28,8 @@ import java.util.Set;
  */
 public class Cache<T> {
 
-    long size_;
-    Set<T> set_ = new LinkedHashSet<>();
+    private long size_;
+    private Set<T> set_ = new LinkedHashSet<>();
     
     public boolean add(T value){
         if(!set_.contains(value)){
