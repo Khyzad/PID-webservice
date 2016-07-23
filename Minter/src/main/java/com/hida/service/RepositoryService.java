@@ -205,31 +205,7 @@ public class RepositoryService {
         }
         Set<Pid> set = this.generatePids(setting, amount);
 
-        boolean flag = true;
-        Iterator<Pid> iter = set.iterator();
-        // iterate through every id 
-        while (iter.hasNext() && flag) {
-            Pid pid = iter.next();
-
-            // counts the number of times an id has been rejected
-            long counter = 0;
-
-            // continuously increments invalid or non-unique ids
-            while (!isValidPid(pid) || !cache_.add(pid)) {
-
-                if (counter > totalPermutations) {
-                    // all possible permutations have been checked, raise flag
-                    flag = false;
-                    break;
-                }
-                else {
-                    // all possible permutations have not been checked, increment
-                    generator_.incrementPid(pid);
-                    counter++;
-                }
-
-            }
-        }
+        this.combinePidSet(cache_, set, totalPermutations);        
     }
 
     /**
