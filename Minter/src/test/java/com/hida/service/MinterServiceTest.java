@@ -32,6 +32,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
+import java.util.LinkedHashSet;
 import java.util.Properties;
 import java.util.Set;
 import org.mockito.Mock;
@@ -39,9 +40,12 @@ import org.mockito.InjectMocks;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyLong;
 import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.mockito.MockitoAnnotations;
@@ -82,7 +86,7 @@ public class MinterServiceTest extends AbstractTestNGSpringContextTests {
     private DefaultSettingRepository defaultSettingRepo_;
 
     @Mock
-    private GeneratorService generatorService_;
+    private GeneratorService genService_;
 
     @Mock
     private UsedSettingRepository usedSettingRepo_;
@@ -120,42 +124,28 @@ public class MinterServiceTest extends AbstractTestNGSpringContextTests {
     /**
      * Tests the MinterService by assuming that the settings aren't currently
      * stored in the database
-     *
-     * @param isRandom Determines if the PIDs are created randomly or
-     * sequentially
-     * @param isAuto Determines which generator, either Auto or Custom, will be
-     * used
      */
-    @Test(dataProvider = "mintSettings")
-    public void testMintWithNewUsedSetting(boolean isRandom, boolean isAuto) throws Exception {
-        // retrieve a sample DefaultSetting entity
-        DefaultSetting testSetting = this.sampleDefaultSetting();
-        testSetting.setAuto(isAuto);
-        testSetting.setRandom(isRandom);
+    @Test
+    public void testMintWithNewUsedSetting() throws Exception {
+        Set<Pid> sampleSet = getSampleSet();
+        when(genService_.generatePids(any(DefaultSetting.class), anyLong())).thenReturn(sampleSet);
 
-        // assume that any Pids created aren't already persisted and pretend to persist them
-        when(generatorService_.findOne(any(String.class))).thenReturn(null);
-        when(generatorService_.save(any(Pid.class))).thenReturn(null);
-
-        // assume the UsedSetting isn't persisted and pretend to persist it
+        // don't do anything when a save attempt has been made
+        doNothing().when(genService_).savePid(any(Pid.class));
+        doNothing().when(usedSettingRepo_).save(any(UsedSetting.class));
         when(usedSettingRepo_.findUsedSetting(any(String.class),
                 any(Token.class),
                 any(String.class),
                 anyInt(),
                 anyBoolean())).thenReturn(null);
 
-        when(usedSettingRepo_.save(any(UsedSetting.class))).thenReturn(null);
+        // start behavior
+        minterService_.mint(sampleSet.size(), sampleDefaultSetting());
 
-        // retrieve a sample DefaultSetting entity
-        int actualAmount = 5;
-        Set<Pid> testSet = minterService_.mint(actualAmount, testSetting);
-
-        // test behavior
-        Assert.assertEquals(actualAmount, testSet.size());
-        verify(generatorService_, atLeast(actualAmount)).findOne(any(String.class));
-        verify(generatorService_, atLeast(actualAmount)).save(any(Pid.class));
-        verify(usedSettingRepo_, atLeastOnce()).save(any(UsedSetting.class));
-        verify(usedSettingRepo_, atLeastOnce()).findUsedSetting(any(String.class),
+        // verify that save attempts have been made
+        verify(genService_, atLeast(sampleSet.size())).savePid(any(Pid.class));
+        verify(usedSettingRepo_, times(1)).save(any(UsedSetting.class));
+        verify(usedSettingRepo_, times(1)).findUsedSetting(any(String.class),
                 any(Token.class),
                 any(String.class),
                 anyInt(),
@@ -182,8 +172,8 @@ public class MinterServiceTest extends AbstractTestNGSpringContextTests {
         UsedSetting usedSetting = getSampleUsedSetting();
 
         // assume that any Pids created aren't already persisted and pretend to persist them
-        when(generatorService_.findOne(any(String.class))).thenReturn(null);
-        when(generatorService_.save(any(Pid.class))).thenReturn(null);
+        when(genService_.findOne(any(String.class))).thenReturn(null);
+        when(genService_.save(any(Pid.class))).thenReturn(null);
 
         // assume the UsedSetting isn't persisted and pretend to persist it        
         when(usedSettingRepo_.findUsedSetting(any(String.class),
@@ -201,8 +191,8 @@ public class MinterServiceTest extends AbstractTestNGSpringContextTests {
         // test behavior
         Assert.assertEquals(actualAmount, testSet.size());
         Assert.assertEquals(postTestAmount, usedSetting.getAmount());
-        verify(generatorService_, atLeast(actualAmount)).findOne(any(String.class));
-        verify(generatorService_, atLeast(actualAmount)).save(any(Pid.class));
+        verify(genService_, atLeast(actualAmount)).findOne(any(String.class));
+        verify(genService_, atLeast(actualAmount)).save(any(Pid.class));
         verify(usedSettingRepo_, never()).save(usedSetting);
         verify(usedSettingRepo_, atLeastOnce()).findUsedSetting(any(String.class),
                 any(Token.class),
@@ -224,8 +214,8 @@ public class MinterServiceTest extends AbstractTestNGSpringContextTests {
         UsedSetting usedSetting = getSampleUsedSetting();
 
         // assume that any Pids created aren't already persisted and pretend to persist them
-        when(generatorService_.findOne(any(String.class))).thenReturn(null);
-        when(generatorService_.save(any(Pid.class))).thenReturn(null);
+        when(genService_.findOne(any(String.class))).thenReturn(null);
+        when(genService_.save(any(Pid.class))).thenReturn(null);
 
         // assume the UsedSetting isn't persisted and pretend to persist it        
         when(usedSettingRepo_.findUsedSetting(any(String.class),
@@ -265,8 +255,8 @@ public class MinterServiceTest extends AbstractTestNGSpringContextTests {
         UsedSetting usedSetting = getSampleUsedSetting();
 
         // assume that any Pids created aren't already persisted and pretend to persist them
-        when(generatorService_.findOne(any(String.class))).thenReturn(null);
-        when(generatorService_.save(any(Pid.class))).thenReturn(null);
+        when(genService_.findOne(any(String.class))).thenReturn(null);
+        when(genService_.save(any(Pid.class))).thenReturn(null);
 
         // pretend to find and retrieve variable usedSetting
         when(usedSettingRepo_.findUsedSetting(any(String.class),
@@ -299,8 +289,8 @@ public class MinterServiceTest extends AbstractTestNGSpringContextTests {
         testSetting.setRandom(isRandom);
 
         // assume that any Pids created aren't already persisted and pretend to persist them
-        when(generatorService_.findOne(any(String.class))).thenReturn(null);
-        when(generatorService_.save(any(Pid.class))).thenReturn(null);
+        when(genService_.findOne(any(String.class))).thenReturn(null);
+        when(genService_.save(any(Pid.class))).thenReturn(null);
 
         // assume that UsedSetting entity with the relevant parameters does not exist
         when(usedSettingRepo_.findUsedSetting(any(String.class),
@@ -308,7 +298,7 @@ public class MinterServiceTest extends AbstractTestNGSpringContextTests {
                 any(String.class),
                 anyInt(),
                 anyBoolean())).thenReturn(null);
-        when(generatorService_.save(any(Pid.class))).thenReturn(null);
+        when(genService_.save(any(Pid.class))).thenReturn(null);
 
         // try to mint an amount greater than what is possible
         Set<Pid> testSet = minterService_.mint(11, testSetting);
@@ -335,8 +325,8 @@ public class MinterServiceTest extends AbstractTestNGSpringContextTests {
 
         // pretend any Pid with the name "0" is the only Pid that exists
         Pid sentinelPid = new Pid("1");
-        when(generatorService_.findOne(any(String.class))).thenReturn(sentinelPid);
-        when(generatorService_.findOne("0")).thenReturn(null);
+        when(genService_.findOne(any(String.class))).thenReturn(sentinelPid);
+        when(genService_.findOne("0")).thenReturn(null);
 
         // assume that UsedSetting entity with the relevant parameters does not exist
         when(usedSettingRepo_.findUsedSetting(any(String.class),
@@ -424,6 +414,16 @@ public class MinterServiceTest extends AbstractTestNGSpringContextTests {
                 1, // rootlength
                 true, //sans vowels
                 5); // amount
+    }
+
+    private Set<Pid> getSampleSet() {
+        Set<Pid> set = new LinkedHashSet<>();
+
+        for (int i = 0; i < 10; i++) {
+            set.add(new Pid(i + ""));
+        }
+
+        return set;
     }
 
     /**
