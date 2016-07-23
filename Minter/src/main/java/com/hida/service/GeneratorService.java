@@ -211,6 +211,7 @@ public class GeneratorService {
 
         if (!setting.isRandom() && setting.equals(cacheSetting_)) {
             set2 = generator_.sequentialMint(amount, lastSequentialAmount_);
+            lastSequentialAmount_ += amount;
         }
         else if (setting.isRandom()) {
             set2 = generator_.randomMint(amount);
