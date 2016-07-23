@@ -38,7 +38,10 @@ public class CacheTest {
     
     @Test
     public void testAdd(){
-        Assert.fail("unimplemented");
+        Cache<Integer> c = new Cache<>(); 
+        
+        Assert.assertEquals(c.add(0), true);
+        Assert.assertEquals(c.add(0), false);
     }
     
     @Test(dependsOnMethods = {"testAdd"})
