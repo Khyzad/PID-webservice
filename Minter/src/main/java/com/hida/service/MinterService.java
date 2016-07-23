@@ -57,7 +57,7 @@ public class MinterService {
      * Default setting values stored in resources folder
      */
     private String defaultSettingPath_ = "DefaultSetting.properties";
-    
+
     @Autowired
     private UsedSettingRepository usedSettingRepo_;
 
@@ -67,7 +67,7 @@ public class MinterService {
     @Autowired
     private GeneratorService repoService_;
 
-    private long lastSequentialAmount_;    
+    private long lastSequentialAmount_;
 
     /**
      * The setting used to store the values of the current request
@@ -98,37 +98,31 @@ public class MinterService {
     public Set<Pid> mint(long amount, DefaultSetting setting) throws IOException {
         LOGGER.info("in mint");
         // try to find a setting that matches and throw an exception if impossible
-        UsedSetting usedSetting = this.findUsedSetting(setting);
+        UsedSetting entity = this.findUsedSetting(setting);
         long max = repoService_.getMaxPermutation(setting);
-        if(usedSetting != null && usedSetting.getAmount() + amount > max){
-            LOGGER.error("Not enough remaining Permutations, "
-                    + "Requested Amount=" + amount + " --> "
-                    + "Amount Remaining=" + 0);
-            throw new NotEnoughPermutationsException(0, amount);
+        if (entity != null && entity.getAmount() + amount > max) {
+            throwNotEnoughPermutationException(amount - entity.getAmount(), amount);
         }
-        
+
         // generate pids at a recorded starting value whenever possible
         Set<Pid> set;
-        if(setting.equals(storedSetting_) && !setting.isRandom()){
+        if (setting.equals(storedSetting_) && !setting.isRandom()) {
             set = repoService_.generatePids(setting, amount, lastSequentialAmount_);
-        }else{
+        }
+        else {
             set = repoService_.generatePids(setting, amount);
         }
 
         if (set.size() != amount) {
-            LOGGER.error("Not enough remaining Permutations, "
-                    + "Requested Amount=" + amount + " --> "
-                    + "Amount Remaining=" + set.size());
-            throw new NotEnoughPermutationsException(set.size(), amount);
+            throwNotEnoughPermutationException(amount - set.size(), amount);
         }
         else {
             // persist the set of Pids
-            persistPids(setting, set, amount);
-
-            // return the set of ids
-            return set;
+            persistPids(setting, entity, set, amount);
         }
-
+        
+        // return the set of ids
+        return set;
     }
 
     /**
@@ -181,7 +175,7 @@ public class MinterService {
             defaultSettingRepo_.save(storedSetting_);
         }
     }
-    
+
     /**
      * Persists a set of Pids in the database. Also adds the Prepend to the Pids
      *
@@ -189,7 +183,8 @@ public class MinterService {
      * @param set A set of Pids
      * @param amountCreated Amount of pids that were created
      */
-    public void persistPids(DefaultSetting setting, Set<Pid> set, long amountCreated) {
+    public void persistPids(DefaultSetting setting, UsedSetting entity, Set<Pid> set,
+            long amountCreated) {
         LOGGER.info("in persistPids");
 
         for (Pid pid : set) {
@@ -200,13 +195,13 @@ public class MinterService {
         LOGGER.info("DatabaseUpdated with new pids");
 
         // update table format
-        recordSettings(setting, amountCreated);
+        recordSettings(setting, entity, amountCreated);
     }
 
     public DefaultSetting getStoredSetting() {
         return storedSetting_;
     }
-    
+
     /**
      * Returns the amount of Pids that were created using the settings
      *
@@ -218,7 +213,7 @@ public class MinterService {
 
         return entity.getAmount();
     }
-    
+
     public long getLastSequentialAmount() {
         return lastSequentialAmount_;
     }
@@ -230,34 +225,40 @@ public class MinterService {
     public void setDefaultSettingPath(String DefaultSettingPath) {
         this.defaultSettingPath_ = DefaultSettingPath;
     }
-    
+
+    private void throwNotEnoughPermutationException(long remaining, long requested)
+            throws NotEnoughPermutationsException {
+        LOGGER.error("Not enough remaining Permutations, "
+                + "Requested Amount=" + requested + " --> "
+                + "Amount Remaining=" + remaining);
+        throw new NotEnoughPermutationsException(remaining, requested);
+    }
+
     /**
      * Attempts to record the setting that were used to create the current set
      * of Pids
      *
      * @param amount The number of PIDs that were created
      */
-    private void recordSettings(DefaultSetting setting, long amount) {
+    private void recordSettings(DefaultSetting setting, UsedSetting entity, long amount) {
         LOGGER.info("in recordSettings");
 
-        UsedSetting entity = findUsedSetting(setting);
-
         if (entity == null) {
-            entity = new UsedSetting(setting.getPrefix(),
+            UsedSetting usedSetting = new UsedSetting(setting.getPrefix(),
                     setting.getTokenType(),
                     setting.getCharMap(),
                     setting.getRootLength(),
                     setting.isSansVowels(),
                     amount);
 
-            usedSettingRepo_.save(entity);
+            usedSettingRepo_.save(usedSetting);
         }
         else {
             long previousAmount = entity.getAmount();
             entity.setAmount(previousAmount + amount);
         }
     }
-    
+
     /**
      * Attempts to find a UsedSetting based on the currently used DefaultSetting
      *
@@ -336,5 +337,5 @@ public class MinterService {
         // save and close
         prop.store(output, "");
         output.close();
-    }   
+    }
 }

@@ -49,6 +49,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.mockito.MockitoAnnotations;
+import org.mockito.Spy;
 import org.springframework.boot.test.IntegrationTest;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.TestExecutionListeners;
@@ -144,7 +145,7 @@ public class MinterServiceTest extends AbstractTestNGSpringContextTests {
         setFindUsedSettingBehavior(sampleUsedSetting);
 
         // start behavior
-        minterService_.mint(sampleSet.size(), sampleDefaultSetting());
+        minterService_.mint(oldAmount, sampleDefaultSetting());
 
         // verify that save attempts have been made
         verify(genService_, atLeast(sampleSet.size())).savePid(any(Pid.class));
