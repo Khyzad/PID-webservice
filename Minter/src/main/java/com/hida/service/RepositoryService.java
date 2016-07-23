@@ -56,7 +56,7 @@ public class RepositoryService {
     @Autowired
     private DefaultSettingRepository defaultSettingRepo_;
 
-    private final Set<Pid> cache_ = new LinkedHashSet<>();
+    private Set<Pid> cache_ = new LinkedHashSet<>();
 
     private IdGenerator generator_;
 
@@ -185,26 +185,40 @@ public class RepositoryService {
     }
 
     /**
-     * Generates the cache
+     * Generates the cache. The method will check to see if the values passed in
+     * setting matches the setting of the cache. If it does it'll attempt to
+     * regenerate the cache, otherwsie it'll create an entirely new cache.
      *
      * @param setting The setting values to base the Pids off of
      */
     public void generateCache(DefaultSetting setting) {
-        // store the setting
-        this.cacheSetting_ = setting;
 
         // try to fulfill the requested cache size
-        long totalPermutations = this.getMaxPermutation(setting);
         long amount;
-        if (totalPermutations > setting.getCacheSize()) {
-            amount = setting.getCacheSize() - cache_.size();
+        long max = getMaxPermutation(setting);
+        if (setting.equals(cacheSetting_)) {
+            // regenerate the cache
+            if (max > setting.getCacheSize()) {
+                amount = setting.getCacheSize() - cache_.size();
+            }
+            else {
+                amount = max - cache_.size();
+            }
+            Set<Pid> set = createSet(setting, amount);
+            this.combinePidSet(cache_, set, max);
         }
         else {
-            amount = totalPermutations - cache_.size();
+            // store the setting and create a new cache
+            this.cacheSetting_ = setting;
+            if (max > setting.getCacheSize()) {
+                amount = setting.getCacheSize();
+            }
+            else {
+                amount = max;
+            }
+            cache_ = createSet(setting, amount);
+            this.rollPidSet(cache_, max);
         }
-        Set<Pid> set = createSet(setting, amount);
-
-        this.combinePidSet(cache_, set, totalPermutations);
     }
 
     /**
