@@ -65,7 +65,7 @@ public class MinterService {
     private DefaultSettingRepository defaultSettingRepo_;
 
     @Autowired
-    private RepositoryService repoService_;
+    private GeneratorService repoService_;
 
     private long lastSequentialAmount_;    
 

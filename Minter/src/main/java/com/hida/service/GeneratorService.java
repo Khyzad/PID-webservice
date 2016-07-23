@@ -43,7 +43,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service("repositoryService")
 @Transactional
-public class RepositoryService {
+public class GeneratorService {
 
     @Autowired
     private PidRepository pidRepo_;
@@ -63,7 +63,7 @@ public class RepositoryService {
     /**
      * Logger; logfile to be stored in resource folder
      */
-    private static final Logger LOGGER = LoggerFactory.getLogger(RepositoryService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(GeneratorService.class);
 
     /**
      * Creates a set of Pids that are guaranteed to be disjoint from the set of

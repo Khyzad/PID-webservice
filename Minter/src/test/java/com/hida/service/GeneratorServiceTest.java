@@ -19,6 +19,7 @@ package com.hida.service;
 
 import com.hida.configuration.RepositoryConfiguration;
 import com.hida.model.DefaultSetting;
+import com.hida.model.NotEnoughPermutationsException;
 import com.hida.model.Pid;
 import com.hida.model.PidTest;
 import com.hida.model.Token;
@@ -42,6 +43,7 @@ import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyInt;
 import org.mockito.Mock;
 import static org.mockito.Mockito.atLeast;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -62,7 +64,7 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 /**
- * A test class designed to test the functionality of RepositoryService
+ * A test class designed to test the functionality of GeneratorService
  *
  * @author lruffin
  */
@@ -73,7 +75,7 @@ import org.testng.annotations.Test;
 @TestExecutionListeners(inheritListeners = false, listeners = {
     DependencyInjectionTestExecutionListener.class,
     DirtiesContextTestExecutionListener.class})
-public class RepositoryServiceTest extends AbstractTestNGSpringContextTests {
+public class GeneratorServiceTest extends AbstractTestNGSpringContextTests {
 
     private final String TEST_FILE = "testDefaultSetting.properties";
 
@@ -87,7 +89,7 @@ public class RepositoryServiceTest extends AbstractTestNGSpringContextTests {
     private DefaultSettingRepository defaultSettingRepo_;
 
     @InjectMocks
-    private RepositoryService service_;
+    private GeneratorService service_;
 
     private DefaultSetting defaultSetting_;
 
