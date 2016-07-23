@@ -50,7 +50,7 @@ public class GeneratorService {
 
     private DefaultSetting cacheSetting_;
 
-    private long lastSequentialAmount_;
+    private long startingValue_;
 
     /**
      * Logger; logfile to be stored in resource folder
@@ -135,7 +135,7 @@ public class GeneratorService {
             this.rollPidSet(cache_, max);
             
             // reset lastSequentialAmount_
-            lastSequentialAmount_ = 0;
+            startingValue_ = 0;
         }
     }
 
@@ -168,12 +168,12 @@ public class GeneratorService {
         pidRepo_.save(pid);
     }
 
-    public long getLastSequentialAmount() {
-        return lastSequentialAmount_;
+    public long getStartingValue() {
+        return startingValue_;
     }
 
-    public void setLastSequentialAmount(long lastSequentialAmount) {
-        this.lastSequentialAmount_ = lastSequentialAmount;
+    public void setStartingValue(long startingValue) {
+        this.startingValue_ = startingValue;
     }        
 
     /**
@@ -187,8 +187,8 @@ public class GeneratorService {
         Set<Pid> set2;
 
         if (!setting.isRandom() && setting.equals(cacheSetting_)) {
-            set2 = generator_.sequentialMint(amount, lastSequentialAmount_);
-            lastSequentialAmount_ += amount;
+            set2 = generator_.sequentialMint(amount, startingValue_);
+            startingValue_ += amount;
         }
         else if (setting.isRandom()) {
             set2 = generator_.randomMint(amount);
