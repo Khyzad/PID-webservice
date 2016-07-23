@@ -120,6 +120,12 @@ public class GeneratorServiceTest extends AbstractTestNGSpringContextTests {
         when(usedSettingRepo_.save(any(UsedSetting.class))).thenReturn(null);
         when(defaultSettingRepo_.save(any(DefaultSetting.class))).thenReturn(null);
     }
+    
+    @Test
+    public void testSavePid(){
+        service_.savePid(new Pid());
+        verify(pidRepo_, times(1)).save(any(Pid.class));
+    }
 
     @Test
     public void testGeneratePids() {
