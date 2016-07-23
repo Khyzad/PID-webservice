@@ -93,40 +93,6 @@ public class GeneratorService {
         return set1;
     }
 
-    /**
-     * Creates a set of Pids at a starting value that are guaranteed to be
-     * disjoint from the set of Pids persisted in the database. If the current
-     * setting is random, have the generator return a random set, otherwise,
-     * have the generator return a sequential set
-     *
-     * @param setting The settings the Pids are based off of
-     * @param amount The requested amount of Pids
-     * @param startingValue The value to start at
-     * @return A set of Pids
-     */
-    public Set<Pid> generatePids(DefaultSetting setting, long amount, long startingValue) {
-        // create a generator
-        generator_ = getGenerator(setting);
-        long max = generator_.getMaxPermutation();
-
-        // collect the cache when possible and ensure that the cache is still unique
-        Set<Pid> set1 = new LinkedHashSet<>();
-        if (setting.equals(cacheSetting_)) {
-            set1 = collectCache(setting, amount);
-            rollPidSet(set1, max);
-        }
-
-        if (amount > set1.size()) {
-            // generate a set of Pids at an arbitrary starting value
-            Set<Pid> set2 = generator_.sequentialMint(amount, startingValue);
-
-            // combine the original and new set
-            this.combinePidSet(set1, set2, max);
-        }
-
-        return set1;
-    }
-
     public long getMaxPermutation(DefaultSetting setting) {
         generator_ = this.getGenerator(setting);
         return generator_.getMaxPermutation();
