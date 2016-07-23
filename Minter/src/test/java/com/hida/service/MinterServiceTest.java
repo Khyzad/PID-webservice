@@ -181,39 +181,7 @@ public class MinterServiceTest extends AbstractTestNGSpringContextTests {
                 anyBoolean());
         
         Assert.assertEquals(sampleUsedSetting.getAmount(), oldAmount + sampleSet.size());
-    }
-
-    /**
-     * Tests to ensure that the whenever the stored default setting is used then
-     * the requested amount is saved and used as a starting value.
-     */
-    @Test
-    public void testMintWithStartingValue() throws Exception {
-        // retrieve a sample DefaultSetting entity
-        DefaultSetting testSetting = this.sampleDefaultSetting();
-
-        // get a sample UsedSetting entity
-        UsedSetting usedSetting = getSampleUsedSetting();
-
-        // assume that any Pids created aren't already persisted and pretend to persist them
-        when(genService_.findOne(any(String.class))).thenReturn(null);
-        when(genService_.save(any(Pid.class))).thenReturn(null);
-
-        // assume the UsedSetting isn't persisted and pretend to persist it        
-        when(usedSettingRepo_.findUsedSetting(any(String.class),
-                any(Token.class),
-                any(String.class),
-                anyInt(),
-                anyBoolean())).thenReturn(usedSetting);
-        when(usedSettingRepo_.save(any(UsedSetting.class))).thenReturn(null);
-
-        // check to see if all the Pids were created
-        long amount = 5;
-        long lastAmount = minterService_.getLastSequentialAmount();
-        Set<Pid> testSet = minterService_.mint(amount, testSetting);
-
-        Assert.assertEquals(minterService_.getLastSequentialAmount(), (lastAmount + amount) % 10);
-    }
+    }   
 
     /**
      * Tests the MinterService to ensure that a NotEnoughPermutationsException
