@@ -32,7 +32,12 @@ public class Cache<T> {
     Set<T> set_ = new LinkedHashSet<>();
     
     public boolean add(T value){
-        return set_.add(value);
+        if(!set_.contains(value)){
+            size_++;
+            return set_.add(value);
+        }else{
+            return false;
+        }        
     }
     
     public long getSize(){
