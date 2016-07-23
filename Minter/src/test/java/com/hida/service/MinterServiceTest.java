@@ -17,6 +17,7 @@
  */
 package com.hida.service;
 
+import com.hida.configuration.RepositoryConfiguration;
 import com.hida.repositories.DefaultSettingRepository;
 import com.hida.repositories.PidRepository;
 import com.hida.repositories.UsedSettingRepository;
@@ -44,6 +45,14 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.mockito.MockitoAnnotations;
+import org.springframework.boot.test.IntegrationTest;
+import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.test.context.TestExecutionListeners;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
+import org.springframework.test.context.support.DirtiesContextTestExecutionListener;
+import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
+import org.springframework.test.context.web.WebAppConfiguration;
 import org.testng.Assert;
 import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeClass;
@@ -55,7 +64,14 @@ import org.testng.annotations.Test;
  *
  * @author lruffin
  */
-public class MinterServiceTest {
+@WebAppConfiguration
+@IntegrationTest
+@SpringApplicationConfiguration(classes = {RepositoryConfiguration.class})
+@TestPropertySource(locations = "classpath:testConfig.properties")
+@TestExecutionListeners(inheritListeners = false, listeners = {
+    DependencyInjectionTestExecutionListener.class,
+    DirtiesContextTestExecutionListener.class})
+public class MinterServiceTest extends AbstractTestNGSpringContextTests {
 
     /**
      * Default setting values stored in resources folder
