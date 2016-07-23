@@ -133,6 +133,9 @@ public class GeneratorService {
             }
             cache_ = createSet(setting, amount);
             this.rollPidSet(cache_, max);
+            
+            // reset lastSequentialAmount_
+            lastSequentialAmount_ = 0;
         }
     }
 
