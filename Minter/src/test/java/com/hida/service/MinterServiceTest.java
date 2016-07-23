@@ -60,6 +60,7 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import org.testng.Assert;
 import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -132,13 +133,8 @@ public class MinterServiceTest extends AbstractTestNGSpringContextTests {
                 .thenReturn(sampleSet);
 
         // don't do anything when a save attempt has been made
-        doNothing().when(genService_).savePid(any(Pid.class));        
-        when(usedSettingRepo_.save(any(UsedSetting.class))).thenReturn(null);
-        when(usedSettingRepo_.findUsedSetting(any(String.class),
-                any(Token.class),
-                any(String.class),
-                anyInt(),
-                anyBoolean())).thenReturn(null);
+        setSaveBehavior();
+        setFindUsedSettingBehavior(null);
 
         // start behavior
         minterService_.mint(sampleSet.size(), sampleDefaultSetting());
@@ -166,12 +162,8 @@ public class MinterServiceTest extends AbstractTestNGSpringContextTests {
         long oldAmount = sampleUsedSetting.getAmount();
 
         // don't do anything when a save attempt has been made
-        doNothing().when(genService_).savePid(any(Pid.class));
-        when(usedSettingRepo_.findUsedSetting(any(String.class),
-                any(Token.class),
-                any(String.class),
-                anyInt(),
-                anyBoolean())).thenReturn(sampleUsedSetting);
+        setSaveBehavior();
+        setFindUsedSettingBehavior(sampleUsedSetting);
 
         // start behavior
         minterService_.mint(sampleSet.size(), sampleDefaultSetting());
@@ -410,6 +402,20 @@ public class MinterServiceTest extends AbstractTestNGSpringContextTests {
         }
 
         return set;
+    }
+        
+    private void setSaveBehavior(){
+        doNothing().when(genService_).savePid(any(Pid.class));        
+        when(usedSettingRepo_.save(any(UsedSetting.class))).thenReturn(null);
+        when(defaultSettingRepo_.save(any(DefaultSetting.class))).thenReturn(null);
+    }
+    
+    private void setFindUsedSettingBehavior(UsedSetting setting){
+        when(usedSettingRepo_.findUsedSetting(any(String.class),
+                any(Token.class),
+                any(String.class),
+                anyInt(),
+                anyBoolean())).thenReturn(setting);
     }
 
     /**
