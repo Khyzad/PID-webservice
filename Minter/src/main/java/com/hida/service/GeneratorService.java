@@ -50,6 +50,8 @@ public class GeneratorService {
 
     private DefaultSetting cacheSetting_;
 
+    private long lastSequentialAmount_;
+
     /**
      * Logger; logfile to be stored in resource folder
      */
@@ -69,12 +71,12 @@ public class GeneratorService {
         // create a generator
         generator_ = getGenerator(setting);
         long max = generator_.getMaxPermutation();
-        
+
         // collect the cache when possible and ensure that the cache is still unique
         Set<Pid> set1 = new LinkedHashSet<>();
         if (setting.equals(cacheSetting_)) {
             set1 = collectCache(setting, amount);
-            rollPidSet(set1, max);                        
+            rollPidSet(set1, max);
         }
 
         // create a generator and generate pids if needed
@@ -106,7 +108,7 @@ public class GeneratorService {
         // create a generator
         generator_ = getGenerator(setting);
         long max = generator_.getMaxPermutation();
-        
+
         // collect the cache when possible and ensure that the cache is still unique
         Set<Pid> set1 = new LinkedHashSet<>();
         if (setting.equals(cacheSetting_)) {
@@ -117,18 +119,18 @@ public class GeneratorService {
         if (amount > set1.size()) {
             // generate a set of Pids at an arbitrary starting value
             Set<Pid> set2 = generator_.sequentialMint(amount, startingValue);
-            
+
             // combine the original and new set
             this.combinePidSet(set1, set2, max);
         }
 
         return set1;
-    }   
+    }
 
     public long getMaxPermutation(DefaultSetting setting) {
         generator_ = this.getGenerator(setting);
         return generator_.getMaxPermutation();
-    }     
+    }
 
     /**
      * Generates the cache. The method will check to see if the values passed in
@@ -192,8 +194,8 @@ public class GeneratorService {
     public Set<Pid> getCache() {
         return this.cache_;
     }
-    
-    public void savePid(Pid pid){
+
+    public void savePid(Pid pid) {
         pidRepo_.save(pid);
     }
 
@@ -206,7 +208,11 @@ public class GeneratorService {
      */
     private Set<Pid> createSet(DefaultSetting setting, long amount) {
         Set<Pid> set2;
-        if (setting.isRandom()) {
+
+        if (!setting.isRandom() && setting.equals(cacheSetting_)) {
+            set2 = generator_.sequentialMint(amount, lastSequentialAmount_);
+        }
+        else if (setting.isRandom()) {
             set2 = generator_.randomMint(amount);
         }
         else {
@@ -318,5 +324,5 @@ public class GeneratorService {
                     setting.isSansVowels(),
                     setting.getCharMap());
         }
-    }       
+    }
 }
