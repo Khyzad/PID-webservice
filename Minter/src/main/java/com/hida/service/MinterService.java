@@ -97,6 +97,15 @@ public class MinterService {
      */
     public Set<Pid> mint(long amount, DefaultSetting setting) throws IOException {
         LOGGER.info("in mint");
+        // try to find a setting that matches and throw an exception if impossible
+        UsedSetting usedSetting = this.findUsedSetting(setting);
+        long max = repoService_.getMaxPermutation(setting);
+        if(usedSetting != null && usedSetting.getAmount() + amount > max){
+            LOGGER.error("Not enough remaining Permutations, "
+                    + "Requested Amount=" + amount + " --> "
+                    + "Amount Remaining=" + 0);
+            throw new NotEnoughPermutationsException(0, amount);
+        }
         
         // generate pids at a recorded starting value whenever possible
         Set<Pid> set;
