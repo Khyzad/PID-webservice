@@ -162,11 +162,19 @@ public class GeneratorService {
 
     public Set<Pid> getCache() {
         return this.cache_;
-    }
+    }        
 
     public void savePid(Pid pid) {
         pidRepo_.save(pid);
     }
+
+    public long getLastSequentialAmount() {
+        return lastSequentialAmount_;
+    }
+
+    public void setLastSequentialAmount(long lastSequentialAmount) {
+        this.lastSequentialAmount_ = lastSequentialAmount;
+    }        
 
     /**
      * Creates a set of Pids based on desired values.
