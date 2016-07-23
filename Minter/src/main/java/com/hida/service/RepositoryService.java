@@ -196,8 +196,9 @@ public class RepositoryService {
         // try to fulfill the requested cache size
         long amount;
         long max = getMaxPermutation(setting);
+        
+        // regenerate the cache
         if (setting.equals(cacheSetting_)) {
-            // regenerate the cache
             if (max > setting.getCacheSize()) {
                 amount = setting.getCacheSize() - cache_.size();
             }
@@ -207,8 +208,8 @@ public class RepositoryService {
             Set<Pid> set = createSet(setting, amount);
             this.combinePidSet(cache_, set, max);
         }
+        // store the setting and create a new cache
         else {
-            // store the setting and create a new cache
             this.cacheSetting_ = setting;
             if (max > setting.getCacheSize()) {
                 amount = setting.getCacheSize();
