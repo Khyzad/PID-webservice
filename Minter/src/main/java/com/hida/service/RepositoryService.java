@@ -133,45 +133,12 @@ public class RepositoryService {
         }
 
         return set1;
-    }
-
-    /**
-     * Persists a set of Pids in the database. Also adds the Prepend to the Pids
-     *
-     * @param setting The settings the Pids are based off of
-     * @param set A set of Pids
-     * @param amountCreated Amount of pids that were created
-     */
-    public void persistPids(DefaultSetting setting, Set<Pid> set, long amountCreated) {
-        LOGGER.info("in persistPids");
-
-        for (Pid pid : set) {
-            pidRepo_.save(pid);
-            pid.setName(setting.getPrepend() + pid.getName());
-        }
-
-        LOGGER.info("DatabaseUpdated with new pids");
-
-        // update table format
-        recordSettings(setting, amountCreated);
-    }
+    }   
 
     public long getMaxPermutation(DefaultSetting setting) {
         generator_ = this.getGenerator(setting);
         return generator_.getMaxPermutation();
-    }
-
-    /**
-     * Returns the amount of Pids that were created using the settings
-     *
-     * @param setting The settings the Pids are based off of
-     * @return The amount of permutations remaining
-     */
-    public long getCurrentAmount(DefaultSetting setting) {
-        UsedSetting entity = this.findUsedSetting(setting);
-
-        return entity.getAmount();
-    }
+    }   
 
     /**
      * Updates the CurrentDefaultSetting to match the values in the given
@@ -388,47 +355,5 @@ public class RepositoryService {
                     setting.isSansVowels(),
                     setting.getCharMap());
         }
-    }
-
-    /**
-     * Attempts to record the setting that were used to create the current set
-     * of Pids
-     *
-     * @param amount The number of PIDs that were created
-     */
-    private void recordSettings(DefaultSetting setting, long amount) {
-        LOGGER.info("in recordSettings");
-
-        UsedSetting entity = findUsedSetting(setting);
-
-        if (entity == null) {
-            entity = new UsedSetting(setting.getPrefix(),
-                    setting.getTokenType(),
-                    setting.getCharMap(),
-                    setting.getRootLength(),
-                    setting.isSansVowels(),
-                    amount);
-
-            usedSettingRepo_.save(entity);
-        }
-        else {
-            long previousAmount = entity.getAmount();
-            entity.setAmount(previousAmount + amount);
-        }
-    }
-
-    /**
-     * Attempts to find a UsedSetting based on the currently used DefaultSetting
-     *
-     * @return Returns a UsedSetting entity if found, null otherwise
-     */
-    private UsedSetting findUsedSetting(DefaultSetting setting) {
-        LOGGER.info("in findUsedSetting");
-
-        return usedSettingRepo_.findUsedSetting(setting.getPrefix(),
-                setting.getTokenType(),
-                setting.getCharMap(),
-                setting.getRootLength(),
-                setting.isSansVowels());
-    }
+    }       
 }

@@ -23,6 +23,7 @@ import com.hida.repositories.UsedSettingRepository;
 import com.hida.model.DefaultSetting;
 import com.hida.model.Pid;
 import com.hida.model.NotEnoughPermutationsException;
+import com.hida.model.UsedSetting;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -113,7 +114,7 @@ public class MinterService {
         }
         else {
             // persist the set of Pids
-            repoService_.persistPids(setting, set, amount);
+            persistPids(setting, set, amount);
 
             // return the set of ids
             return set;
@@ -171,9 +172,84 @@ public class MinterService {
             defaultSettingRepo_.save(storedSetting_);
         }
     }
+    
+    /**
+     * Persists a set of Pids in the database. Also adds the Prepend to the Pids
+     *
+     * @param setting The settings the Pids are based off of
+     * @param set A set of Pids
+     * @param amountCreated Amount of pids that were created
+     */
+    public void persistPids(DefaultSetting setting, Set<Pid> set, long amountCreated) {
+        LOGGER.info("in persistPids");
+
+        for (Pid pid : set) {
+            pidRepo_.save(pid);
+            pid.setName(setting.getPrepend() + pid.getName());
+        }
+
+        LOGGER.info("DatabaseUpdated with new pids");
+
+        // update table format
+        recordSettings(setting, amountCreated);
+    }
 
     public DefaultSetting getStoredSetting() {
         return storedSetting_;
+    }
+    
+    /**
+     * Attempts to record the setting that were used to create the current set
+     * of Pids
+     *
+     * @param amount The number of PIDs that were created
+     */
+    private void recordSettings(DefaultSetting setting, long amount) {
+        LOGGER.info("in recordSettings");
+
+        UsedSetting entity = findUsedSetting(setting);
+
+        if (entity == null) {
+            entity = new UsedSetting(setting.getPrefix(),
+                    setting.getTokenType(),
+                    setting.getCharMap(),
+                    setting.getRootLength(),
+                    setting.isSansVowels(),
+                    amount);
+
+            usedSettingRepo_.save(entity);
+        }
+        else {
+            long previousAmount = entity.getAmount();
+            entity.setAmount(previousAmount + amount);
+        }
+    }
+    
+    /**
+     * Attempts to find a UsedSetting based on the currently used DefaultSetting
+     *
+     * @return Returns a UsedSetting entity if found, null otherwise
+     */
+    private UsedSetting findUsedSetting(DefaultSetting setting) {
+        LOGGER.info("in findUsedSetting");
+
+        return usedSettingRepo_.findUsedSetting(setting.getPrefix(),
+                setting.getTokenType(),
+                setting.getCharMap(),
+                setting.getRootLength(),
+                setting.isSansVowels());
+    }
+    
+    /**
+     * Returns the amount of Pids that were created using the settings
+     *
+     * @param setting The settings the Pids are based off of
+     * @return The amount of permutations remaining
+     */
+    public long getCurrentAmount(DefaultSetting setting) {
+        UsedSetting entity = this.findUsedSetting(setting);
+
+        return entity.getAmount();
     }
 
     /**
