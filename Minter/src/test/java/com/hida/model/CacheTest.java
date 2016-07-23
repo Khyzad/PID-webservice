@@ -37,7 +37,13 @@ public class CacheTest {
     
     @Test(dependsOnMethods = {"testAdd"})
     public void testGetSize(){
-        Assert.fail("unimplemented");
+        Cache<Integer> c = new Cache<>();
+        int size = 10;
+        for (int i = 0; i < size; i++) {
+            c.add(i);
+        }
+        
+        Assert.assertEquals(c.getSize(), size);
     }
     
     @Test
