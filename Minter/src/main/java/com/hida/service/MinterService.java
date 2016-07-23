@@ -104,14 +104,8 @@ public class MinterService {
             throwNotEnoughPermutationException(amount - entity.getAmount(), amount);
         }
 
-        // generate pids at a recorded starting value whenever possible
-        Set<Pid> set;
-        if (setting.equals(storedSetting_) && !setting.isRandom()) {
-            set = repoService_.generatePids(setting, amount, lastSequentialAmount_);
-        }
-        else {
-            set = repoService_.generatePids(setting, amount);
-        }
+        // generate pids and check its validity
+        Set<Pid> set = repoService_.generatePids(setting, amount);        
 
         if (set.size() != amount) {
             throwNotEnoughPermutationException(amount - set.size(), amount);

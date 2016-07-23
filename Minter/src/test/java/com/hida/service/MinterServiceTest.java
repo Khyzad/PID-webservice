@@ -108,7 +108,7 @@ public class MinterServiceTest extends AbstractTestNGSpringContextTests {
     @Test
     public void testMintWithNewUsedSetting() throws Exception {
         Set<Pid> sampleSet = getSampleSet();
-        when(genService_.generatePids(any(DefaultSetting.class), anyLong(), anyLong()))
+        when(genService_.generatePids(any(DefaultSetting.class), anyLong()))
                 .thenReturn(sampleSet);
 
         // don't do anything when a save attempt has been made
@@ -136,7 +136,7 @@ public class MinterServiceTest extends AbstractTestNGSpringContextTests {
     public void testMintWithOldUsedSetting() throws Exception {
         Set<Pid> sampleSet = getSampleSet();
         UsedSetting sampleUsedSetting = getSampleUsedSetting();
-        when(genService_.generatePids(any(DefaultSetting.class), anyLong(), anyLong()))
+        when(genService_.generatePids(any(DefaultSetting.class), anyLong()))
                 .thenReturn(sampleSet);
         long oldAmount = sampleUsedSetting.getAmount();
 
