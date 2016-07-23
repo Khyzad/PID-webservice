@@ -78,10 +78,15 @@ public class RepositoryService {
      * @return A set of Pids
      */
     public Set<Pid> generatePids(DefaultSetting setting, long amount) {
-        // collect the cache when possible
+        // create a generator
+        generator_ = getGenerator(setting);
+        long max = generator_.getMaxPermutation();
+        
+        // collect the cache when possible and ensure that the cache is still unique
         Set<Pid> set1 = new LinkedHashSet<>();
         if (setting.equals(cacheSetting_)) {
             set1 = collectCache(setting, amount);
+            rollPidSet(set1, max);                        
         }
 
         // create a generator and generate pids if needed
@@ -112,17 +117,24 @@ public class RepositoryService {
     public Set<Pid> generatePids(DefaultSetting setting, long amount, long startingValue) {
         // create a generator
         generator_ = getGenerator(setting);
+        long max = generator_.getMaxPermutation();
+        
+        // collect the cache when possible and ensure that the cache is still unique
+        Set<Pid> set1 = new LinkedHashSet<>();
+        if (setting.equals(cacheSetting_)) {
+            set1 = collectCache(setting, amount);
+            rollPidSet(set1, max);
+        }
 
-        // generate a set of Pids at an arbitrary starting value
-        Set<Pid> set = generator_.sequentialMint(amount, startingValue);
+        if (amount > set1.size()) {
+            // generate a set of Pids at an arbitrary starting value
+            Set<Pid> set2 = generator_.sequentialMint(amount, startingValue);
+            
+            // combine the original and new set
+            this.combinePidSet(set1, set2, max);
+        }
 
-        // calculat maximum permutations
-        long total = generator_.getMaxPermutation();
-
-        // check ids and increment them appropriately
-        set = rollPidSet(set, total);
-
-        return set;
+        return set1;
     }
 
     /**
@@ -196,7 +208,7 @@ public class RepositoryService {
         // try to fulfill the requested cache size
         long amount;
         long max = getMaxPermutation(setting);
-        
+
         // regenerate the cache
         if (setting.equals(cacheSetting_)) {
             if (max > setting.getCacheSize()) {
