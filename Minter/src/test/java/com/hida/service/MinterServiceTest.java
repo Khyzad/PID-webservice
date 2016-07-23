@@ -82,7 +82,7 @@ public class MinterServiceTest extends AbstractTestNGSpringContextTests {
     private DefaultSettingRepository defaultSettingRepo_;
 
     @Mock
-    private PidRepository pidRepo_;
+    private GeneratorService generatorService_;
 
     @Mock
     private UsedSettingRepository usedSettingRepo_;
@@ -134,8 +134,8 @@ public class MinterServiceTest extends AbstractTestNGSpringContextTests {
         testSetting.setRandom(isRandom);
 
         // assume that any Pids created aren't already persisted and pretend to persist them
-        when(pidRepo_.findOne(any(String.class))).thenReturn(null);
-        when(pidRepo_.save(any(Pid.class))).thenReturn(null);
+        when(generatorService_.findOne(any(String.class))).thenReturn(null);
+        when(generatorService_.save(any(Pid.class))).thenReturn(null);
 
         // assume the UsedSetting isn't persisted and pretend to persist it
         when(usedSettingRepo_.findUsedSetting(any(String.class),
@@ -152,8 +152,8 @@ public class MinterServiceTest extends AbstractTestNGSpringContextTests {
 
         // test behavior
         Assert.assertEquals(actualAmount, testSet.size());
-        verify(pidRepo_, atLeast(actualAmount)).findOne(any(String.class));
-        verify(pidRepo_, atLeast(actualAmount)).save(any(Pid.class));
+        verify(generatorService_, atLeast(actualAmount)).findOne(any(String.class));
+        verify(generatorService_, atLeast(actualAmount)).save(any(Pid.class));
         verify(usedSettingRepo_, atLeastOnce()).save(any(UsedSetting.class));
         verify(usedSettingRepo_, atLeastOnce()).findUsedSetting(any(String.class),
                 any(Token.class),
@@ -182,8 +182,8 @@ public class MinterServiceTest extends AbstractTestNGSpringContextTests {
         UsedSetting usedSetting = getSampleUsedSetting();
 
         // assume that any Pids created aren't already persisted and pretend to persist them
-        when(pidRepo_.findOne(any(String.class))).thenReturn(null);
-        when(pidRepo_.save(any(Pid.class))).thenReturn(null);
+        when(generatorService_.findOne(any(String.class))).thenReturn(null);
+        when(generatorService_.save(any(Pid.class))).thenReturn(null);
 
         // assume the UsedSetting isn't persisted and pretend to persist it        
         when(usedSettingRepo_.findUsedSetting(any(String.class),
@@ -201,8 +201,8 @@ public class MinterServiceTest extends AbstractTestNGSpringContextTests {
         // test behavior
         Assert.assertEquals(actualAmount, testSet.size());
         Assert.assertEquals(postTestAmount, usedSetting.getAmount());
-        verify(pidRepo_, atLeast(actualAmount)).findOne(any(String.class));
-        verify(pidRepo_, atLeast(actualAmount)).save(any(Pid.class));
+        verify(generatorService_, atLeast(actualAmount)).findOne(any(String.class));
+        verify(generatorService_, atLeast(actualAmount)).save(any(Pid.class));
         verify(usedSettingRepo_, never()).save(usedSetting);
         verify(usedSettingRepo_, atLeastOnce()).findUsedSetting(any(String.class),
                 any(Token.class),
@@ -224,8 +224,8 @@ public class MinterServiceTest extends AbstractTestNGSpringContextTests {
         UsedSetting usedSetting = getSampleUsedSetting();
 
         // assume that any Pids created aren't already persisted and pretend to persist them
-        when(pidRepo_.findOne(any(String.class))).thenReturn(null);
-        when(pidRepo_.save(any(Pid.class))).thenReturn(null);
+        when(generatorService_.findOne(any(String.class))).thenReturn(null);
+        when(generatorService_.save(any(Pid.class))).thenReturn(null);
 
         // assume the UsedSetting isn't persisted and pretend to persist it        
         when(usedSettingRepo_.findUsedSetting(any(String.class),
@@ -265,8 +265,8 @@ public class MinterServiceTest extends AbstractTestNGSpringContextTests {
         UsedSetting usedSetting = getSampleUsedSetting();
 
         // assume that any Pids created aren't already persisted and pretend to persist them
-        when(pidRepo_.findOne(any(String.class))).thenReturn(null);
-        when(pidRepo_.save(any(Pid.class))).thenReturn(null);
+        when(generatorService_.findOne(any(String.class))).thenReturn(null);
+        when(generatorService_.save(any(Pid.class))).thenReturn(null);
 
         // pretend to find and retrieve variable usedSetting
         when(usedSettingRepo_.findUsedSetting(any(String.class),
@@ -299,8 +299,8 @@ public class MinterServiceTest extends AbstractTestNGSpringContextTests {
         testSetting.setRandom(isRandom);
 
         // assume that any Pids created aren't already persisted and pretend to persist them
-        when(pidRepo_.findOne(any(String.class))).thenReturn(null);
-        when(pidRepo_.save(any(Pid.class))).thenReturn(null);
+        when(generatorService_.findOne(any(String.class))).thenReturn(null);
+        when(generatorService_.save(any(Pid.class))).thenReturn(null);
 
         // assume that UsedSetting entity with the relevant parameters does not exist
         when(usedSettingRepo_.findUsedSetting(any(String.class),
@@ -308,7 +308,7 @@ public class MinterServiceTest extends AbstractTestNGSpringContextTests {
                 any(String.class),
                 anyInt(),
                 anyBoolean())).thenReturn(null);
-        when(pidRepo_.save(any(Pid.class))).thenReturn(null);
+        when(generatorService_.save(any(Pid.class))).thenReturn(null);
 
         // try to mint an amount greater than what is possible
         Set<Pid> testSet = minterService_.mint(11, testSetting);
@@ -335,8 +335,8 @@ public class MinterServiceTest extends AbstractTestNGSpringContextTests {
 
         // pretend any Pid with the name "0" is the only Pid that exists
         Pid sentinelPid = new Pid("1");
-        when(pidRepo_.findOne(any(String.class))).thenReturn(sentinelPid);
-        when(pidRepo_.findOne("0")).thenReturn(null);
+        when(generatorService_.findOne(any(String.class))).thenReturn(sentinelPid);
+        when(generatorService_.findOne("0")).thenReturn(null);
 
         // assume that UsedSetting entity with the relevant parameters does not exist
         when(usedSettingRepo_.findUsedSetting(any(String.class),
