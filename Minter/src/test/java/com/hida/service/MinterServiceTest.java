@@ -128,11 +128,12 @@ public class MinterServiceTest extends AbstractTestNGSpringContextTests {
     @Test
     public void testMintWithNewUsedSetting() throws Exception {
         Set<Pid> sampleSet = getSampleSet();
-        when(genService_.generatePids(any(DefaultSetting.class), anyLong())).thenReturn(sampleSet);
+        when(genService_.generatePids(any(DefaultSetting.class), anyLong(), anyLong()))
+                .thenReturn(sampleSet);
 
         // don't do anything when a save attempt has been made
-        doNothing().when(genService_).savePid(any(Pid.class));
-        doNothing().when(usedSettingRepo_).save(any(UsedSetting.class));
+        doNothing().when(genService_).savePid(any(Pid.class));        
+        when(usedSettingRepo_.save(any(UsedSetting.class))).thenReturn(null);
         when(usedSettingRepo_.findUsedSetting(any(String.class),
                 any(Token.class),
                 any(String.class),
@@ -154,51 +155,36 @@ public class MinterServiceTest extends AbstractTestNGSpringContextTests {
 
     /**
      * Tests the MinterService under the scenario where UsedSetting entity with
-     * matching parameters already exist.
-     *
-     * @param isRandom Determines if the PIDs are created randomly or
-     * sequentially
-     * @param isAuto Determines which generator, either Auto or Custom, will be
-     * used
+     * matching parameters already exist.     
      */
-    @Test(dataProvider = "mintSettings")
-    public void testMintWithOldUsedSetting(boolean isAuto, boolean isRandom) throws Exception {
-        // retrieve a sample DefaultSetting entity
-        DefaultSetting testSetting = this.sampleDefaultSetting();
-        testSetting.setAuto(isAuto);
-        testSetting.setRandom(isRandom);
+    @Test
+    public void testMintWithOldUsedSetting() throws Exception {
+        Set<Pid> sampleSet = getSampleSet();
+        UsedSetting sampleUsedSetting = getSampleUsedSetting();
+        when(genService_.generatePids(any(DefaultSetting.class), anyLong(), anyLong()))
+                .thenReturn(sampleSet);
+        long oldAmount = sampleUsedSetting.getAmount();
 
-        // get a sample UsedSetting entity
-        UsedSetting usedSetting = getSampleUsedSetting();
-
-        // assume that any Pids created aren't already persisted and pretend to persist them
-        when(genService_.findOne(any(String.class))).thenReturn(null);
-        when(genService_.save(any(Pid.class))).thenReturn(null);
-
-        // assume the UsedSetting isn't persisted and pretend to persist it        
+        // don't do anything when a save attempt has been made
+        doNothing().when(genService_).savePid(any(Pid.class));
         when(usedSettingRepo_.findUsedSetting(any(String.class),
                 any(Token.class),
                 any(String.class),
                 anyInt(),
-                anyBoolean())).thenReturn(usedSetting);
-        when(usedSettingRepo_.save(usedSetting)).thenReturn(null);
+                anyBoolean())).thenReturn(sampleUsedSetting);
 
-        int preTestAmount = (int) usedSetting.getAmount();
-        int actualAmount = 5;
-        int postTestAmount = actualAmount + preTestAmount;
-        Set<Pid> testSet = minterService_.mint(actualAmount, testSetting);
+        // start behavior
+        minterService_.mint(sampleSet.size(), sampleDefaultSetting());
 
-        // test behavior
-        Assert.assertEquals(actualAmount, testSet.size());
-        Assert.assertEquals(postTestAmount, usedSetting.getAmount());
-        verify(genService_, atLeast(actualAmount)).findOne(any(String.class));
-        verify(genService_, atLeast(actualAmount)).save(any(Pid.class));
-        verify(usedSettingRepo_, never()).save(usedSetting);
-        verify(usedSettingRepo_, atLeastOnce()).findUsedSetting(any(String.class),
+        // verify that save attempts have been made
+        verify(genService_, atLeast(sampleSet.size())).savePid(any(Pid.class));
+        verify(usedSettingRepo_, times(1)).findUsedSetting(any(String.class),
                 any(Token.class),
                 any(String.class),
                 anyInt(),
                 anyBoolean());
+        
+        Assert.assertEquals(sampleUsedSetting.getAmount(), oldAmount + sampleSet.size());
     }
 
     /**
