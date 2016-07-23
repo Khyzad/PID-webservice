@@ -155,7 +155,22 @@ public class MinterServiceTest extends AbstractTestNGSpringContextTests {
                 anyBoolean());
         
         Assert.assertEquals(sampleUsedSetting.getAmount(), oldAmount + sampleSet.size());
-    }          
+    }
+    
+    @Test(expectedExceptions = NotEnoughPermutationsException.class)
+    public void testExceptionBeforeGeneration() throws Exception {
+        UsedSetting sampleUsedSetting = getSampleUsedSetting();
+        Set<Pid> sampleSet = getSampleSet();
+        when(genService_.generatePids(any(DefaultSetting.class), anyLong()))
+                .thenReturn(sampleSet);
+        
+        // pretend a usedSetting was found
+        setFindUsedSettingBehavior(sampleUsedSetting);
+        
+        // try to mint an impossible amount
+        minterService_.mint(sampleSet.size(), sampleDefaultSetting());        
+    }
+        
 
     /**
      * Test in MinterService that ensures that the CurrentSetting is sought
