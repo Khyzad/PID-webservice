@@ -88,13 +88,10 @@ public class RepositoryService {
         Set<Pid> set2;
         generator_ = getGenerator(setting);
         if (amount > set1.size()) {
-            if (setting.isRandom()) {
-                set2 = generator_.randomMint(amount);
-            }
-            else {
-                set2 = generator_.sequentialMint(amount);
-            }
+            // create a second set of Pids to add to the original
+            set2 = createSet(setting, amount);
 
+            // combine the original and new set
             this.combinePidSet(set1, set2, amount);
         }
 
@@ -205,7 +202,7 @@ public class RepositoryService {
         else {
             amount = totalPermutations - cache_.size();
         }
-        Set<Pid> set = this.generatePids(setting, amount);
+        Set<Pid> set = createSet(setting, amount);
 
         this.combinePidSet(cache_, set, totalPermutations);
     }
@@ -243,6 +240,24 @@ public class RepositoryService {
 
     public Set<Pid> getCache() {
         return this.cache_;
+    }
+
+    /**
+     * Creates a set of Pids based on desired values.
+     *
+     * @param setting The settings the Pids are based off of
+     * @param amount The amount of Pids to create
+     * @return
+     */
+    private Set<Pid> createSet(DefaultSetting setting, long amount) {
+        Set<Pid> set2;
+        if (setting.isRandom()) {
+            set2 = generator_.randomMint(amount);
+        }
+        else {
+            set2 = generator_.sequentialMint(amount);
+        }
+        return set2;
     }
 
     /**
