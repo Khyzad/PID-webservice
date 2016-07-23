@@ -79,12 +79,14 @@ public class RepositoryService {
      */
     public Set<Pid> generatePids(DefaultSetting setting, long amount) {
         // collect the cache when possible
-        Set<Pid> set1 = collectCache(setting, amount);
+        Set<Pid> set1 = new LinkedHashSet<>();
+        if (setting.equals(cacheSetting_)) {
+            set1 = collectCache(setting, amount);
+        }
 
-        // create a generator
+        // create a generator and generate pids if needed
         Set<Pid> set2;
         generator_ = getGenerator(setting);
-
         if (amount > set1.size()) {
             if (setting.isRandom()) {
                 set2 = generator_.randomMint(amount);
@@ -92,7 +94,7 @@ public class RepositoryService {
             else {
                 set2 = generator_.sequentialMint(amount);
             }
-            
+
             this.combinePidSet(set1, set2, amount);
         }
 
@@ -205,7 +207,7 @@ public class RepositoryService {
         }
         Set<Pid> set = this.generatePids(setting, amount);
 
-        this.combinePidSet(cache_, set, totalPermutations);        
+        this.combinePidSet(cache_, set, totalPermutations);
     }
 
     /**
@@ -218,15 +220,13 @@ public class RepositoryService {
     public Set<Pid> collectCache(DefaultSetting setting, long amount) {
         Set<Pid> set1 = new LinkedHashSet<>();
 
-        if (setting.equals(cacheSetting_)) {
-            Iterator<Pid> iter = cache_.iterator();
-            for (long i = 0; i < amount && iter.hasNext(); i++) {
-                Pid pid = iter.next();
-                set1.add(pid);
-            }
-
-            cache_.removeAll(set1);
+        Iterator<Pid> iter = cache_.iterator();
+        for (long i = 0; i < amount && iter.hasNext(); i++) {
+            Pid pid = iter.next();
+            set1.add(pid);
         }
+
+        cache_.removeAll(set1);
 
         return set1;
     }
