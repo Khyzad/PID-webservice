@@ -96,8 +96,18 @@ public class CacheTest {
         Assert.assertEquals(c.getSize(), size - limit);
     }
     
-    @Test(dependsOnMethods = {"testAdd"})
+    @Test(dependsOnMethods = {"testAdd", "testIsEmpty"})
     public void testRemoveAll(){
-        Assert.fail("unimplemented");
+        Cache<Integer> c = new Cache<>();
+        int size = 10;        
+        
+        // populate the cahe
+        for (int i = 0; i < size; i++) {
+            c.add(i);
+        }
+        
+        c.removeAll();
+        
+        Assert.assertEquals(c.isEmpty(), true);
     }
 }
