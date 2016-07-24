@@ -88,7 +88,7 @@ public class CacheTest {
         }
         
         // check the value of the cache
-        Set<Integer> set = c.peek(limit);
+        Set<Integer> set = c.collect(limit);
         Iterator<Integer> iter1 = set.iterator();                
         for (int i = 0; i < limit; i++) {
             Assert.assertEquals(iter1.next().intValue(), i);
