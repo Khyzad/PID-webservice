@@ -77,7 +77,8 @@ public class Cache<T> {
     }
 
     public void removeAll() {
-
+        set_.clear();
+        size_ = 0;
     }
 
 }
