@@ -116,7 +116,7 @@ public class MinterServiceTest extends AbstractTestNGSpringContextTests {
         setFindUsedSettingBehavior(null);
 
         // start behavior
-        minterService_.mint(sampleSet.size(), sampleDefaultSetting());
+        minterService_.mint(sampleSet.size(), getSampleDefaultSetting());
 
         // verify that save attempts have been made
         verify(genService_, atLeast(sampleSet.size())).savePid(any(Pid.class));
@@ -136,16 +136,21 @@ public class MinterServiceTest extends AbstractTestNGSpringContextTests {
     public void testMintWithOldUsedSetting() throws Exception {
         Set<Pid> sampleSet = getSampleSet();
         UsedSetting sampleUsedSetting = getSampleUsedSetting();
-        when(genService_.generatePids(any(DefaultSetting.class), anyLong()))
-                .thenReturn(sampleSet);
-        long oldAmount = sampleUsedSetting.getAmount();
-
-        // don't do anything when a save attempt has been made
+        DefaultSetting sampleDefaultSetting = getSampleDefaultSetting();
+        
+        // set up behavior
+        when(genService_.generatePids(any(DefaultSetting.class), anyLong())).thenReturn(sampleSet);
+        when(genService_.getMaxPermutation(sampleDefaultSetting)).thenCallRealMethod();
         setSaveBehavior();
         setFindUsedSettingBehavior(sampleUsedSetting);
+        
+        // record previous amount
+        long oldAmount = sampleUsedSetting.getAmount();      
 
         // start behavior
-        minterService_.mint(oldAmount, sampleDefaultSetting());
+        long max = genService_.getMaxPermutation(sampleDefaultSetting);
+        long mintAmount = max - oldAmount;
+        minterService_.mint(mintAmount, getSampleDefaultSetting());
 
         // verify that save attempts have been made
         verify(genService_, atLeast(sampleSet.size())).savePid(any(Pid.class));
@@ -155,7 +160,8 @@ public class MinterServiceTest extends AbstractTestNGSpringContextTests {
                 anyInt(),
                 anyBoolean());
         
-        Assert.assertEquals(sampleUsedSetting.getAmount(), oldAmount + sampleSet.size());
+        // the new amount should be the previous amount + the requested amount
+        Assert.assertEquals(sampleUsedSetting.getAmount(), mintAmount + oldAmount);
     }
     
     @Test(expectedExceptions = NotEnoughPermutationsException.class)
@@ -169,7 +175,7 @@ public class MinterServiceTest extends AbstractTestNGSpringContextTests {
         setFindUsedSettingBehavior(sampleUsedSetting);
         
         // try to mint an impossible amount
-        minterService_.mint(sampleSet.size(), sampleDefaultSetting());        
+        minterService_.mint(sampleSet.size(), getSampleDefaultSetting());        
     }
         
 
@@ -179,7 +185,7 @@ public class MinterServiceTest extends AbstractTestNGSpringContextTests {
      */
     @Test
     public void testInitializeStoredSetting() throws Exception {
-        DefaultSetting testSetting = sampleDefaultSetting();
+        DefaultSetting testSetting = getSampleDefaultSetting();
         when(defaultSettingRepo_.findCurrentDefaultSetting()).thenReturn(testSetting);
 
         minterService_.initializeStoredSetting();
@@ -193,7 +199,7 @@ public class MinterServiceTest extends AbstractTestNGSpringContextTests {
      */
     @Test
     public void testGetCurrentSettingWithoutExistingDefaultSetting() throws Exception {
-        DefaultSetting testSetting = sampleDefaultSetting();
+        DefaultSetting testSetting = getSampleDefaultSetting();
         when(defaultSettingRepo_.findCurrentDefaultSetting()).thenReturn(null);
         DefaultSetting actualSetting = minterService_.getStoredSetting();
 
@@ -213,7 +219,7 @@ public class MinterServiceTest extends AbstractTestNGSpringContextTests {
      */
     @Test
     public void testUpdateCurrentSetting() throws Exception {
-        DefaultSetting testSetting = sampleDefaultSetting();
+        DefaultSetting testSetting = getSampleDefaultSetting();
         when(defaultSettingRepo_.findCurrentDefaultSetting()).thenReturn(testSetting);
 
         minterService_.updateCurrentSetting(testSetting);
@@ -223,7 +229,7 @@ public class MinterServiceTest extends AbstractTestNGSpringContextTests {
     /**
      * Create a test Default Setting object
      */
-    private DefaultSetting sampleDefaultSetting() {
+    private DefaultSetting getSampleDefaultSetting() {
         return new DefaultSetting("", // prepend
                 "", // prefix
                 500, // cacheSize
