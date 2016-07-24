@@ -30,7 +30,7 @@ public class CacheTest {
        
     @Test(dependsOnMethods = {"testAdd"})
     public void testIsEmpty(){
-        Cache<Integer> c = new Cache<>(); 
+        Cache<Integer> c = new Cache<>();         
         
         Assert.assertEquals(c.isEmpty(), true);
         c.add(0);
@@ -109,5 +109,5 @@ public class CacheTest {
         c.removeAll();
         
         Assert.assertEquals(c.isEmpty(), true);
-    }
+    }        
 }

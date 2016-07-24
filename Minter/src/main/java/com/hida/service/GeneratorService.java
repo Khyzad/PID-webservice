@@ -18,6 +18,7 @@
 package com.hida.service;
 
 import com.hida.model.AutoIdGenerator;
+import com.hida.model.Cache;
 import com.hida.model.CustomIdGenerator;
 import com.hida.model.DefaultSetting;
 import com.hida.model.IdGenerator;
@@ -45,13 +46,13 @@ public class GeneratorService {
     @Autowired
     private PidRepository pidRepo_;
 
-    private Set<Pid> cache_ = new LinkedHashSet<>();
-
     private IdGenerator generator_;
 
     private DefaultSetting cacheSetting_;
 
     private long startingValue_;
+
+    private Cache<Pid> cache_;
 
     /**
      * Logger; logfile to be stored in resource folder
@@ -77,7 +78,7 @@ public class GeneratorService {
         // collect the cache when possible and ensure that the cache is still unique
         Set<Pid> set1 = new LinkedHashSet<>();
         if (setting.equals(cacheSetting_)) {
-            set1 = collectCache(setting, amount);
+            set1 = cache_.peek(amount);
             rollPidSet(set1, max);
         }
 
@@ -92,10 +93,11 @@ public class GeneratorService {
             this.combinePidSet(set1, set2, amount);
         }
 
-        if (set1.size() != amount) {            
+        if (set1.size() != amount) {
             throw new NotEnoughPermutationsException(set1.size(), amount - set1.size());
         }
         else {
+            cache_.collect(amount);
             return set1;
         }
     }
@@ -114,33 +116,35 @@ public class GeneratorService {
      */
     public void generateCache(DefaultSetting setting) {
 
-        // try to fulfill the requested cache size
+        // try to fulfill the requested cache size        
         long amount;
         long max = getMaxPermutation(setting);
 
         // regenerate the cache
         if (setting.equals(cacheSetting_)) {
             if (max > setting.getCacheSize()) {
-                amount = setting.getCacheSize() - cache_.size();
+                amount = setting.getCacheSize() - cache_.getSize();
             }
             else {
-                amount = max - cache_.size();
+                amount = max - cache_.getSize();
             }
             Set<Pid> set = createSet(setting, amount);
-            this.combinePidSet(cache_, set, max);
+            this.combinePidSet(cache_.collect(amount), set, max);
         }
         // store the setting and create a new cache
         else {
             this.cacheSetting_ = setting;
+            cache_.removeAll();
             if (max > setting.getCacheSize()) {
                 amount = setting.getCacheSize();
             }
             else {
                 amount = max;
             }
-            cache_ = createSet(setting, amount);
-            this.rollPidSet(cache_, max);
+            Set<Pid> set = createSet(setting, amount);
+            this.rollPidSet(set, max);
 
+            cache_ = new Cache(set);
             // reset startingValue_
             startingValue_ = 0;
         }
@@ -154,21 +158,18 @@ public class GeneratorService {
      * @return A set containing the requested amount of Pids
      */
     public Set<Pid> collectCache(DefaultSetting setting, long amount) {
-        Set<Pid> set1 = new LinkedHashSet<>();
+        /*
+         Set<Pid> set1 = new LinkedHashSet<>();
 
-        Iterator<Pid> iter = cache_.iterator();
-        for (long i = 0; i < amount && iter.hasNext(); i++) {
-            Pid pid = iter.next();
-            set1.add(pid);
-        }
+         Iterator<Pid> iter = cache_.iterator();
+         for (long i = 0; i < amount && iter.hasNext(); i++) {
+         Pid pid = iter.next();
+         set1.add(pid);
+         }
 
-        cache_.removeAll(set1);
-
-        return set1;
-    }
-
-    public Set<Pid> getCache() {
-        return this.cache_;
+         cache_.removeAll(set1);
+         */
+        return cache_.collect(amount);
     }
 
     public void savePid(Pid pid) {
