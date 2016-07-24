@@ -52,7 +52,7 @@ public class GeneratorService {
 
     private long startingValue_;
 
-    private Cache<Pid> cache_;
+    private Cache<Pid> cache_ = new Cache<>();
 
     /**
      * Logger; logfile to be stored in resource folder
@@ -129,7 +129,9 @@ public class GeneratorService {
                 amount = max - cache_.getSize();
             }
             Set<Pid> set = createSet(setting, amount);
-            this.combinePidSet(cache_.collect(amount), set, max);
+            Set<Pid> cachedSet = cache_.collect(amount);
+            this.combinePidSet(cachedSet, set, max);
+            cache_ = new Cache(cachedSet);
         }
         // store the setting and create a new cache
         else {
@@ -151,25 +153,28 @@ public class GeneratorService {
     }
 
     /**
+     * Retrieves the requested amount of Pids from the cache. 
+     *
+     * @param amount The amount of Pids
+     * @return A set containing the requested amount of Pids
+     */
+    public Set<Pid> peekCache(long amount) {        
+        return cache_.peek(amount);
+    }
+    
+    /**
      * Retrieves the requested amount of Pids from the cache. Also removes the
      * selected Pids from the cache.
      *
      * @param amount The amount of Pids
      * @return A set containing the requested amount of Pids
      */
-    public Set<Pid> collectCache(DefaultSetting setting, long amount) {
-        /*
-         Set<Pid> set1 = new LinkedHashSet<>();
-
-         Iterator<Pid> iter = cache_.iterator();
-         for (long i = 0; i < amount && iter.hasNext(); i++) {
-         Pid pid = iter.next();
-         set1.add(pid);
-         }
-
-         cache_.removeAll(set1);
-         */
+    public Set<Pid> collectCache(long amount) {        
         return cache_.collect(amount);
+    }
+    
+    public void clearCache(){
+        cache_.removeAll();
     }
 
     public void savePid(Pid pid) {
