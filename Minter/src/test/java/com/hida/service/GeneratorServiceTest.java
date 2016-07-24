@@ -19,6 +19,7 @@ package com.hida.service;
 
 import com.hida.configuration.RepositoryConfiguration;
 import com.hida.model.DefaultSetting;
+import com.hida.model.NotEnoughPermutationsException;
 import com.hida.model.Pid;
 import com.hida.model.PidTest;
 import com.hida.model.Token;
@@ -97,11 +98,11 @@ public class GeneratorServiceTest extends AbstractTestNGSpringContextTests {
         MockitoAnnotations.initMocks(this);
 
         // return null when any repository attempts to save
-        when(pidRepo_.save(any(Pid.class))).thenReturn(null);        
+        when(pidRepo_.save(any(Pid.class))).thenReturn(null);
     }
-    
+
     @Test
-    public void testSavePid(){
+    public void testSavePid() {
         service_.savePid(new Pid());
         verify(pidRepo_, times(1)).save(any(Pid.class));
     }
@@ -114,7 +115,7 @@ public class GeneratorServiceTest extends AbstractTestNGSpringContextTests {
         // generate the set of Pids
         int actualAmount = 5;
         Set<Pid> testSet = service_.generatePids(defaultSetting_, actualAmount);
-        
+
         // test behavior
         Assert.assertEquals(actualAmount, testSet.size());
         verify(pidRepo_, atLeast(actualAmount)).findOne(any(String.class));
@@ -129,22 +130,21 @@ public class GeneratorServiceTest extends AbstractTestNGSpringContextTests {
         int actualAmount = 5;
         service_.setStartingValue(actualAmount);
         service_.setCacheSetting(defaultSetting_);
-        
+
         // generate the set of Pids
         Set<Pid> testSet = service_.generatePids(defaultSetting_, actualAmount);
-        
 
         // test behavior
         int value = actualAmount;
         Iterator<Pid> iter = testSet.iterator();
-        while(iter.hasNext()){
+        while (iter.hasNext()) {
             Pid pid = iter.next();
             String name = pid.getName();
             boolean isRightName = Integer.parseInt(name) == value;
-            Assert.assertEquals(isRightName, true, String.format("name = %s, value = %d",name,value));
+            Assert.assertEquals(isRightName, true, String.format("name = %s, value = %d", name, value));
             value++;
         }
-        
+
         Assert.assertEquals(actualAmount, testSet.size());
         Assert.assertEquals(service_.getStartingValue(), value);
         verify(pidRepo_, atLeast(actualAmount)).findOne(any(String.class));
@@ -189,81 +189,89 @@ public class GeneratorServiceTest extends AbstractTestNGSpringContextTests {
         Assert.assertEquals(amount, testSet.size());
         verify(pidRepo_, atLeast(amount)).findOne(any(String.class));
     }
-    
+
     @Test
     public void testGenerateCacheWithinMaxPermutation() {
         DefaultSetting setting = new DefaultSetting(defaultSetting_);
         long size = 5;
         setting.setCacheSize(size);
-        
+
         service_.generateCache(setting);
         Assert.assertEquals(service_.getCacheSize(), size);
     }
-    
+
     @Test
-    public void testGenerateCacheBeyondMaxPermutation() {        
+    public void testGenerateCacheBeyondMaxPermutation() {
         service_.generateCache(defaultSetting_);
         long max = service_.getMaxPermutation(defaultSetting_);
         Assert.assertEquals(service_.getCacheSize(), max);
     }
-    
+
     @Test
     public void testGenerateCacheNonEmptyCache() {
         DefaultSetting setting = new DefaultSetting(defaultSetting_);
         long size = 5;
         setting.setCacheSize(size);
-        
+
         // generate intitial content for cache
         service_.generateCache(setting);
-        
+
         // reduce the cache
         service_.collectCache(3);
-        
+
         // regenerate cache
-        service_.generateCache(setting);        
+        service_.generateCache(setting);
         Assert.assertEquals(service_.getCacheSize(), size);
-    }    
-    
+    }
+
     @Test
-    public void testGeneratePidWithCache(){
+    public void testGeneratePidWithCache() {
         DefaultSetting setting = new DefaultSetting(defaultSetting_);
         long size = service_.getMaxPermutation(setting) / 2;
         setting.setCacheSize(size);
-        
+
         // generate intitial content for cache
         service_.generateCache(setting);
-        
+
         Set<Pid> set = service_.generatePids(setting, size * 2);
-        
+
         Assert.assertEquals(set.size(), size * 2);
     }
-    
+
     @Test
-    public void testCacheReplacement(){
+    public void testCacheReplacement() {
         DefaultSetting setting1 = new DefaultSetting(defaultSetting_);
         DefaultSetting setting2 = new DefaultSetting(defaultSetting_);
-        
+
         long amount = defaultSetting_.getCacheSize();
-        
-        setting1.setTokenType(Token.DIGIT);       
+
+        setting1.setTokenType(Token.DIGIT);
         setting2.setTokenType(Token.LOWER_ALPHABET);
-        
+
         // test the first pid in the first cache to ensure it matches Token.DIGIT
         service_.generateCache(setting1);
         Iterator<Pid> iter1 = service_.peekCache(amount).iterator();
         pidTest_.testTokenType(iter1.next().getName(), setting1);
-        
+
         // test the first pid in the second cache to ensure it matches Token.LOWER_ALPHABET
         service_.generateCache(setting2);
         Iterator<Pid> iter2 = service_.peekCache(amount).iterator();
         pidTest_.testTokenType(iter2.next().getName(), setting2);
+    }
+
+    @Test(expectedExceptions = {NotEnoughPermutationsException.class})
+    public void testNEPExceptionInGeneratePid() throws Exception {
+        when(pidRepo_.findOne(any(String.class))).thenReturn(new Pid());
+        
+        long amount = 5;
+        service_.generatePids(defaultSetting_, amount);
     }        
 
     @AfterMethod
-    private void emptyCache(){
+    private void emptyCache() {
         service_.clearCache();
     }
-    
+
     /**
      * Read a given properties file and return its values in the form of a
      * DefaultSetting object
