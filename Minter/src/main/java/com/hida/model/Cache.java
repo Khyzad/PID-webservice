@@ -31,6 +31,11 @@ public class Cache<T> {
 
     private long size_;
     private Set<T> set_ = new LinkedHashSet<>();
+    
+    public Cache(Set<T> set){
+        set_ = set;
+        size_ = set.size();
+    }
 
     public boolean add(T value) {
         if (!set_.contains(value)) {
@@ -80,5 +85,5 @@ public class Cache<T> {
         set_.clear();
         size_ = 0;
     }
-
+   
 }
