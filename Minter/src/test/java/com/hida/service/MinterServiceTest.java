@@ -236,6 +236,15 @@ public class MinterServiceTest extends AbstractTestNGSpringContextTests {
         minterService_.updateCurrentSetting(testSetting);
         verify(defaultSettingRepo_, atLeastOnce()).findCurrentDefaultSetting();
     }
+   
+    @Test
+    public void testGenerateCache() throws Exception {
+        doNothing().when(genService_).generateCache(any(DefaultSetting.class));
+        
+        minterService_.generateCache();
+        
+        verify(genService_, times(1)).generateCache(any(DefaultSetting.class));        
+    }
 
     /**
      * Create a test Default Setting object
