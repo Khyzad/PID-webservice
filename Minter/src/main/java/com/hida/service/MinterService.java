@@ -101,7 +101,7 @@ public class MinterService {
         UsedSetting entity = this.findUsedSetting(setting);
         long max = repoService_.getMaxPermutation(setting);
         if (entity != null && entity.getAmount() + amount > max) {
-            throwNotEnoughPermutationException(amount - entity.getAmount(), amount);
+            throw new NotEnoughPermutationsException(amount - entity.getAmount(), amount);
         }
 
         // generate pids 
@@ -213,15 +213,7 @@ public class MinterService {
 
     public void setDefaultSettingPath(String DefaultSettingPath) {
         this.defaultSettingPath_ = DefaultSettingPath;
-    }
-
-    private void throwNotEnoughPermutationException(long remaining, long requested)
-            throws NotEnoughPermutationsException {
-        LOGGER.error("Not enough remaining Permutations, "
-                + "Requested Amount=" + requested + " --> "
-                + "Amount Remaining=" + remaining);
-        throw new NotEnoughPermutationsException(remaining, requested);
-    }
+    }   
 
     /**
      * Attempts to record the setting that were used to create the current set
