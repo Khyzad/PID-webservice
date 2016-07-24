@@ -127,7 +127,7 @@ public class GeneratorServiceTest extends AbstractTestNGSpringContextTests {
 
         // generate the set of Pids
         int actualAmount = 4;
-        Set<Pid> testSet = service_.generatePids(defaultSetting_, actualAmount, 5);
+        Set<Pid> testSet = service_.generatePids(defaultSetting_, actualAmount);
 
         // test behavior                
         Assert.assertEquals(actualAmount, testSet.size());
@@ -174,7 +174,7 @@ public class GeneratorServiceTest extends AbstractTestNGSpringContextTests {
         when(pidRepo_.findOne(any(String.class))).thenReturn(null);
 
         // generate the set of Pids
-        Set<Pid> testSet = service_.generatePids(defaultSetting_, amount, 5);
+        Set<Pid> testSet = service_.generatePids(defaultSetting_, amount);
 
         // test behavior and ensure that the set contains the desired amonut
         Assert.assertEquals(amount, testSet.size());
@@ -188,14 +188,14 @@ public class GeneratorServiceTest extends AbstractTestNGSpringContextTests {
         setting.setCacheSize(size);
         
         service_.generateCache(setting);
-        Assert.assertEquals(service_.getCache().size(), size);
+        Assert.assertEquals(service_.getCacheSize(), size);
     }
     
     @Test
     public void testGenerateCacheBeyondMaxPermutation() {        
         service_.generateCache(defaultSetting_);
         long max = service_.getMaxPermutation(defaultSetting_);
-        Assert.assertEquals(service_.getCache().size(), max);
+        Assert.assertEquals(service_.getCacheSize(), max);
     }
     
     @Test
@@ -208,25 +208,12 @@ public class GeneratorServiceTest extends AbstractTestNGSpringContextTests {
         service_.generateCache(setting);
         
         // reduce the cache
-        service_.collectCache(setting, 3);
+        service_.collectCache(3);
         
         // regenerate cache
         service_.generateCache(setting);        
-        Assert.assertEquals(service_.getCache().size(), size);
-    }
-    
-    @Test 
-    public void testCollectCache(){
-        // fill the cache
-        service_.generateCache(defaultSetting_);
-        
-        // collect
-        long max = service_.getMaxPermutation(defaultSetting_);
-        Set<Pid> set = service_.collectCache(defaultSetting_, max);
-        
-        Assert.assertEquals(set.size(), max);
-        Assert.assertEquals(service_.getCache().size(), 0);
-    }
+        Assert.assertEquals(service_.getCacheSize(), size);
+    }    
     
     @Test
     public void testGeneratePidWithCache(){
@@ -247,23 +234,25 @@ public class GeneratorServiceTest extends AbstractTestNGSpringContextTests {
         DefaultSetting setting1 = new DefaultSetting(defaultSetting_);
         DefaultSetting setting2 = new DefaultSetting(defaultSetting_);
         
+        long amount = defaultSetting_.getCacheSize();
+        
         setting1.setTokenType(Token.DIGIT);       
         setting2.setTokenType(Token.LOWER_ALPHABET);
         
         // test the first pid in the first cache to ensure it matches Token.DIGIT
         service_.generateCache(setting1);
-        Iterator<Pid> iter1 = service_.getCache().iterator();
+        Iterator<Pid> iter1 = service_.peekCache(amount).iterator();
         pidTest_.testTokenType(iter1.next().getName(), setting1);
         
         // test the first pid in the second cache to ensure it matches Token.LOWER_ALPHABET
         service_.generateCache(setting2);
-        Iterator<Pid> iter2 = service_.getCache().iterator();
+        Iterator<Pid> iter2 = service_.peekCache(amount).iterator();
         pidTest_.testTokenType(iter2.next().getName(), setting2);
     }    
 
     @AfterMethod
     private void emptyCache(){
-        service_.getCache().clear();
+        service_.clearCache();
     }
     
     /**
