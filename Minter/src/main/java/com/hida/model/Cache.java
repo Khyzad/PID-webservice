@@ -30,7 +30,12 @@ import java.util.Set;
 public class Cache<T> {
 
     private long size_;
-    private Set<T> set_ = new LinkedHashSet<>();
+    private Set<T> set_;
+    
+    public Cache() {
+        set_ = new LinkedHashSet<>();
+        size_ = 0;
+    }
     
     public Cache(Set<T> set){
         set_ = set;
