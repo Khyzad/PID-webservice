@@ -114,7 +114,7 @@ public class GeneratorServiceTest extends AbstractTestNGSpringContextTests {
         // generate the set of Pids
         int actualAmount = 5;
         Set<Pid> testSet = service_.generatePids(defaultSetting_, actualAmount);
-
+        
         // test behavior
         Assert.assertEquals(actualAmount, testSet.size());
         verify(pidRepo_, atLeast(actualAmount)).findOne(any(String.class));
@@ -125,20 +125,29 @@ public class GeneratorServiceTest extends AbstractTestNGSpringContextTests {
         // pretend that no newly generated Pids were persisted
         when(pidRepo_.findOne(any(String.class))).thenReturn(null);
 
+        // set the starting value
+        int actualAmount = 5;
+        service_.setStartingValue(actualAmount);
+        service_.setCacheSetting(defaultSetting_);
+        
         // generate the set of Pids
-        int actualAmount = 4;
         Set<Pid> testSet = service_.generatePids(defaultSetting_, actualAmount);
+        
 
-        // test behavior                
-        Assert.assertEquals(actualAmount, testSet.size());
-        verify(pidRepo_, atLeast(actualAmount)).findOne(any(String.class));
-
+        // test behavior
+        int value = actualAmount;
         Iterator<Pid> iter = testSet.iterator();
-        while (iter.hasNext()) {
-            Pid pid1 = iter.next();
-            Pid pid2 = iter.next();
-            pidTest_.testOrder(pid1, pid2);
+        while(iter.hasNext()){
+            Pid pid = iter.next();
+            String name = pid.getName();
+            boolean isRightName = Integer.parseInt(name) == value;
+            Assert.assertEquals(isRightName, true, String.format("name = %s, value = %d",name,value));
+            value++;
         }
+        
+        Assert.assertEquals(actualAmount, testSet.size());
+        Assert.assertEquals(service_.getStartingValue(), value);
+        verify(pidRepo_, atLeast(actualAmount)).findOne(any(String.class));
     }
 
     @Test
@@ -248,7 +257,7 @@ public class GeneratorServiceTest extends AbstractTestNGSpringContextTests {
         service_.generateCache(setting2);
         Iterator<Pid> iter2 = service_.peekCache(amount).iterator();
         pidTest_.testTokenType(iter2.next().getName(), setting2);
-    }    
+    }        
 
     @AfterMethod
     private void emptyCache(){

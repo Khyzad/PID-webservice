@@ -188,6 +188,10 @@ public class GeneratorService {
     public void setStartingValue(long startingValue) {
         this.startingValue_ = startingValue;
     }
+    
+    public void setCacheSetting(DefaultSetting setting){
+        this.cacheSetting_ = setting;
+    }
 
     /**
      * Creates a set of Pids based on desired values.
