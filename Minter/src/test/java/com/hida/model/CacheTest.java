@@ -78,7 +78,22 @@ public class CacheTest {
     
     @Test(dependsOnMethods = {"testAdd"})
     public void testCollect(){
-        Assert.fail("unimplemented");
+        Cache<Integer> c = new Cache<>();
+        int size = 10;
+        int limit = 5;
+        
+        // populate the cahe
+        for (int i = 0; i < size; i++) {
+            c.add(i);
+        }
+        
+        // check the value of the cache
+        Set<Integer> set = c.peek(limit);
+        Iterator<Integer> iter1 = set.iterator();                
+        for (int i = 0; i < limit; i++) {
+            Assert.assertEquals(iter1.next().intValue(), i);
+        }
+        Assert.assertEquals(c.getSize(), size - limit);
     }
     
     @Test(dependsOnMethods = {"testAdd"})
