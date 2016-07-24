@@ -99,6 +99,7 @@ public class MinterServiceTest extends AbstractTestNGSpringContextTests {
     @BeforeMethod
     public void setUpMethod(){
         MockitoAnnotations.initMocks(this);
+        when(genService_.getMaxPermutation(getSampleDefaultSetting())).thenCallRealMethod();
     }   
 
     /**
@@ -140,7 +141,6 @@ public class MinterServiceTest extends AbstractTestNGSpringContextTests {
         
         // set up behavior
         when(genService_.generatePids(any(DefaultSetting.class), anyLong())).thenReturn(sampleSet);
-        when(genService_.getMaxPermutation(sampleDefaultSetting)).thenCallRealMethod();
         setSaveBehavior();
         setFindUsedSettingBehavior(sampleUsedSetting);
         
@@ -165,7 +165,7 @@ public class MinterServiceTest extends AbstractTestNGSpringContextTests {
     }
     
     @Test(expectedExceptions = NotEnoughPermutationsException.class)
-    public void testExceptionBeforeGeneration() throws Exception {
+    public void testExceptionThroughUsedSetting() throws Exception {
         UsedSetting sampleUsedSetting = getSampleUsedSetting();
         Set<Pid> sampleSet = getSampleSet();
         when(genService_.generatePids(any(DefaultSetting.class), anyLong()))
@@ -176,6 +176,17 @@ public class MinterServiceTest extends AbstractTestNGSpringContextTests {
         
         // try to mint an impossible amount
         minterService_.mint(sampleSet.size(), getSampleDefaultSetting());        
+    }
+    
+    @Test(expectedExceptions = NotEnoughPermutationsException.class)
+    public void testExceptionForImpossibleRequest() throws Exception {
+        Set<Pid> sampleSet = getSampleSet();
+        when(genService_.generatePids(any(DefaultSetting.class), anyLong()))
+                .thenReturn(sampleSet);
+        long max = genService_.getMaxPermutation(getSampleDefaultSetting());
+        
+        // try to mint an impossible amount
+        minterService_.mint(max + 1, getSampleDefaultSetting());        
     }
         
 

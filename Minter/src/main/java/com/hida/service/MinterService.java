@@ -100,9 +100,16 @@ public class MinterService {
         // try to find a setting that matches and throw an exception if impossible
         UsedSetting entity = this.findUsedSetting(setting);
         long max = repoService_.getMaxPermutation(setting);
-        if (entity != null && entity.getAmount() + amount > max) {
-            throw new NotEnoughPermutationsException(amount - entity.getAmount(), amount);
+        
+        // throw if amount exceeds the max
+        if(amount > max){
+            throw new NotEnoughPermutationsException(max, amount);
         }
+        // throw if the retrieved entity's amount + the requsted amount is greater than max
+        if (entity != null && entity.getAmount() + amount > max) {
+            throw new NotEnoughPermutationsException(max - entity.getAmount(), amount);
+        }
+        
 
         // generate pids 
         Set<Pid> set = repoService_.generatePids(setting, amount);        
