@@ -63,7 +63,17 @@ public class Cache<T> {
     }
 
     public Set<T> collect(long amount) {
-        return null;
+        Set<T> set = new LinkedHashSet<>();
+
+        int i = 0;
+        Iterator<T> iter = set_.iterator();
+        while (iter.hasNext() && i < amount) {
+            set.add(iter.next());
+        }
+
+        set_.removeAll(set);
+        size_ -= amount;
+        return set;
     }
 
     public void removeAll() {
