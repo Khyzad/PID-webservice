@@ -311,4 +311,9 @@ public class GeneratorService {
                     setting.getCharMap());
         }
     }
+    
+    public long getCacheSize(){
+        return cache_.getSize();
+    }
+    
 }
