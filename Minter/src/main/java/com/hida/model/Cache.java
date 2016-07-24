@@ -17,6 +17,7 @@
  */
 package com.hida.model;
 
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -30,35 +31,43 @@ public class Cache<T> {
 
     private long size_;
     private Set<T> set_ = new LinkedHashSet<>();
-    
-    public boolean add(T value){
-        if(!set_.contains(value)){
+
+    public boolean add(T value) {
+        if (!set_.contains(value)) {
             size_++;
             return set_.add(value);
-        }else{
+        }
+        else {
             return false;
-        }        
+        }
     }
-    
-    public long getSize(){
+
+    public long getSize() {
         return this.size_;
     }
-    
-    public boolean isEmpty(){
+
+    public boolean isEmpty() {
         return size_ == 0;
     }
-    
-    public Set<T> peek(long amount){
+
+    public Set<T> peek(long amount) {
+        Set<T> set = new LinkedHashSet<>();
+
+        int i = 0;
+        Iterator<T> iter = set_.iterator();
+        while (iter.hasNext() && i < amount) {
+            set.add(iter.next());
+        }
+
+        return set;
+    }
+
+    public Set<T> collect(long amount) {
         return null;
     }
-    
-    public Set<T> collect(long amount){
-        return null;
+
+    public void removeAll() {
+
     }
-    
-    public void removeAll(){
-        
-    }
-    
-    
+
 }
