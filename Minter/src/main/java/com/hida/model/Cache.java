@@ -82,7 +82,7 @@ public class Cache<T> {
         }
 
         set_.removeAll(set);
-        size_ -= amount;
+        size_ = (amount > size_)? 0 : size_ - amount;
         return set;
     }
 
