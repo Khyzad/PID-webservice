@@ -65,9 +65,7 @@ public class MinterService {
     private DefaultSettingRepository defaultSettingRepo_;
 
     @Autowired
-    private GeneratorService repoService_;
-
-    private long lastSequentialAmount_;
+    private GeneratorService repoService_;   
 
     /**
      * The setting used to store the values of the current request
@@ -171,10 +169,6 @@ public class MinterService {
     public DefaultSetting getStoredSetting() {
         return storedSetting_;
     }   
-
-    public long getLastSequentialAmount() {
-        return lastSequentialAmount_;
-    }
 
     public String getDefaultSettingPath() {
         return defaultSettingPath_;
