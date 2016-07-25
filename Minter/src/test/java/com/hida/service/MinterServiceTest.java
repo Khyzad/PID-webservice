@@ -19,7 +19,6 @@ package com.hida.service;
 
 import com.hida.configuration.RepositoryConfiguration;
 import com.hida.repositories.DefaultSettingRepository;
-import com.hida.repositories.PidRepository;
 import com.hida.repositories.UsedSettingRepository;
 import com.hida.model.DefaultSetting;
 import com.hida.model.NotEnoughPermutationsException;
@@ -44,12 +43,10 @@ import static org.mockito.Matchers.anyLong;
 import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.mockito.MockitoAnnotations;
-import org.mockito.Spy;
 import org.springframework.boot.test.IntegrationTest;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.TestExecutionListeners;
@@ -60,9 +57,7 @@ import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.testng.Assert;
 import org.testng.annotations.AfterTest;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 /**
