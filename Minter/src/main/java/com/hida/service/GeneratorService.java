@@ -35,7 +35,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * A service that directly creates transactions with Hibernate
+ * A service that handles the generation and persistence of Pids. All generated
+ * sets of Pids that are guaranteed to be disjoint from the database.
  *
  * @author lruffin
  */
@@ -102,6 +103,13 @@ public class GeneratorService {
         }
     }
 
+    /**
+     * Retrieves the maximum number of possible permutation based on the passed
+     * setting.
+     *
+     * @param setting The setting values to base the Pids off of
+     * @return The maximum number of permutations
+     */
     public long getMaxPermutation(DefaultSetting setting) {
         generator_ = this.getGenerator(setting);
         return generator_.getMaxPermutation();
@@ -153,15 +161,15 @@ public class GeneratorService {
     }
 
     /**
-     * Retrieves the requested amount of Pids from the cache. 
+     * Retrieves the requested amount of Pids from the cache.
      *
      * @param amount The amount of Pids
      * @return A set containing the requested amount of Pids
      */
-    public Set<Pid> peekCache(long amount) {        
+    public Set<Pid> peekCache(long amount) {
         return cache_.peek(amount);
     }
-    
+
     /**
      * Retrieves the requested amount of Pids from the cache. Also removes the
      * selected Pids from the cache.
@@ -169,27 +177,59 @@ public class GeneratorService {
      * @param amount The amount of Pids
      * @return A set containing the requested amount of Pids
      */
-    public Set<Pid> collectCache(long amount) {        
+    public Set<Pid> collectCache(long amount) {
         return cache_.collect(amount);
     }
-    
-    public void clearCache(){
+
+    /**
+     * Removes all elements in the cache
+     */
+    public void clearCache() {
         cache_.removeAll();
     }
 
+    /**
+     * Saves a Pid to the database
+     *
+     * @param pid Pid to be saved
+     */
     public void savePid(Pid pid) {
         pidRepo_.save(pid);
     }
 
+    /**
+     * Gets the starting value of the generator
+     *
+     * @return starting value
+     */
     public long getStartingValue() {
         return startingValue_;
     }
 
+    /**
+     * Gets the size of the cache
+     *
+     * @return size of the cache
+     */
+    public long getCacheSize() {
+        return cache_.getSize();
+    }
+
+    /**
+     * Sets the starting value of the generator
+     *
+     * @param startingValue Starting value of the generator
+     */
     public void setStartingValue(long startingValue) {
         this.startingValue_ = startingValue;
     }
-    
-    public void setCacheSetting(DefaultSetting setting){
+
+    /**
+     * Stores the setting fo the cache
+     *
+     * @param setting
+     */
+    public void setCacheSetting(DefaultSetting setting) {
         this.cacheSetting_ = setting;
     }
 
@@ -198,7 +238,7 @@ public class GeneratorService {
      *
      * @param setting The settings the Pids are based off of
      * @param amount The amount of Pids to create
-     * @return
+     * @return The set of Pids created based on the passed parameters
      */
     private Set<Pid> createSet(DefaultSetting setting, long amount) {
         Set<Pid> set2;
@@ -303,6 +343,12 @@ public class GeneratorService {
         }
     }
 
+    /**
+     * Creates and returns a generator based on the settings passed to it.
+     *
+     * @param setting The settings the Pids are based off of
+     * @return The appropriate generator type based on the settings
+     */
     private IdGenerator getGenerator(DefaultSetting setting) {
         LOGGER.info("in createGenerator");
         if (setting.isAuto()) {
@@ -320,9 +366,4 @@ public class GeneratorService {
                     setting.getCharMap());
         }
     }
-    
-    public long getCacheSize(){
-        return cache_.getSize();
-    }
-    
 }
