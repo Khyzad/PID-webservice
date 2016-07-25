@@ -27,7 +27,10 @@ import org.testng.annotations.Test;
  * @author lruffin
  */
 public class CacheTest {
-       
+    
+    /**
+     * Tests the functionality of isEmpty
+     */
     @Test(dependsOnMethods = {"testAdd"})
     public void testIsEmpty(){
         Cache<Integer> c = new Cache<>();         
@@ -37,6 +40,9 @@ public class CacheTest {
         Assert.assertEquals(c.isEmpty(), false);        
     }
     
+    /**
+     * Tests the functionality of getSize
+     */
     @Test(dependsOnMethods = {"testAdd"})
     public void testGetSize(){
         Cache<Integer> c = new Cache<>();
@@ -48,6 +54,9 @@ public class CacheTest {
         Assert.assertEquals(c.getSize(), size);
     }
     
+    /**
+     * Tests the functionality of add
+     */
     @Test
     public void testAdd(){
         Cache<Integer> c = new Cache<>(); 
@@ -56,6 +65,9 @@ public class CacheTest {
         Assert.assertEquals(c.add(0), false);
     }
     
+    /**
+     * Tests the functionality of peek
+     */
     @Test(dependsOnMethods = {"testAdd"})
     public void testPeek(){
         Cache<Integer> c = new Cache<>();
@@ -76,6 +88,9 @@ public class CacheTest {
         Assert.assertEquals(c.getSize(), size);            
     }
     
+    /**
+     * Tests the functionality of collect
+     */
     @Test(dependsOnMethods = {"testAdd"})
     public void testCollect(){
         Cache<Integer> c = new Cache<>();
@@ -96,6 +111,9 @@ public class CacheTest {
         Assert.assertEquals(c.getSize(), size - limit);
     }
     
+    /**
+     * Tests the functionality of removeAll
+     */
     @Test(dependsOnMethods = {"testAdd", "testIsEmpty"})
     public void testRemoveAll(){
         Cache<Integer> c = new Cache<>();
