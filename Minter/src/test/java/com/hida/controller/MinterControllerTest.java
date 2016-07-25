@@ -32,17 +32,16 @@ import junit.framework.Assert;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyLong;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 
 /**
@@ -61,7 +60,7 @@ public class MinterControllerTest {
     private final String PREPEND = "http://digitalarchives.hawaii.gov/70111/";
     private final int AMOUNT = 5;
 
-    @BeforeClass
+    @BeforeMethod
     public void setUpClass() throws Exception {
         MockitoAnnotations.initMocks(this);
     }
