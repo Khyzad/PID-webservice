@@ -97,24 +97,20 @@ public class MinterService {
      */
     public Set<Pid> mint(long amount, DefaultSetting setting) throws IOException {
         LOGGER.info("in mint");
-        // try to find a setting that matches and throw an exception if impossible
+        // try to find a setting that matches and throw an exception if impossible        
         UsedSetting entity = this.findUsedSetting(setting);
+        long currentAmount = (entity == null)? 0 : entity.getAmount();
         long max = repoService_.getMaxPermutation(setting);
-        
-        // throw if amount exceeds the max
-        if(amount > max){
-            throw new NotEnoughPermutationsException(max, amount);
-        }
-        // throw if the retrieved entity's amount + the requsted amount is greater than max
-        if (entity != null && entity.getAmount() + amount > max) {
-            throw new NotEnoughPermutationsException(max - entity.getAmount(), amount);
+                
+        // throw if requesting an impossible amount
+        if (amount + currentAmount > max) {
+            throw new NotEnoughPermutationsException(max - currentAmount, amount);
         }
         
-
         // generate pids 
         Set<Pid> set = repoService_.generatePids(setting, amount);        
 
-        // add the pids
+        // add the pids        
         persistPids(setting, entity, set, amount);        
         
         // return the set of ids
@@ -170,8 +166,24 @@ public class MinterService {
             storedSetting_ = readPropertiesFile(defaultSettingPath_);
             defaultSettingRepo_.save(storedSetting_);
         }
+    }   
+
+    public DefaultSetting getStoredSetting() {
+        return storedSetting_;
+    }   
+
+    public long getLastSequentialAmount() {
+        return lastSequentialAmount_;
     }
 
+    public String getDefaultSettingPath() {
+        return defaultSettingPath_;
+    }
+
+    public void setDefaultSettingPath(String DefaultSettingPath) {
+        this.defaultSettingPath_ = DefaultSettingPath;
+    }         
+    
     /**
      * Persists a set of Pids in the database. Also adds the Prepend to the Pids
      *
@@ -179,7 +191,7 @@ public class MinterService {
      * @param set A set of Pids
      * @param amountCreated Amount of pids that were created
      */
-    public void persistPids(DefaultSetting setting, UsedSetting entity, Set<Pid> set,
+    private void persistPids(DefaultSetting setting, UsedSetting entity, Set<Pid> set,
             long amountCreated) {
         LOGGER.info("in persistPids");
 
@@ -193,34 +205,6 @@ public class MinterService {
         // update table format
         recordSettings(setting, entity, amountCreated);
     }
-
-    public DefaultSetting getStoredSetting() {
-        return storedSetting_;
-    }
-
-    /**
-     * Returns the amount of Pids that were created using the settings
-     *
-     * @param setting The settings the Pids are based off of
-     * @return The amount of permutations remaining
-     */
-    public long getCurrentAmount(DefaultSetting setting) {
-        UsedSetting entity = this.findUsedSetting(setting);
-
-        return entity.getAmount();
-    }
-
-    public long getLastSequentialAmount() {
-        return lastSequentialAmount_;
-    }
-
-    public String getDefaultSettingPath() {
-        return defaultSettingPath_;
-    }
-
-    public void setDefaultSettingPath(String DefaultSettingPath) {
-        this.defaultSettingPath_ = DefaultSettingPath;
-    }   
 
     /**
      * Attempts to record the setting that were used to create the current set
