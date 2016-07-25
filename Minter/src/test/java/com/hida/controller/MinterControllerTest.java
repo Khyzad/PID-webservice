@@ -172,8 +172,7 @@ public class MinterControllerTest {
 
         // return originalSetting whenever CurrentSetting is called
         when(minterServiceDao_.getStoredSetting()).thenReturn(originalSetting);
-        doNothing().when(minterServiceDao_).
-                updateCurrentSetting(any(DefaultSetting.class));
+        doNothing().when(minterServiceDao_).updateStoredSetting(any(DefaultSetting.class));
 
         // call the method to test
         controller_.handleForm("prepend",

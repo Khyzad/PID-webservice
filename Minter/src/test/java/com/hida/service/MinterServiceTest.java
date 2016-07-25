@@ -96,6 +96,8 @@ public class MinterServiceTest extends AbstractTestNGSpringContextTests {
     @InjectMocks
     private MinterService minterService_;   
     
+    
+    
     @BeforeMethod
     public void setUpMethod(){
         MockitoAnnotations.initMocks(this);
@@ -211,9 +213,11 @@ public class MinterServiceTest extends AbstractTestNGSpringContextTests {
     @Test
     public void testGetCurrentSettingWithoutExistingDefaultSetting() throws Exception {
         DefaultSetting testSetting = getSampleDefaultSetting();
-        when(defaultSettingRepo_.findCurrentDefaultSetting()).thenReturn(null);
+        when(defaultSettingRepo_.findCurrentDefaultSetting()).thenReturn(null);  
+        
+        minterService_.initializeStoredSetting();
         DefaultSetting actualSetting = minterService_.getStoredSetting();
-
+                
         Assert.assertEquals(actualSetting.getCharMap(), testSetting.getCharMap());
         Assert.assertEquals(actualSetting.getPrefix(), testSetting.getPrefix());
         Assert.assertEquals(actualSetting.getPrepend(), testSetting.getPrepend());
@@ -233,7 +237,7 @@ public class MinterServiceTest extends AbstractTestNGSpringContextTests {
         DefaultSetting testSetting = getSampleDefaultSetting();
         when(defaultSettingRepo_.findCurrentDefaultSetting()).thenReturn(testSetting);
 
-        minterService_.updateCurrentSetting(testSetting);
+        minterService_.updateStoredSetting(testSetting);
         verify(defaultSettingRepo_, atLeastOnce()).findCurrentDefaultSetting();
     }
    

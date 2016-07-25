@@ -190,7 +190,7 @@ public class MinterController {
                         random);
             }
 
-            minterService_.updateCurrentSetting(newSetting);
+            minterService_.updateStoredSetting(newSetting);
         }
         finally {
             // unlocks RequestLock and gives access to longest waiting thread            

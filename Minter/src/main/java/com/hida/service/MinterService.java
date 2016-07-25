@@ -72,7 +72,7 @@ public class MinterService {
     /**
      * The setting used to store the values of the current request
      */
-    private DefaultSetting currentSetting_;
+    //private DefaultSetting currentSetting_;
 
     /**
      * The default values that are currently stored in the properties file and
@@ -136,18 +136,18 @@ public class MinterService {
      * values
      * @throws IOException
      */
-    public void updateCurrentSetting(DefaultSetting newSetting) throws Exception {
+    public void updateStoredSetting(DefaultSetting newSetting) throws Exception {
         LOGGER.info("in updateCurrentSetting");
 
-        currentSetting_ = defaultSettingRepo_.findCurrentDefaultSetting();
-        currentSetting_.setPrepend(newSetting.getPrepend());
-        currentSetting_.setPrefix(newSetting.getPrefix());
-        currentSetting_.setCharMap(newSetting.getCharMap());
-        currentSetting_.setRootLength(newSetting.getRootLength());
-        currentSetting_.setTokenType(newSetting.getTokenType());
-        currentSetting_.setAuto(newSetting.isAuto());
-        currentSetting_.setRandom(newSetting.isRandom());
-        currentSetting_.setSansVowels(newSetting.isSansVowels());
+        storedSetting_ = defaultSettingRepo_.findCurrentDefaultSetting();
+        storedSetting_.setPrepend(newSetting.getPrepend());
+        storedSetting_.setPrefix(newSetting.getPrefix());
+        storedSetting_.setCharMap(newSetting.getCharMap());
+        storedSetting_.setRootLength(newSetting.getRootLength());
+        storedSetting_.setTokenType(newSetting.getTokenType());
+        storedSetting_.setAuto(newSetting.isAuto());
+        storedSetting_.setRandom(newSetting.isRandom());
+        storedSetting_.setSansVowels(newSetting.isSansVowels());
 
         // record Default Setting values into properties file
         writeToPropertiesFile(defaultSettingPath_, newSetting);
