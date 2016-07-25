@@ -23,6 +23,7 @@ import com.hida.model.IdGenerator;
 import com.hida.model.Pid;
 import com.hida.model.Token;
 import com.hida.service.MinterService;
+import java.io.IOException;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -200,6 +201,8 @@ public class MinterController {
 
         // redirect to the administration panel      
         response.sendRedirect("administration");
+        
+        generateCache();
     }
 
     /**
@@ -240,6 +243,8 @@ public class MinterController {
             // unlocks RequestLock and gives access to longest waiting thread            
             requestLock_.unlock();
             LOGGER.info("Request to Minter Finished, UNLOCKING MINTER");
+            
+            generateCache();
         }
 
         // return the generated set of Pids  
@@ -311,6 +316,23 @@ public class MinterController {
 
         mav.setViewName("error");
         return mav;
+    }
+
+    /**
+     * Generates the cache
+     */
+    private void generateCache() throws IOException {
+        if (!requestLock_.hasQueuedThreads()) {
+            requestLock_.lock();
+            try {
+                minterService_.generateCache();
+            }
+            finally {
+                requestLock_.unlock();
+                LOGGER.info("cache generated");
+            }
+        }
+
     }
 
     /**
