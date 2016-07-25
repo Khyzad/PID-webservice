@@ -101,12 +101,18 @@ public class GeneratorServiceTest extends AbstractTestNGSpringContextTests {
         when(pidRepo_.save(any(Pid.class))).thenReturn(null);
     }
 
+    /**
+     * Test to ensure that pids can be saved
+     */
     @Test
     public void testSavePid() {
         service_.savePid(new Pid());
         verify(pidRepo_, times(1)).save(any(Pid.class));
     }
 
+    /**
+     * Test to ensure that generatePid works
+     */
     @Test
     public void testGeneratePids() {
         // pretend that no newly generated Pids were persisted
@@ -121,6 +127,10 @@ public class GeneratorServiceTest extends AbstractTestNGSpringContextTests {
         verify(pidRepo_, atLeast(actualAmount)).findOne(any(String.class));
     }
 
+    /**
+     * Test to ensure that the starting value is saved and is used in Pid
+     * generation when appropriate.
+     */
     @Test
     public void testGeneratePidsWithStartingValue() {
         // pretend that no newly generated Pids were persisted
@@ -150,6 +160,11 @@ public class GeneratorServiceTest extends AbstractTestNGSpringContextTests {
         verify(pidRepo_, atLeast(actualAmount)).findOne(any(String.class));
     }
 
+    /**
+     * Test to ensure that Pids are incremented when generating a set of Pids. A
+     * Pid should only be incremented when it already exists in either the
+     * database or in the set it creates.
+     */
     @Test
     public void testGeneratePidsWithRollOver() {
         // pretend to persist all odd Pids
@@ -176,6 +191,9 @@ public class GeneratorServiceTest extends AbstractTestNGSpringContextTests {
         }
     }
 
+    /**
+     * Ensures that Pids are wrapping around to the 0th name.
+     */
     @Test
     public void testGeneratePidsWithWrapAround() {
         // pretend that no newly generated Pids were persisted
@@ -190,6 +208,10 @@ public class GeneratorServiceTest extends AbstractTestNGSpringContextTests {
         verify(pidRepo_, atLeast(amount)).findOne(any(String.class));
     }
 
+    /**
+     * Test to ensure that the cache can be generated normally and will contain
+     * the desired amount when possible.
+     */
     @Test
     public void testGenerateCacheWithinMaxPermutation() {
         DefaultSetting setting = new DefaultSetting(defaultSetting_);
@@ -200,6 +222,10 @@ public class GeneratorServiceTest extends AbstractTestNGSpringContextTests {
         Assert.assertEquals(service_.getCacheSize(), size);
     }
 
+    /**
+     * Test to ensure that the cache will try to meet the desired cache size by
+     * filling the cache with all possible permutations.
+     */
     @Test
     public void testGenerateCacheBeyondMaxPermutation() {
         service_.generateCache(defaultSetting_);
@@ -207,6 +233,9 @@ public class GeneratorServiceTest extends AbstractTestNGSpringContextTests {
         Assert.assertEquals(service_.getCacheSize(), max);
     }
 
+    /**
+     * Test to ensure that the cache can be regenerated.
+     */
     @Test
     public void testGenerateCacheNonEmptyCache() {
         DefaultSetting setting = new DefaultSetting(defaultSetting_);
@@ -224,6 +253,9 @@ public class GeneratorServiceTest extends AbstractTestNGSpringContextTests {
         Assert.assertEquals(service_.getCacheSize(), size);
     }
 
+    /**
+     * Test to ensure that the generatePid method uses the cache.
+     */
     @Test
     public void testGeneratePidWithCache() {
         DefaultSetting setting = new DefaultSetting(defaultSetting_);
@@ -238,6 +270,9 @@ public class GeneratorServiceTest extends AbstractTestNGSpringContextTests {
         Assert.assertEquals(set.size(), size * 2);
     }
 
+    /**
+     * Test to ensure that the cache is replaced when the cache setting changes
+     */
     @Test
     public void testCacheReplacement() {
         DefaultSetting setting1 = new DefaultSetting(defaultSetting_);
@@ -262,11 +297,14 @@ public class GeneratorServiceTest extends AbstractTestNGSpringContextTests {
     @Test(expectedExceptions = {NotEnoughPermutationsException.class})
     public void testNEPExceptionInGeneratePid() throws Exception {
         when(pidRepo_.findOne(any(String.class))).thenReturn(new Pid());
-        
+
         long amount = 5;
         service_.generatePids(defaultSetting_, amount);
-    }        
+    }
 
+    /**
+     * Empties the cache after each test case.
+     */
     @AfterMethod
     private void emptyCache() {
         service_.clearCache();
