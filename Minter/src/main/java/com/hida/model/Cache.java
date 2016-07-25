@@ -31,17 +31,23 @@ public class Cache<T> {
 
     private long size_;
     private Set<T> set_;
-    
+
     public Cache() {
         set_ = new LinkedHashSet<>();
         size_ = 0;
     }
-    
-    public Cache(Set<T> set){
+
+    public Cache(Set<T> set) {
         set_ = set;
         size_ = set.size();
     }
 
+    /**
+     * Adds an element to the cache.
+     *
+     * @param value Element to be added
+     * @return True if the element was successfully added, false otherwise
+     */
     public boolean add(T value) {
         if (!set_.contains(value)) {
             size_++;
@@ -52,14 +58,33 @@ public class Cache<T> {
         }
     }
 
+    /**
+     * Gets the size of the cache.
+     *
+     * @return Size of the cache
+     */
     public long getSize() {
         return this.size_;
     }
 
+    /**
+     * True if the cache is empty, false otherwise
+     *
+     * @return True if the cache empty, false otherwise
+     */
     public boolean isEmpty() {
         return size_ == 0;
     }
 
+    /**
+     * Returns a set of elements contained within the cache. If the requested
+     * amount exceeds the size of the cache, the entire cache is retrieved.
+     *
+     * Elements are retrieved on a first-in-first-out basis.
+     *
+     * @param amount The requested amount
+     * @return A set of Pids
+     */
     public Set<T> peek(long amount) {
         Set<T> set = new LinkedHashSet<>();
 
@@ -72,6 +97,16 @@ public class Cache<T> {
         return set;
     }
 
+    /**
+     * Returns a set of elements within the cache and then proceeds to remove
+     * those elements from the cache. If the requested amount exceeds the size
+     * of the cache, the entire cache is retrieved and removed from the cache.
+     *
+     * Elements are retrieved on a first-in-first-out basis.
+     *
+     * @param amount The requested amount
+     * @return A set of Pids
+     */
     public Set<T> collect(long amount) {
         Set<T> set = new LinkedHashSet<>();
 
@@ -83,13 +118,16 @@ public class Cache<T> {
         }
 
         set_.removeAll(set);
-        size_ = (amount > size_)? 0 : size_ - amount;
+        size_ = (amount > size_) ? 0 : size_ - amount;
         return set;
     }
 
+    /**
+     * Removes all elements from the cache.
+     */
     public void removeAll() {
         set_.clear();
         size_ = 0;
     }
-   
+
 }
