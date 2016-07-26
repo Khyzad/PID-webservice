@@ -82,20 +82,17 @@ public class GeneratorService {
             set1 = cache_.peek(amount);
             rollPidSet(set1, max);
         }
-
-        // create a generator and generate pids if needed
-        Set<Pid> set2;
-        generator_ = getGenerator(setting);
-        if (amount > set1.size()) {
+        
+        // if the amount from the cache isn't enough then generate Pids to meet request
+        if (amount > set1.size()) {            
             // create a second set of Pids to add to the original
-            set2 = createSet(setting, amount);
-
+            Set<Pid> set2 = createSet(setting, amount - set1.size());
             // combine the original and new set
-            this.combinePidSet(set1, set2, amount);
+            this.combinePidSet(set1, set2, max);
         }
 
         if (set1.size() != amount) {
-            throw new NotEnoughPermutationsException(set1.size(), amount - set1.size());
+            throw new NotEnoughPermutationsException(set1.size(), amount);
         }
         else {
             cache_.collect(amount);
@@ -242,6 +239,7 @@ public class GeneratorService {
      */
     private Set<Pid> createSet(DefaultSetting setting, long amount) {
         Set<Pid> set2;
+        generator_ = getGenerator(setting);
 
         if (!setting.isRandom() && setting.equals(cacheSetting_)) {
             set2 = generator_.sequentialMint(amount, startingValue_);

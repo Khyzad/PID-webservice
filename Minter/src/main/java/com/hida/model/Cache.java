@@ -92,6 +92,7 @@ public class Cache<T> {
         Iterator<T> iter = set_.iterator();
         while (iter.hasNext() && i < amount) {
             set.add(iter.next());
+            i++;
         }
 
         return set;
