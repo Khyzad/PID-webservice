@@ -165,6 +165,18 @@ public class MinterService {
             defaultSettingRepo_.save(storedSetting_);
         }
     }   
+    
+    public long getMaxPermutation(DefaultSetting setting){
+        return repoService_.getMaxPermutation(setting);
+    }
+    
+    public long getCacheSize(){
+        return repoService_.getCacheSize();
+    }
+    
+    public long getRemainingEstimate(DefaultSetting setting){
+        return getMaxPermutation(setting) - findUsedSetting(setting).getAmount();
+    }
 
     public DefaultSetting getStoredSetting() {
         return storedSetting_;

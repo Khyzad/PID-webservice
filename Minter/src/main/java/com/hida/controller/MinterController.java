@@ -263,9 +263,14 @@ public class MinterController {
 
         // retrieve default values stored in the database
         DefaultSetting defaultSetting = minterService_.getStoredSetting();
-
-        // add the values to the settings page so that they can be displayed 
+       
         LOGGER.info("index page called");
+        // add data to permutationTable
+        model.addObject("currentCacheSize", minterService_.getCacheSize());
+        model.addObject("remainingEstimate", minterService_.getRemainingEstimate(defaultSetting));
+        model.addObject("max", minterService_.getMaxPermutation(defaultSetting));
+        
+        // add data to defaultSettingTable
         model.addObject("prepend", defaultSetting.getPrepend());
         model.addObject("prefix", defaultSetting.getPrefix());
         model.addObject("cacheSize", defaultSetting.getCacheSize());
